@@ -27,10 +27,11 @@ export function useProjects() {
       }
 
       console.log('[fetchAll] 시작');
-      const [{ data: projs, error: pErr }, { data: tasks, error: tErr }] = await Promise.all([
-        supabase.from('projects').select('*').order('created_at', { ascending: true }),
-        supabase.from('tasks').select('*').order('created_at', { ascending: true }),
-      ]);
+      const { data: projs, error: pErr } = await supabase
+        .from('projects').select('*').order('created_at', { ascending: true });
+      const { data: tasks, error: tErr } = await supabase
+        .from('tasks')
+        .select('*');
 
       if (pErr) {
         console.error('[fetchAll] projects 에러:', pErr);
