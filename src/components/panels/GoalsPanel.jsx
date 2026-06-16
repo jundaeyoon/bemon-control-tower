@@ -2,7 +2,7 @@ import { goals } from '../../data/mockData';
 import styles from './GoalsPanel.module.css';
 
 const MEMBER_COLOR = {
-  JUN: '#6B7C5C', SURI: '#C06850', 'SUNNY!': '#D4A843', JIN: '#6B7C5C',
+  JUN: '#6B7C5C', SURI: '#C06850', 'SUNNY!': '#D4A843', ZIN: '#6B7C5C',
 };
 
 function getProgressColor(pct) {

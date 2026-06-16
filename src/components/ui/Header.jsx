@@ -5,7 +5,7 @@ const TEAM = [
   { name: 'JUN',    role: '대표' },
   { name: 'SURI',   role: null   },
   { name: 'SUNNY!', role: null   },
-  { name: 'JIN',    role: null   },
+  { name: 'ZIN',    role: null   },
   { name: 'LENA',   role: null   },
 ];
 

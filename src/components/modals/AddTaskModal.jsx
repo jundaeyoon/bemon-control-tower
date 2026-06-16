@@ -4,7 +4,7 @@ import RoughButton from '../rough/RoughButton';
 import { getMemberColor } from '../../constants/memberColors';
 import styles from './AddTaskModal.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'JIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
 export default function AddTaskModal({ projectName, onAdd, onClose }) {
   const [name,     setName]     = useState('');

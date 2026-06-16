@@ -5,7 +5,7 @@ const MEMBER_COLOR = {
   JUN:    '#6B7C5C',
   SURI:   '#C06850',
   'SUNNY!': '#D4A843',
-  JIN:    '#6B7C5C',
+  ZIN:    '#6B7C5C',
 };
 
 export default function SchedulePanel() {

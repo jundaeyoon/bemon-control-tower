@@ -4,7 +4,7 @@ const TEAM = [
   { name: 'JUN', role: '대표', color: '#6B7C45' },
   { name: 'SURI', role: '', color: '#E8896A' },
   { name: 'SUNNY!', role: '', color: '#4A3728' },
-  { name: 'JIN', role: '', color: '#6B7C45' },
+  { name: 'ZIN', role: '', color: '#6B7C45' },
 ];
 
 export default function Header() {

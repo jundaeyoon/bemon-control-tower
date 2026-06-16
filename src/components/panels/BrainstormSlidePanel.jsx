@@ -7,7 +7,7 @@ import TodoDetailModal from './TodoDetailModal';
 import { getMemberColor } from '../../constants/memberColors';
 import styles from './BrainstormSlidePanel.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'JIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
 const TABS = [
   { id: 'todos',     label: '할일',         emoji: '📋' },
