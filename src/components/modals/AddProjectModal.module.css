@@ -75,3 +75,17 @@
 .memberActive {
   font-weight: 700;
 }
+
+.descTextarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid rgba(26,26,26,0.2);
+  background: #FAFAF8;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: var(--font-family);
+  color: var(--color-text-main);
+  resize: vertical;
+  box-sizing: border-box;
+}

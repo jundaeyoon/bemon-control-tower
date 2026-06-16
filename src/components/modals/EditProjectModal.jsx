@@ -6,9 +6,10 @@ import styles from './AddProjectModal.module.css';
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
-export default function EditProjectModal({ initialName, initialPm, onSave, onClose }) {
-  const [name, setName] = useState(initialName ?? '');
-  const [pm,   setPm]   = useState(initialPm   ?? null);
+export default function EditProjectModal({ initialName, initialPm, initialDescription, onSave, onClose }) {
+  const [name,        setName]        = useState(initialName ?? '');
+  const [pm,          setPm]          = useState(initialPm   ?? null);
+  const [description, setDescription] = useState(initialDescription ?? '');
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -20,12 +21,12 @@ export default function EditProjectModal({ initialName, initialPm, onSave, onClo
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onSave({ name: trimmed, pm });
+    onSave({ name: trimmed, pm, description: description.trim() });
     onClose();
   };
 
   const handleKey = (e) => {
-    if (e.key === 'Enter') handleSubmit();
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') handleSubmit();
     if (e.key === 'Escape') onClose();
   };
 
@@ -64,6 +65,16 @@ export default function EditProjectModal({ initialName, initialPm, onSave, onClo
               );
             })}
           </div>
+        </div>
+
+        <div className={styles.field}>
+          <span className={styles.label}>프로젝트 내용</span>
+          <textarea
+            className={styles.descTextarea}
+            value={description}
+            placeholder="프로젝트에 대한 설명을 입력하세요..."
+            onChange={e => setDescription(e.target.value)}
+          />
         </div>
 
         <div className={styles.actions}>

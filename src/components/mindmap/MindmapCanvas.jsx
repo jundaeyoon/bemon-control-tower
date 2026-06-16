@@ -109,12 +109,12 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const handleEditProject = useCallback((projectId) => {
     const proj = projects.find(p => p.id === projectId);
     if (!proj) return;
-    setShowEditProj({ projectId, name: proj.name, pm: proj.pm ?? null });
+    setShowEditProj({ projectId, name: proj.name, pm: proj.pm ?? null, description: proj.description ?? '' });
   }, [projects]);
 
-  const handleSaveEditProject = useCallback(({ name, pm }) => {
+  const handleSaveEditProject = useCallback(({ name, pm, description }) => {
     if (!showEditProj) return;
-    updateProject(showEditProj.projectId, { name, pm });
+    updateProject(showEditProj.projectId, { name, pm, description });
     setShowEditProj(null);
   }, [updateProject, showEditProj]);
 
@@ -383,6 +383,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <EditProjectModal
             initialName={showEditProj.name}
             initialPm={showEditProj.pm}
+            initialDescription={showEditProj.description}
             onSave={handleSaveEditProject}
             onClose={() => setShowEditProj(null)}
           />

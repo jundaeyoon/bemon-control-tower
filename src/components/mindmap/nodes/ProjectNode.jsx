@@ -61,6 +61,7 @@ export default function ProjectNode({ data }) {
     <div
       className={`${styles.node} ${hovered ? styles.hovered : ''}`}
       style={{ width: PROJECT_W, height: PROJECT_H }}
+      title={data.description || undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -84,6 +85,9 @@ export default function ProjectNode({ data }) {
             </div>
             <span className={styles.pmName}>{data.pm}</span>
           </div>
+        )}
+        {!pmMc && data.description && (
+          <span className={styles.descPreview}>{data.description}</span>
         )}
       </div>
 
