@@ -2,7 +2,7 @@ import { Handle, Position } from '@xyflow/react';
 import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useMindmapActions } from '../../../contexts/MindmapActionsContext';
-import { getMemberColor } from '../../../constants/memberColors';
+import { getMemberColor, getMemberInitial } from '../../../constants/memberColors';
 import styles from './ProjectNode.module.css';
 
 export const PROJECT_W = 170;
@@ -80,7 +80,7 @@ export default function ProjectNode({ data }) {
               className={styles.pmAvatar}
               style={{ background: pmMc.bg, color: pmMc.text, borderColor: pmMc.border }}
             >
-              {data.pm[0]}
+              {getMemberInitial(data.pm)}
             </div>
             <span className={styles.pmName}>{data.pm}</span>
           </div>

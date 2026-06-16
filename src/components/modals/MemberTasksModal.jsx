@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getMemberColor } from '../../constants/memberColors';
+import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './MemberTasksModal.module.css';
 
 function getDaysLeft(deadline) {
@@ -70,7 +70,7 @@ export default function MemberTasksModal({ member, projects, onClose }) {
               className={styles.avatar}
               style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
             >
-              {member[0]}
+              {getMemberInitial(member)}
             </div>
             <div className={styles.memberText}>
               <span className={styles.memberName} style={{ color: mc.text }}>{member}</span>

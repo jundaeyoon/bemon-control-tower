@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import RoughStrikethrough from '../../rough/RoughStrikethrough';
 import { useMindmapActions } from '../../../contexts/MindmapActionsContext';
-import { getMemberColor } from '../../../constants/memberColors';
+import { getMemberColor, getMemberInitial } from '../../../constants/memberColors';
 import styles from './TaskNode.module.css';
 
 export const TASK_W = 255;
@@ -91,7 +91,7 @@ export default function TaskNode({ data }) {
         {data.assignee && (
           <div className={styles.assignee}>
             <div className={styles.avatar} style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}>
-              {data.assignee[0]}
+              {getMemberInitial(data.assignee)}
             </div>
             <span className={styles.assigneeName}>{data.assignee}</span>
           </div>

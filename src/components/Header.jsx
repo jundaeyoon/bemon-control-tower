@@ -1,3 +1,4 @@
+import { getMemberInitial } from '../constants/memberColors';
 import styles from './Header.module.css';
 
 const TEAM = [
@@ -19,7 +20,7 @@ export default function Header() {
         {TEAM.map((m) => (
           <div key={m.name} className={styles.member}>
             <div className={styles.avatar} style={{ background: m.color }}>
-              {m.name[0]}
+              {getMemberInitial(m.name)}
             </div>
             <div className={styles.memberInfo}>
               <span className={styles.memberName}>{m.name}</span>

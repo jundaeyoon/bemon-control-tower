@@ -4,7 +4,7 @@ import RoughCard    from '../rough/RoughCard';
 import RoughButton  from '../rough/RoughButton';
 import RoughInput   from '../rough/RoughInput';
 import TodoDetailModal from './TodoDetailModal';
-import { getMemberColor } from '../../constants/memberColors';
+import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './BrainstormSlidePanel.module.css';
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
@@ -373,7 +373,7 @@ function MemberAvatar({ name }) {
       style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
       title={name}
     >
-      {name[0]}
+      {getMemberInitial(name)}
     </span>
   );
 }

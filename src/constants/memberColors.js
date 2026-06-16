@@ -9,3 +9,11 @@ export const MEMBER_COLORS = {
 export function getMemberColor(name) {
   return MEMBER_COLORS[name] ?? { bg: 'rgba(180,180,180,0.12)', text: '#888', border: '#888' };
 }
+
+const MEMBER_INITIALS = {
+  'SUNNY!': 'SS',
+};
+
+export function getMemberInitial(name) {
+  return MEMBER_INITIALS[name] ?? name?.[0] ?? '';
+}

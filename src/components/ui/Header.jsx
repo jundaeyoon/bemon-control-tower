@@ -1,4 +1,4 @@
-import { getMemberColor } from '../../constants/memberColors';
+import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './Header.module.css';
 
 const TEAM = [
@@ -40,7 +40,7 @@ export default function Header({ selectedMember, onSelectMember }) {
                   transform:   isSelected ? 'scale(1.12)' : 'scale(1)',
                 }}
               >
-                {m.name[0]}
+                {getMemberInitial(m.name)}
               </div>
               <div className={styles.info}>
                 <span className={styles.name}>{m.name}</span>
