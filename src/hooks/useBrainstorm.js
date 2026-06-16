@@ -137,8 +137,8 @@ export function useBrainstorm() {
 
   // ── Ideas ─────────────────────────────────────────────────────────────────
 
-  const addIdea = useCallback(async (sessionId, content, author) => {
-    const payload = { session_id: sessionId, content, author: author || null, votes: 0, voters: [] };
+  const addIdea = useCallback(async (sessionId, title, content, author) => {
+    const payload = { session_id: sessionId, title: title || '', content, author: author || null, votes: 0, voters: [] };
     const { data, error } = await supabase.from('brainstorm_ideas').insert(payload).select().single();
     if (error) {
       console.error('[addIdea] 에러:', error);
@@ -146,6 +146,21 @@ export function useBrainstorm() {
       return;
     }
     setIdeas(prev => [...prev, data]);
+  }, []);
+
+  const updateIdea = useCallback(async (ideaId, fields) => {
+    const dbUpdates = {};
+    if ('title'   in fields) dbUpdates.title   = fields.title;
+    if ('content' in fields) dbUpdates.content = fields.content;
+    if ('author'  in fields) dbUpdates.author  = fields.author || null;
+
+    const { data, error } = await supabase.from('brainstorm_ideas').update(dbUpdates).eq('id', ideaId).select().single();
+    if (error) {
+      console.error('[updateIdea] 에러:', error);
+      alert(`❌ 아이디어 수정 실패\n코드: ${error.code}\n메시지: ${error.message}`);
+      return;
+    }
+    setIdeas(prev => prev.map(i => i.id === ideaId ? data : i));
   }, []);
 
   const toggleVoteIdea = useCallback(async (ideaId, voterName) => {
@@ -206,7 +221,7 @@ export function useBrainstorm() {
     addSession, deleteSession,
     addTodo, updateTodo, deleteTodo,
     upsertFeedbackForTodo, deleteFeedback,
-    addIdea, toggleVoteIdea, deleteIdea,
+    addIdea, updateIdea, toggleVoteIdea, deleteIdea,
     addRecording, updateRecordingSummary, uploadRecordingFile,
   };
 }

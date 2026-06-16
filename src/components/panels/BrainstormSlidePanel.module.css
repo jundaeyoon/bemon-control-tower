@@ -92,6 +92,27 @@
   word-break: break-word;
 }
 
+.itemTextCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4A3728;
+  word-break: break-word;
+}
+
+.itemContent {
+  font-size: 11px;
+  color: var(--color-text-sub);
+  word-break: break-word;
+}
+
 .itemDone {
   text-decoration: line-through;
   color: var(--color-text-sub);

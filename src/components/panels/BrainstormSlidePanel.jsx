@@ -4,6 +4,7 @@ import RoughCard    from '../rough/RoughCard';
 import RoughButton  from '../rough/RoughButton';
 import RoughInput   from '../rough/RoughInput';
 import TodoDetailModal from './TodoDetailModal';
+import IdeaDetailModal from './IdeaDetailModal';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './BrainstormSlidePanel.module.css';
 
@@ -199,13 +200,17 @@ function FeedbackCard({ sessionId, todo, feedback, brainstorm }) {
 // ── 아이디어 뱅크 ────────────────────────────────────────────────────────────
 
 function IdeasTab({ sessionId, ideas, brainstorm }) {
-  const [content, setContent] = useState('');
-  const [author,  setAuthor]  = useState(null);
+  const [title,      setTitle]      = useState('');
+  const [content,    setContent]    = useState('');
+  const [author,     setAuthor]     = useState(null);
+  const [activeIdea, setActiveIdea] = useState(null);
 
   const handleAdd = () => {
-    const trimmed = content.trim();
-    if (!trimmed) return;
-    brainstorm.addIdea(sessionId, trimmed, author);
+    const trimmedTitle = title.trim();
+    const trimmedContent = content.trim();
+    if (!trimmedTitle && !trimmedContent) return;
+    brainstorm.addIdea(sessionId, trimmedTitle, trimmedContent, author);
+    setTitle('');
     setContent('');
   };
 
@@ -215,9 +220,12 @@ function IdeasTab({ sessionId, ideas, brainstorm }) {
   return (
     <div className={styles.tabContent}>
       <div className={styles.addRow}>
-        <RoughInput placeholder="새 아이디어 입력..." value={content} onChange={e => setContent(e.target.value)} />
+        <RoughInput placeholder="아이디어 제목..." value={title} onChange={e => setTitle(e.target.value)} />
         <MemberPicker value={author} onChange={setAuthor} />
-        <RoughButton size="sm" variant="secondary" onClick={handleAdd} disabled={!content.trim()}>등록</RoughButton>
+      </div>
+      <div className={styles.addRow}>
+        <RoughInput placeholder="아이디어 내용..." value={content} onChange={e => setContent(e.target.value)} />
+        <RoughButton size="sm" variant="secondary" onClick={handleAdd} disabled={!title.trim() && !content.trim()}>등록</RoughButton>
       </div>
 
       <div className={styles.list}>
@@ -225,24 +233,47 @@ function IdeasTab({ sessionId, ideas, brainstorm }) {
         {sorted.map(idea => {
           const adopted = maxVotes > 0 && idea.votes === maxVotes;
           return (
-            <RoughCard key={idea.id} padding="10px 14px" seed={idea.id.charCodeAt(0)} {...CARD_COLORS}>
+            <RoughCard
+              key={idea.id}
+              padding="10px 14px"
+              seed={idea.id.charCodeAt(0)}
+              hoverable
+              {...CARD_COLORS}
+              {...CARD_HOVER_COLORS}
+              onClick={() => setActiveIdea(idea)}
+            >
               <div className={styles.itemRow}>
-                <span className={styles.itemText}>
-                  {adopted && <span title="채택됨">🎉 </span>}
-                  {idea.content}
+                <span className={styles.itemTextCol}>
+                  <span className={styles.itemTitle}>
+                    {adopted && <span title="채택됨">🎉 </span>}
+                    {idea.title || '(제목 없음)'}
+                  </span>
+                  {idea.content && <span className={styles.itemContent}>{idea.content}</span>}
                 </span>
                 {idea.author && <MemberAvatar name={idea.author} />}
                 <button
                   className={styles.voteBtn}
-                  onClick={() => brainstorm.toggleVoteIdea(idea.id, 'me')}
+                  onClick={e => { e.stopPropagation(); brainstorm.toggleVoteIdea(idea.id, 'me'); }}
                   title="투표"
                 >👍 {idea.votes}</button>
-                <button className={styles.deleteIcon} onClick={() => brainstorm.deleteIdea(idea.id)}>✕</button>
+                <button
+                  className={styles.deleteIcon}
+                  onClick={e => { e.stopPropagation(); brainstorm.deleteIdea(idea.id); }}
+                >✕</button>
               </div>
             </RoughCard>
           );
         })}
       </div>
+
+      {activeIdea && (
+        <IdeaDetailModal
+          idea={activeIdea}
+          onSave={brainstorm.updateIdea}
+          onDelete={brainstorm.deleteIdea}
+          onClose={() => setActiveIdea(null)}
+        />
+      )}
     </div>
   );
 }
