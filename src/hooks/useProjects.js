@@ -112,17 +112,34 @@ export function useProjects() {
     return data.id;
   }, []);
 
-  const updateTask = useCallback(async (projectId, taskId, updates) => {
+  const updateTask = useCallback(async (projectId, taskId, fields) => {
     // images는 localStorage 전용, DB 컬럼은 deadline (due_date 아님)
-    // eslint-disable-next-line no-unused-vars
-    const { images: _imgs, ...dbUpdates } = updates;
+    const dbUpdates = {};
+    if ('name'      in fields) dbUpdates.name      = fields.name;
+    if ('assignee'  in fields) dbUpdates.assignee  = fields.assignee;
+    if ('deadline'  in fields) dbUpdates.deadline  = fields.deadline || null;
+    if ('progress'  in fields) dbUpdates.progress  = fields.progress;
+    if ('completed' in fields) dbUpdates.completed = fields.completed;
+    if ('memo'      in fields) dbUpdates.memo      = fields.memo;
+
     console.log('[updateTask] 업데이트 시도 (deadline 컬럼):', dbUpdates);
-    const { error } = await supabase
-      .from('tasks').update(dbUpdates).eq('id', taskId);
-    if (error) { console.error(error); return; }
+    const { data, error } = await supabase
+      .from('tasks')
+      .update(dbUpdates)
+      .eq('id', taskId)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('[updateTask] 에러:', error);
+      alert(`❌ 작업 수정 실패\n코드: ${error.code}\n메시지: ${error.message}\n힌트: ${error.hint ?? '-'}`);
+      return;
+    }
+
+    console.log('[updateTask] 성공:', data);
     setProjects(prev => prev.map(p =>
       p.id === projectId
-        ? { ...p, tasks: p.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t) }
+        ? { ...p, tasks: p.tasks.map(t => t.id === taskId ? { ...t, ...data, images: t.images } : t) }
         : p
     ));
   }, []);
