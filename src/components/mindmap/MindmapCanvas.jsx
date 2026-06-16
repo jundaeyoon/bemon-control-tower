@@ -22,9 +22,10 @@ const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, tas
 const EDGE_TYPES = { rough: RoughEdge };
 
 // Zigzag tree layout — X positions
-const PROJ_BRANCH_X   = -220;   // projects branch node left-edge X (fixed)
-const PROJ_X          = -430;   // project node left-edge X
-// Task X is computed per project: odd projects → PROJ_X - 250, even → PROJ_X - 450
+const PROJ_BRANCH_X   = -320;   // projects branch node left-edge X (fixed)
+const PROJ_X          = -530;   // project node left-edge X
+// Task X per project: odd(1,3,5→i=0,2,4) → PROJ_X-440, even(2,4,6→i=1,3,5) → PROJ_X-640
+// Minimum offset = TASK_W(255) + addBtn left(-32) + 150px gap = 437 → using 440/640
 const BRANCH_H        = 84;     // BranchNode height
 
 // Zigzag tree layout — vertical sizing
@@ -187,8 +188,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
 
         // STEP 4 — tasks spaced 80px apart, centered around project Y, zigzag X
         if (expandedSet.has(proj.id) && proj.tasks.length > 0) {
-          // Odd projects (1,3,5… → i=0,2,4): closer; even (2,4,6… → i=1,3,5): farther left
-          const taskX     = (i % 2 === 0) ? PROJ_X - 250 : PROJ_X - 450;
+          // Odd projects (1,3,5… → i=0,2,4): 440px offset; even (2,4,6… → i=1,3,5): 640px offset
+          const taskX     = (i % 2 === 0) ? PROJ_X - 440 : PROJ_X - 640;
           const taskCount = proj.tasks.length;
           proj.tasks.forEach((task, j) => {
             const taskCY = cy - ((taskCount - 1) * TASK_BLOCK_STEP / 2) + j * TASK_BLOCK_STEP;
