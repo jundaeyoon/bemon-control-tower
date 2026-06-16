@@ -1,12 +1,10 @@
-import SlidePanel       from '../panels/SlidePanel';
-import SchedulePanel   from '../panels/SchedulePanel';
-import BrainstormPanel from '../panels/BrainstormPanel';
-import GoalsPanel      from '../panels/GoalsPanel';
+import SlidePanel    from '../panels/SlidePanel';
+import SchedulePanel from '../panels/SchedulePanel';
+import GoalsPanel    from '../panels/GoalsPanel';
 
 const CONFIG = {
-  schedule:   { title: '스케줄',      emoji: '📅', Component: SchedulePanel,   width: 500 },
-  brainstorm: { title: '브레인스토밍', emoji: '💡', Component: BrainstormPanel, width: 520 },
-  goals:      { title: '목표',        emoji: '🎯', Component: GoalsPanel,      width: 520 },
+  schedule: { title: '스케줄', emoji: '📅', Component: SchedulePanel, width: 500 },
+  goals:    { title: '목표',   emoji: '🎯', Component: GoalsPanel,    width: 520 },
 };
 
 export default function NodePanel({ nodeId, onClose }) {

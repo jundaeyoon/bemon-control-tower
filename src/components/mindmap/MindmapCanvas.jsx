@@ -7,18 +7,22 @@ import HubNode     from './nodes/HubNode';
 import BranchNode  from './nodes/BranchNode';
 import ProjectNode, { PROJECT_W, PROJECT_H } from './nodes/ProjectNode';
 import TaskNode,    { TASK_W,    TASK_H    } from './nodes/TaskNode';
+import SessionNode, { SESSION_W, SESSION_H } from './nodes/SessionNode';
 import RoughEdge   from './edges/RoughEdge';
 import NodePanel   from './NodePanel';
-import TaskDetailPanel  from '../panels/TaskDetailPanel';
+import TaskDetailPanel       from '../panels/TaskDetailPanel';
+import BrainstormSlidePanel  from '../panels/BrainstormSlidePanel';
 import AddProjectModal  from '../modals/AddProjectModal';
 import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
+import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
+import { useBrainstorm }         from '../../hooks/useBrainstorm';
 import styles from './MindmapCanvas.module.css';
 
-const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode };
+const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode };
 const EDGE_TYPES = { rough: RoughEdge };
 
 // Zigzag tree layout — X positions
@@ -32,6 +36,10 @@ const PROJ_BLOCK_MIN  = 150;    // minimum block height per project (150px spaci
 const TASK_BLOCK_STEP = 80;     // vertical space per task
 const PROJ_GAP        = 20;     // gap between adjacent project blocks
 
+// Brainstorm sessions — vertical stack below the brainstorm branch
+const SESSION_GAP_TOP = 50;     // gap from branch bottom to first session
+const SESSION_STEP    = 75;     // vertical spacing between sessions
+
 // Triggers fitView only when hub/branch level changes (not project/task expansion)
 function FitViewController({ fitKey }) {
   const { fitView } = useReactFlow();
@@ -43,25 +51,29 @@ function FitViewController({ fitKey }) {
 }
 
 export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMember }) {
-  const [expandedSet,   setExpandedSet]   = useState(new Set());
-  const [activePanel,   setActivePanel]   = useState(null);
-  const [activeTask,    setActiveTask]    = useState(null);
-  const [showAddProj,  setShowAddProj]  = useState(false);
-  const [showEditProj, setShowEditProj] = useState(null); // { projectId, name, pm }
-  const [showAddTask,  setShowAddTask]  = useState(null); // { projectId, projectName }
+  const [expandedSet,    setExpandedSet]    = useState(new Set());
+  const [activePanel,    setActivePanel]    = useState(null);
+  const [activeTask,     setActiveTask]     = useState(null);
+  const [activeSession,  setActiveSession]  = useState(null); // sessionId
+  const [showAddProj,    setShowAddProj]    = useState(false);
+  const [showEditProj,   setShowEditProj]   = useState(null); // { projectId, name, pm }
+  const [showAddTask,    setShowAddTask]    = useState(null); // { projectId, projectName }
+  const [showAddSession, setShowAddSession] = useState(false);
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
+  const brainstorm = useBrainstorm();
 
-  // fitView key: changes whenever the project layout shape changes
+  // fitView key: changes whenever the project/brainstorm layout shape changes
   const fitKey = useMemo(() => {
-    const hubE  = expandedSet.has('hub');
-    const projE = expandedSet.has('projects');
-    if (!hubE || !projE || projects.length === 0) return `${hubE}-${projE}`;
-    const layoutStr = projects.map((p, i) =>
-      `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`
-    ).join(',');
-    return `${hubE}-${projE}-${layoutStr}`;
-  }, [expandedSet, projects]);
+    const hubE   = expandedSet.has('hub');
+    const projE  = expandedSet.has('projects');
+    const brainE = expandedSet.has('brainstorm');
+    const projLayout  = (!hubE || !projE || projects.length === 0)
+      ? ''
+      : projects.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
+    const brainLayout = (!hubE || !brainE) ? '' : brainstorm.sessions.length;
+    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}`;
+  }, [expandedSet, projects, brainstorm.sessions]);
 
   const toggleNode = useCallback((id) => {
     setExpandedSet(prev => {
@@ -73,10 +85,15 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   }, []);
 
   const handleNodeClick = useCallback((_ev, node) => {
-    if (node.type === 'hub')     return toggleNode('hub');
-    if (node.type === 'branch')  return node.id === 'projects' ? toggleNode('projects') : setActivePanel(node.id);
+    if (node.type === 'hub')    return toggleNode('hub');
+    if (node.type === 'branch') {
+      if (node.id === 'projects')   return toggleNode('projects');
+      if (node.id === 'brainstorm') return toggleNode('brainstorm');
+      return setActivePanel(node.id);
+    }
     if (node.type === 'project') return toggleNode(node.id);
     if (node.type === 'task')    return setActiveTask({ taskId: node.id, projectId: node.data.projectId });
+    if (node.type === 'session') return setActiveSession(node.id);
   }, [toggleNode]);
 
   const handleDeleteProject = useCallback((projectId) => {
@@ -101,6 +118,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     setShowEditProj(null);
   }, [updateProject, showEditProj]);
 
+  const handleDeleteSession = useCallback((sessionId) => {
+    brainstorm.deleteSession(sessionId);
+    setActiveSession(prev => (prev === sessionId ? null : prev));
+  }, [brainstorm]);
+
   // Context value
   const ctxValue = useMemo(() => ({
     onRequestAddProject: () => setShowAddProj(true),
@@ -108,15 +130,18 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       const proj = projects.find(p => p.id === projectId);
       setShowAddTask({ projectId, projectName: proj?.name ?? '' });
     },
-    onToggleTask:    toggleTask,
-    onDeleteProject: handleDeleteProject,
-    onEditProject:   handleEditProject,
-  }), [projects, toggleTask, handleDeleteProject, handleEditProject]);
+    onToggleTask:       toggleTask,
+    onDeleteProject:    handleDeleteProject,
+    onEditProject:      handleEditProject,
+    onRequestAddSession: () => setShowAddSession(true),
+    onDeleteSession:     handleDeleteSession,
+  }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
   const allNodes = useMemo(() => {
-    const hubExpanded      = expandedSet.has('hub');
-    const projectsExpanded = expandedSet.has('projects');
+    const hubExpanded        = expandedSet.has('hub');
+    const projectsExpanded   = expandedSet.has('projects');
+    const brainstormExpanded = expandedSet.has('brainstorm');
     const result = [];
 
     // STEP 1 — block height for each project (includes its expanded tasks)
@@ -166,7 +191,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         ...n,
         position: overridePos ?? n.position,
         hidden,
-        data: { ...n.data, isExpanded, showAdd: n.id === 'projects' },
+        data: { ...n.data, isExpanded, addAction: n.id === 'projects' ? 'project' : n.id === 'brainstorm' ? 'session' : null },
       });
     });
 
@@ -206,13 +231,32 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    // Brainstorm sessions — vertical stack below the brainstorm branch
+    if (hubExpanded && brainstormExpanded && brainstorm.sessions.length > 0) {
+      const brainstormNode = result.find(n => n.id === 'brainstorm');
+      const baseX = brainstormNode.position.x;
+      const baseY = brainstormNode.position.y;
+      brainstorm.sessions.forEach((session, i) => {
+        result.push({
+          id:   session.id,
+          type: 'session',
+          position: { x: baseX, y: baseY + BRANCH_H + SESSION_GAP_TOP + i * SESSION_STEP },
+          data: { ...session, id: session.id },
+          width:  SESSION_W,
+          height: SESSION_H,
+          hidden: false,
+        });
+      });
+    }
+
     return result;
-  }, [expandedSet, projects]);
+  }, [expandedSet, projects, brainstorm.sessions]);
 
   // Build dynamic edges
   const allEdges = useMemo(() => {
-    const hubExpanded      = expandedSet.has('hub');
-    const projectsExpanded = expandedSet.has('projects');
+    const hubExpanded        = expandedSet.has('hub');
+    const projectsExpanded   = expandedSet.has('projects');
+    const brainstormExpanded = expandedSet.has('brainstorm');
     const result = [];
 
     INITIAL_EDGES.forEach(e => {
@@ -244,8 +288,20 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    if (hubExpanded && brainstormExpanded) {
+      brainstorm.sessions.forEach((session, i) => {
+        result.push({
+          id:     `e-brainstorm-${session.id}`,
+          source: 'brainstorm',
+          target: session.id,
+          type:   'rough',
+          data:   { color: '#6B7C5C', seed: i + 50 },
+        });
+      });
+    }
+
     return result;
-  }, [expandedSet, projects]);
+  }, [expandedSet, projects, brainstorm.sessions]);
 
   const handleAddProject = useCallback(({ name, pm }) => {
     addProject(name, pm);
@@ -258,6 +314,12 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     setExpandedSet(prev => new Set([...prev, 'hub', 'projects', projectId]));
     setShowAddTask(null);
   }, [addTask]);
+
+  const handleAddSession = useCallback(({ title, date }) => {
+    brainstorm.addSession(title, date);
+    setExpandedSet(prev => new Set([...prev, 'hub', 'brainstorm']));
+    setShowAddSession(false);
+  }, [brainstorm]);
 
   return (
     <MindmapActionsContext.Provider value={ctxValue}>
@@ -331,6 +393,21 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             projectName={showAddTask.projectName}
             onAdd={(fields) => handleAddTask({ projectId: showAddTask.projectId, fields })}
             onClose={() => setShowAddTask(null)}
+          />
+        )}
+
+        {showAddSession && (
+          <AddSessionModal
+            onAdd={handleAddSession}
+            onClose={() => setShowAddSession(false)}
+          />
+        )}
+
+        {activeSession && (
+          <BrainstormSlidePanel
+            session={brainstorm.sessions.find(s => s.id === activeSession)}
+            brainstorm={brainstorm}
+            onClose={() => setActiveSession(null)}
           />
         )}
 

@@ -84,11 +84,15 @@ export default function BranchNode({ data }) {
         </div>
       </div>
 
-      {data.showAdd && (
+      {data.addAction && (
         <button
           className={styles.addBtn}
-          onClick={e => { e.stopPropagation(); actions?.onRequestAddProject(); }}
-          title="프로젝트 추가"
+          onClick={e => {
+            e.stopPropagation();
+            if (data.addAction === 'project') actions?.onRequestAddProject();
+            if (data.addAction === 'session') actions?.onRequestAddSession();
+          }}
+          title={data.addAction === 'project' ? '프로젝트 추가' : '세션 추가'}
         >+</button>
       )}
 

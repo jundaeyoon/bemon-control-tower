@@ -6,8 +6,10 @@ export default function RoughCard({
   children,
   className = '',
   style = {},
-  fill = 'var(--color-card-bg)',
-  stroke = 'var(--color-text-main)',
+  fill = '#FAFAF8',
+  stroke = '#1A1A1A',
+  hoverFill,
+  hoverStroke,
   strokeWidth = 1.5,
   roughness = 1.2,
   onClick,
@@ -41,11 +43,11 @@ export default function RoughCard({
     const pad = 2;
 
     const resolvedFill = isHovered && hoverable
-      ? 'var(--color-card-bg-hover)'
+      ? (hoverFill ?? fill)
       : fill;
 
     const resolvedStroke = isHovered && hoverable
-      ? stroke.replace('0.08', '0.2')
+      ? (hoverStroke ?? stroke)
       : stroke;
 
     rc.rectangle(pad, pad, w - pad * 2, h - pad * 2, {
@@ -66,7 +68,7 @@ export default function RoughCard({
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hovered, fill, stroke, roughness, strokeWidth]);
+  }, [hovered, fill, stroke, hoverFill, hoverStroke, roughness, strokeWidth]);
 
   return (
     <div
