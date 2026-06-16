@@ -1,0 +1,86 @@
+.header {
+  height: 54px;
+  background: #fff;
+  border-bottom: 1px solid #ede8e3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoText {
+  font-size: 19px;
+  font-weight: 800;
+  color: #4A3728;
+  letter-spacing: 4px;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+}
+
+.logoDivider {
+  width: 1px;
+  height: 18px;
+  background: #d5cdc6;
+}
+
+.logoSub {
+  font-size: 11px;
+  color: #6B7C45;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.memberName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4A3728;
+  line-height: 1;
+}
+
+.memberRole {
+  font-size: 10px;
+  color: #6B7C45;
+  font-weight: 600;
+  line-height: 1;
+}

@@ -1,0 +1,20 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.text {
+  transition: opacity var(--transition-slow), color var(--transition-slow);
+}
+
+.done .text {
+  opacity: 0.4;
+  color: var(--color-text-muted);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

@@ -1,0 +1,44 @@
+.wrapper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 중앙·브랜치 노드 React Flow 기본 박스 완전 제거 */
+.wrapper :global(.react-flow__node-center),
+.wrapper :global(.react-flow__node-center):hover,
+.wrapper :global(.react-flow__node-center):focus,
+.wrapper :global(.react-flow__node-center):focus-visible,
+.wrapper :global(.react-flow__node-center.selected),
+.wrapper :global(.react-flow__node-center.selectable) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.wrapper :global(.react-flow__node-branch),
+.wrapper :global(.react-flow__node-branch):hover,
+.wrapper :global(.react-flow__node-branch):focus,
+.wrapper :global(.react-flow__node-branch.selected) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.wrapper :global(.react-flow__node) {
+  cursor: default;
+}
+
+.wrapper :global(.react-flow__node-branch) {
+  cursor: pointer;
+}
+
+.wrapper :global(.react-flow__panel) {
+  display: none;
+}

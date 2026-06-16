@@ -1,0 +1,212 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.toggleBtn:hover {
+  background: rgba(255,255,255,0.95);
+}
+
+.toggleDone {
+  color: var(--color-green-khaki);
+  background: rgba(107,124,92,0.06);
+}
+
+.toggleIcon {
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.memberGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.memberBtn {
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: var(--font-family);
+}
+
+.memberActive {
+  font-weight: 700;
+}
+
+.slider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.actionRight {
+  display: flex;
+  gap: 8px;
+}
+
+/* Memo textarea */
+.memoTextarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--color-text-main);
+  background: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.memoTextarea:focus {
+  border-color: var(--color-mustard);
+  background: rgba(255,255,255,0.88);
+}
+
+.memoTextarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Image upload */
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: rgba(255,255,255,0.50);
+}
+
+.dropZone:hover,
+.dragOver {
+  border-color: var(--color-mustard);
+  background: rgba(212,168,67,0.06);
+}
+
+.dropIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.dropText {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: var(--font-family);
+}
+
+/* Thumbnail grid */
+.thumbGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.thumbWrap {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: visible;
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1.5px solid var(--color-border);
+  transition: border-color 0.15s, opacity 0.15s;
+  display: block;
+}
+
+.thumb:hover {
+  border-color: var(--color-mustard);
+  opacity: 0.88;
+}
+
+.removeImg {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(26,26,26,0.80);
+  border: none;
+  color: #fff;
+  font-size: 9px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+  line-height: 1;
+}
+
+.thumbWrap:hover .removeImg {
+  display: flex;
+}
+
+.removeImg:hover {
+  background: #C06850;
+}

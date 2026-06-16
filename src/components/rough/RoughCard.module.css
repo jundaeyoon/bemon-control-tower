@@ -1,0 +1,35 @@
+.card {
+  position: relative;
+  border-radius: 0;
+  background: transparent;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hoverable {
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.hoverable:active {
+  transform: translateY(0px);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}

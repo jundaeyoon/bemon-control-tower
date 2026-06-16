@@ -1,0 +1,222 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,26,0.36);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--color-card-bg);
+  border: 1.5px solid var(--color-border);
+  border-top: 3px solid; /* colored via header borderTopColor inline */
+  border-radius: var(--radius-lg);
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  max-height: 76vh;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--color-border);
+  border-top: 3px solid transparent; /* overridden inline */
+  flex-shrink: 0;
+}
+
+.memberRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.memberText {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.memberName {
+  font-size: 17px;
+  font-weight: 800;
+  font-family: var(--font-family);
+  line-height: 1;
+}
+
+.suffix {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-sub);
+  line-height: 1;
+}
+
+.countBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-family);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-sub);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.13s, color 0.13s;
+}
+
+.closeBtn:hover {
+  background: rgba(0,0,0,0.07);
+  color: var(--color-text-main);
+}
+
+/* ── Body ────────────────────────────── */
+.body {
+  overflow-y: auto;
+  padding: 14px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-family: var(--font-family);
+}
+
+/* ── Project group ───────────────────── */
+.projectGroup {
+  border-left: 2.5px solid var(--accent);
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.projectLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0 6px;
+}
+
+.projIcon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.projectName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.projCount {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Task row ────────────────────────── */
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px 5px 0;
+  border-radius: var(--radius-sm);
+  transition: background 0.12s;
+}
+
+.taskRow:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.bullet {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.taskName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskDone .taskName {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.progress {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.deadline {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.deadlineOverdue {
+  color: #e05050;
+}
+
+.completedBadge {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}

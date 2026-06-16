@@ -1,0 +1,43 @@
+.node {
+  position: relative;
+  cursor: pointer;
+  transition: filter var(--transition-base);
+}
+
+.hovered {
+  filter: drop-shadow(0 4px 18px rgba(212,168,67,0.35));
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+.label {
+  font-family: var(--font-family);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--color-text-main);
+  line-height: 1;
+}
+
+.sublabel {
+  font-family: var(--font-family);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}

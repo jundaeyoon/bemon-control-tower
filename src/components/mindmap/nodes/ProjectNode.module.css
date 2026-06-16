@@ -1,0 +1,183 @@
+.node {
+  position: relative;
+  cursor: pointer;
+  transition: filter var(--transition-base);
+}
+
+.hovered {
+  filter: drop-shadow(0 3px 12px rgba(192,104,80,0.30));
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px 10px 5px 12px;
+  gap: 2px;
+  z-index: 1;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.pmRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pmAvatar {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: 700;
+  border: 1px solid;
+  line-height: 1;
+}
+
+.pmName {
+  font-family: var(--font-family);
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.80);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.label {
+  flex: 1;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.30);
+}
+
+.count {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chevron {
+  font-size: 14px;
+  color: rgba(255,255,255,0.70);
+  flex-shrink: 0;
+  transition: transform var(--transition-base);
+  line-height: 1;
+}
+
+.chevronOpen {
+  transform: scaleX(-1);
+}
+
+/* "+" button floats to the LEFT of the node */
+.addBtn {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  border: 1.5px solid rgba(192,104,80,0.55);
+  color: #C06850;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 20;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+
+.addBtn:hover {
+  background: rgba(192,104,80,0.12);
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* "✕" delete button — top-right corner, hover-only */
+.deleteBtn {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.96);
+  border: 1.5px solid rgba(192,104,80,0.40);
+  color: #C06850;
+  font-size: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 20;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.deleteBtn:hover {
+  background: #C06850;
+  color: #fff;
+  border-color: #C06850;
+}
+
+/* "✎" edit button — top-right, left of delete button */
+.editBtn {
+  position: absolute;
+  top: -9px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.96);
+  border: 1.5px solid rgba(192,104,80,0.40);
+  color: #C06850;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 20;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.editBtn:hover {
+  background: #C06850;
+  color: #fff;
+  border-color: #C06850;
+}

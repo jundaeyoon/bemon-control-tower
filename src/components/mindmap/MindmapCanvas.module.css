@@ -1,0 +1,119 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+}
+
+/* Override React Flow defaults */
+.wrap :global(.react-flow__renderer) {
+  background: transparent;
+}
+
+.wrap :global(.react-flow__background) {
+  background: transparent;
+}
+
+/* Strip white box from all custom node wrappers */
+.wrap :global(.react-flow__node-hub),
+.wrap :global(.react-flow__node-hub):hover,
+.wrap :global(.react-flow__node-hub):focus,
+.wrap :global(.react-flow__node-hub):focus-visible,
+.wrap :global(.react-flow__node-hub.selected),
+.wrap :global(.react-flow__node-hub.selectable),
+.wrap :global(.react-flow__node-branch),
+.wrap :global(.react-flow__node-branch):hover,
+.wrap :global(.react-flow__node-branch):focus,
+.wrap :global(.react-flow__node-branch):focus-visible,
+.wrap :global(.react-flow__node-branch.selected),
+.wrap :global(.react-flow__node-branch.selectable),
+.wrap :global(.react-flow__node-project),
+.wrap :global(.react-flow__node-project):hover,
+.wrap :global(.react-flow__node-project):focus,
+.wrap :global(.react-flow__node-project.selected),
+.wrap :global(.react-flow__node-project.selectable),
+.wrap :global(.react-flow__node-task),
+.wrap :global(.react-flow__node-task):hover,
+.wrap :global(.react-flow__node-task):focus,
+.wrap :global(.react-flow__node-task.selected),
+.wrap :global(.react-flow__node-task.selectable) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Controls — minimal rough-styled look */
+.controls {
+  bottom: 80px !important;
+  right: 20px !important;
+  left: auto !important;
+}
+
+.controls :global(.react-flow__controls-button) {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  box-shadow: var(--shadow-sm);
+  width: 26px;
+  height: 26px;
+}
+
+.controls :global(.react-flow__controls-button:hover) {
+  background: var(--color-mustard-pale);
+  border-color: var(--color-mustard);
+}
+
+/* MiniMap */
+.minimap {
+  bottom: 80px !important;
+  left: 20px !important;
+  right: auto !important;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Expand hint */
+.hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.90);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-family);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+  animation: fade-in 0.8s 1.5s both;
+}
+
+.hintIcon {
+  font-size: 13px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .minimap { display: none; }
+  .controls { bottom: 72px !important; right: 12px !important; }
+  .hint { bottom: 16px; font-size: 10px; padding: 6px 12px; }
+}
