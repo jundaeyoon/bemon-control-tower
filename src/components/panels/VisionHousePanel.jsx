@@ -64,8 +64,13 @@ function RoughSaveButton({ onClick, saved, cfg }) {
   const canvasRef  = useRef(null);
   const [hovered, setHovered] = useState(false);
 
-  const fill   = saved ? '#4E7E4E' : hovered ? cfg.btnFillHover : cfg.btnFill;
-  const stroke = saved ? '#3A6A3A' : cfg.btnStroke;
+  // saved: false | 'ok' | 'fail'
+  const fill   = saved === 'ok'   ? '#4E7E4E'
+               : saved === 'fail' ? '#B84040'
+               : hovered          ? cfg.btnFillHover : cfg.btnFill;
+  const stroke = saved === 'ok'   ? '#3A6A3A'
+               : saved === 'fail' ? '#8C2828'
+               : cfg.btnStroke;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,11 +104,13 @@ function RoughSaveButton({ onClick, saved, cfg }) {
       onClick={saved ? undefined : onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      disabled={saved}
+      disabled={!!saved}
     >
       <canvas ref={canvasRef} className={styles.saveBtnCanvas} aria-hidden="true" />
       <span className={styles.saveBtnLabel}>
-        {saved ? '저장됐어요! ✅' : '저장하기'}
+        {saved === 'ok'   ? '저장됐어요! ✅' :
+         saved === 'fail' ? '저장 실패 ❌'   :
+                            '저장하기'}
       </span>
     </button>
   );
@@ -152,23 +159,29 @@ export default function VisionHousePanel({ vhHook, initialTab = 'mission', onClo
 
 function VisionTab({ kind, cfg, value, onSave }) {
   const [text,  setText]  = useState(value);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(false); // false | 'ok' | 'fail'
 
   useEffect(() => { setText(value); }, [value]);
 
   // blur 자동저장 (기존 유지)
   const handleBlur = useCallback(() => {
-    if (text !== value) onSave(text);
+    if (text !== value) onSave(text).catch(console.error);
   }, [text, value, onSave]);
 
-  // 버튼 수동저장
+  // 버튼 수동저장 — 성공/실패 구분
   const handleSave = useCallback(async () => {
-    await onSave(text);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await onSave(text);
+      setSaved('ok');
+    } catch (err) {
+      console.error('[VisionTab] 저장 실패:', err);
+      setSaved('fail');
+    } finally {
+      setTimeout(() => setSaved(false), 2000);
+    }
   }, [text, onSave]);
 
-  // 타이핑 시작하면 "저장됐어요" 상태 즉시 해제
+  // 타이핑 시작하면 상태 즉시 해제
   const handleChange = useCallback((e) => {
     setText(e.target.value);
     if (saved) setSaved(false);
