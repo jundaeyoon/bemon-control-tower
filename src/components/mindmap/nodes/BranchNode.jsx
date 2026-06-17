@@ -20,6 +20,7 @@ const HANDLE = {
 const ACCENT_COLORS = {
   mustard: { fill: 'rgba(180,130,30,0.72)',  fillHover: 'rgba(180,130,30,0.86)', stroke: '#B8903A' },
   green:   { fill: 'rgba(80,100,65,0.72)',   fillHover: 'rgba(80,100,65,0.86)',  stroke: '#4E5E42' },
+  olive:   { fill: 'rgba(90,110,48,0.72)',   fillHover: 'rgba(90,110,48,0.88)',  stroke: '#637A35' },
   neutral: { fill: 'rgba(110,110,110,0.68)', fillHover: 'rgba(110,110,110,0.82)', stroke: '#888888' },
   salmon:  { fill: 'rgba(180,100,75,0.72)',  fillHover: 'rgba(180,100,75,0.86)', stroke: '#C06850' },
 };
@@ -92,10 +93,12 @@ export default function BranchNode({ data }) {
             if (data.addAction === 'project') actions?.onRequestAddProject();
             if (data.addAction === 'session') actions?.onRequestAddSession();
             if (data.addAction === 'quest')   actions?.onRequestOpenQuest?.();
+            if (data.addAction === 'compass') actions?.onRequestOpenCompass?.();
           }}
           title={
             data.addAction === 'project' ? '프로젝트 추가' :
             data.addAction === 'session' ? '세션 추가' :
+            data.addAction === 'compass' ? '나침반 열기' :
             '퀘스트 작성'
           }
         >+</button>

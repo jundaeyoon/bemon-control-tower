@@ -1,0 +1,251 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── 탭 바 ── */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  padding: 10px 16px 0;
+  border-bottom: 2px solid rgba(99,122,53,0.18);
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabBar::-webkit-scrollbar { display: none; }
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  border-radius: 7px 7px 0 0;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tabBtn:hover { background: rgba(99,122,53,0.10); color: #637A35; }
+
+.tabActive { color: #637A35; border-bottom: 2.5px solid #637A35; font-weight: 800; }
+
+/* team_spirit / jun_promise 탭 강조 색 */
+.tabBtn[data-kind="team_spirit"].tabActive { color: #B85828; border-color: #B85828; }
+.tabBtn[data-kind="team_spirit"]:hover     { background: rgba(184,88,40,0.10); color: #B85828; }
+.tabBtn[data-kind="jun_promise"].tabActive { color: #0082A0; border-color: #0082A0; }
+.tabBtn[data-kind="jun_promise"]:hover     { background: rgba(0,130,160,0.10); color: #0082A0; }
+
+.tabEmoji { font-size: 12px; line-height: 1; }
+
+/* ── 탭 본문 ── */
+.tabBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* ── 일반 비전 탭 ── */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg, transparent, transparent 8px,
+    rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 9px
+  );
+  pointer-events: none;
+}
+
+.bannerEmoji {
+  font-size: 26px;
+  line-height: 1;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.bannerTitle {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.28);
+  position: relative;
+  z-index: 1;
+}
+
+.desc {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: var(--text-secondary, #888);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 2px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 13px 15px;
+  font-family: var(--font-family);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.75;
+  color: var(--text-primary, #222);
+  background: #FAFFF6;
+  border: 1.5px solid rgba(99,122,53,0.30);
+  border-radius: 10px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.textarea:focus { border-color: #637A35; box-shadow: 0 0 0 3px rgba(99,122,53,0.13); }
+.textarea::placeholder { color: rgba(0,0,0,0.28); font-style: italic; font-weight: 400; }
+
+/* ── JUN의 약속 탭 ── */
+.junWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.junCard {
+  width: 100%;
+  background: linear-gradient(160deg, #0096C7 0%, #0077B6 45%, #023E8A 100%);
+  border-radius: 18px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0,119,182,0.38), 4px 4px 0 rgba(0,50,120,0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 배경 원형 장식 */
+.junCard::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.junCard::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.junWave {
+  font-size: 16px;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.junTitle {
+  font-family: var(--font-family);
+  font-size: 52px;
+  font-weight: 900;
+  color: #FFD166;
+  text-shadow: 0 3px 12px rgba(0,0,0,0.30), 0 0 30px rgba(255,209,102,0.35);
+  letter-spacing: 6px;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.junTitleKo {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.60);
+  letter-spacing: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.junEmojis {
+  font-size: 18px;
+  letter-spacing: 6px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.4;
+}
+
+.junDivider {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.junPromise {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.75;
+  margin: 4px 0 0;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.20);
+  position: relative;
+  z-index: 1;
+}
+.junPromise strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 900;
+  color: #FFD166;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.28);
+  margin-top: 4px;
+}
+
+.junNote {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: var(--text-secondary, #888);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}

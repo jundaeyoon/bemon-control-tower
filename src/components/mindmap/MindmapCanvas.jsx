@@ -9,11 +9,13 @@ import ProjectNode, { PROJECT_W, PROJECT_H } from './nodes/ProjectNode';
 import TaskNode,    { TASK_W,    TASK_H    } from './nodes/TaskNode';
 import SessionNode, { SESSION_W, SESSION_H } from './nodes/SessionNode';
 import QuestNode,   { QUEST_W,   QUEST_H   } from './nodes/QuestNode';
+import CompassNode, { COMPASS_W, COMPASS_H } from './nodes/CompassNode';
 import RoughEdge   from './edges/RoughEdge';
 import NodePanel   from './NodePanel';
 import TaskDetailPanel       from '../panels/TaskDetailPanel';
 import BrainstormSlidePanel  from '../panels/BrainstormSlidePanel';
 import QuestSlidePanel       from '../panels/QuestSlidePanel';
+import VisionHousePanel      from '../panels/VisionHousePanel';
 import AddProjectModal  from '../modals/AddProjectModal';
 import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
@@ -23,9 +25,10 @@ import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
 import { useGoals }              from '../../hooks/useGoals';
+import { useVisionHouse }        from '../../hooks/useVisionHouse';
 import styles from './MindmapCanvas.module.css';
 
-const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode };
+const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
 const EDGE_TYPES = { rough: RoughEdge };
 
 // Zigzag tree layout — X positions
@@ -47,6 +50,13 @@ const SESSION_STEP    = 75;     // vertical spacing between sessions
 const QUEST_GAP_TOP   = 50;
 const QUEST_STEP      = 80;
 
+// Compass child nodes — tree layout (3 levels: mission / team+vision / jun+cap+val)
+const COMPASS_LEVEL_TOP = 40;   // branch bottom → mission top
+const COMPASS_LEVEL_GAP = 30;   // vertical gap between tree levels
+// From branch bottom to deepest nodes (3 levels):
+// COMPASS_LEVEL_TOP + COMPASS_H + COMPASS_LEVEL_GAP + COMPASS_H + COMPASS_LEVEL_GAP + COMPASS_H = 274
+const COMPASS_SUBTREE = COMPASS_LEVEL_TOP + COMPASS_H * 3 + COMPASS_LEVEL_GAP * 2;
+
 // Triggers fitView only when hub/branch level changes (not project/task expansion)
 function FitViewController({ fitKey }) {
   const { fitView } = useReactFlow();
@@ -67,23 +77,27 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [showAddTask,    setShowAddTask]    = useState(null); // { projectId, projectName }
   const [showAddSession, setShowAddSession] = useState(false);
   const [activeQuest,    setActiveQuest]    = useState(null); // null | yearMonth string
+  const [activeCompass,  setActiveCompass]  = useState(null); // null | kind string
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
+  const vhHook     = useVisionHouse();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
-    const hubE   = expandedSet.has('hub');
-    const projE  = expandedSet.has('projects');
-    const brainE = expandedSet.has('brainstorm');
-    const goalsE = expandedSet.has('goals');
-    const projLayout  = (!hubE || !projE || projects.length === 0)
+    const hubE     = expandedSet.has('hub');
+    const projE    = expandedSet.has('projects');
+    const brainE   = expandedSet.has('brainstorm');
+    const goalsE   = expandedSet.has('goals');
+    const compassE = expandedSet.has('compass');
+    const projLayout    = (!hubE || !projE || projects.length === 0)
       ? ''
       : projects.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
-    const brainLayout = (!hubE || !brainE) ? '' : brainstorm.sessions.length;
-    const goalsLayout = (!hubE || !goalsE) ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
-    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}`;
+    const brainLayout   = (!hubE || !brainE)   ? '' : brainstorm.sessions.length;
+    const goalsLayout   = (!hubE || !goalsE)   ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
+    const compassLayout = (!hubE || !compassE) ? '' : 'open';
+    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}-${compassE}-${compassLayout}`;
   }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   const toggleNode = useCallback((id) => {
@@ -101,12 +115,14 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'projects')   return toggleNode('projects');
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
       if (node.id === 'goals')      return toggleNode('goals');
+      if (node.id === 'compass')    return toggleNode('compass');
       return setActivePanel(node.id);
     }
     if (node.type === 'project') return toggleNode(node.id);
     if (node.type === 'task')    return setActiveTask({ taskId: node.id, projectId: node.data.projectId });
     if (node.type === 'session') return setActiveSession(node.id);
     if (node.type === 'quest')   return setActiveQuest(node.data.yearMonth);
+    if (node.type === 'compass') return setActiveCompass(node.data.kind);
   }, [toggleNode]);
 
   const handleDeleteProject = useCallback((projectId) => {
@@ -153,6 +169,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       setActiveQuest(ym);
     },
+    onRequestOpenCompass: () => setActiveCompass('mission'),
   }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
@@ -185,7 +202,10 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     let dynBranchY     = null;
     let dynScheduleY   = null;
     let dynBrainstormY = null;
+    let dynCompassY    = null;
     let dynGoalsY      = null;
+
+    const compassExpanded = expandedSet.has('compass');
 
     if (hubExpanded && projectsExpanded && projects.length > 0) {
       const startY   = -(totalHeight / 2);
@@ -193,7 +213,10 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       dynBranchY     = -BRANCH_H / 2;                  // projects branch centered at Y=0
       dynScheduleY   = Math.min(-200, startY - 120);
       dynBrainstormY = Math.max(200,  endY   + 120);
-      dynGoalsY      = dynBrainstormY + 160;
+      dynCompassY    = dynScheduleY + 230;
+      dynGoalsY      = compassExpanded
+        ? dynCompassY + BRANCH_H + COMPASS_SUBTREE + 60
+        : dynCompassY + BRANCH_H + 220;
     }
 
     // Hub + 4 branch nodes
@@ -204,6 +227,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'projects'   && dynBranchY     !== null) overridePos = { x: PROJ_BRANCH_X, y: dynBranchY };
       if (n.id === 'schedule'   && dynScheduleY   !== null) overridePos = { ...n.position, y: dynScheduleY };
       if (n.id === 'brainstorm' && dynBrainstormY !== null) overridePos = { ...n.position, y: dynBrainstormY };
+      if (n.id === 'compass'    && dynCompassY    !== null) overridePos = { ...n.position, y: dynCompassY };
       if (n.id === 'goals'      && dynGoalsY      !== null) overridePos = { ...n.position, y: dynGoalsY };
       result.push({
         ...n,
@@ -214,7 +238,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           isExpanded,
           addAction: n.id === 'projects'   ? 'project' :
                      n.id === 'brainstorm' ? 'session'  :
-                     n.id === 'goals'      ? 'quest'    : null,
+                     n.id === 'goals'      ? 'quest'    :
+                     n.id === 'compass'    ? 'compass'  : null,
         },
       });
     });
@@ -294,8 +319,42 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       }
     }
 
+    // Compass child nodes — 3-level tree layout
+    // Level 1: mission (center)
+    // Level 2: team_spirit (left)  |  vision (right)
+    // Level 3: jun_promise (left)  |  capability + values (right)
+    if (hubExpanded && expandedSet.has('compass')) {
+      const compassNode = result.find(n => n.id === 'compass');
+      const bx = compassNode.position.x;
+      const by = compassNode.position.y;
+
+      const missionY = by + BRANCH_H + COMPASS_LEVEL_TOP;
+      const level2Y  = missionY + COMPASS_H + COMPASS_LEVEL_GAP;
+      const level3Y  = level2Y  + COMPASS_H + COMPASS_LEVEL_GAP;
+
+      const compassNodes = [
+        { id: 'cv-mission',     kind: 'mission',     x: bx,        y: missionY },
+        { id: 'cv-team-spirit', kind: 'team_spirit', x: bx - 120,  y: level2Y  },
+        { id: 'cv-jun-promise', kind: 'jun_promise', x: bx - 120,  y: level3Y  },
+        { id: 'cv-vision',      kind: 'vision',      x: bx + 220,  y: level2Y  },
+        { id: 'cv-capability',  kind: 'capability',  x: bx + 130,  y: level3Y  },
+        { id: 'cv-values',      kind: 'values',      x: bx + 330,  y: level3Y  },
+      ];
+      compassNodes.forEach(({ id, kind, x, y }) => {
+        result.push({
+          id,
+          type: 'compass',
+          position: { x, y },
+          data: { kind, text: vhHook.house?.[kind] ?? '' },
+          width:  COMPASS_W,
+          height: COMPASS_H,
+          hidden: false,
+        });
+      });
+    }
+
     return result;
-  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house]);
 
   // Build dynamic edges
   const allEdges = useMemo(() => {
@@ -354,6 +413,20 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           type:   'rough',
           data:   { color: '#D4A843', seed: i + 70 },
         });
+      });
+    }
+
+    if (hubExpanded && expandedSet.has('compass')) {
+      const compassEdges = [
+        { id: 'e-compass-mission',    source: 'compass',        target: 'cv-mission',     seed: 80 },
+        { id: 'e-mission-team',       source: 'cv-mission',     target: 'cv-team-spirit', seed: 81 },
+        { id: 'e-team-jun',           source: 'cv-team-spirit', target: 'cv-jun-promise', seed: 82 },
+        { id: 'e-mission-vision',     source: 'cv-mission',     target: 'cv-vision',      seed: 83 },
+        { id: 'e-vision-capability',  source: 'cv-vision',      target: 'cv-capability',  seed: 84 },
+        { id: 'e-vision-values',      source: 'cv-vision',      target: 'cv-values',      seed: 85 },
+      ];
+      compassEdges.forEach(({ id, source, target, seed }) => {
+        result.push({ id, source, target, type: 'rough', data: { color: '#637A35', seed } });
       });
     }
 
@@ -474,6 +547,14 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             goalsHook={goalsHook}
             initialMonth={activeQuest}
             onClose={() => setActiveQuest(null)}
+          />
+        )}
+
+        {activeCompass && (
+          <VisionHousePanel
+            vhHook={vhHook}
+            initialTab={activeCompass}
+            onClose={() => setActiveCompass(null)}
           />
         )}
 
