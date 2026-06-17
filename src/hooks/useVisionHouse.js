@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 const DEFAULT_ROW = {
-  mission: '', vision: '', capability: '', values: '',
+  mission: '', vision: '', competency: '', values: '',
   team_spirit: '', jun_promise: '',
 };
 

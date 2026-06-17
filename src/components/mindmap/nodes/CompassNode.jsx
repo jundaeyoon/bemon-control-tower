@@ -21,7 +21,7 @@ const ITEM_CONFIG = {
   team_spirit: { emoji: '🔥', label: 'Team Spirit', fill: 'rgba(180,90,40,0.70)',  fillH: 'rgba(180,90,40,0.88)',  stroke: '#B85828' },
   jun_promise: { emoji: '🌴', label: "JUN의 약속",  fill: 'rgba(0,130,160,0.70)',  fillH: 'rgba(0,130,160,0.88)',  stroke: '#0082A0' },
   vision:      { emoji: '🌟', label: '비전',        fill: 'rgba(90,110,48,0.70)',  fillH: 'rgba(90,110,48,0.88)',  stroke: '#637A35' },
-  capability:  { emoji: '💪', label: '핵심역량',    fill: 'rgba(90,110,48,0.65)',  fillH: 'rgba(90,110,48,0.82)',  stroke: '#637A35' },
+  competency:  { emoji: '💪', label: '핵심역량',    fill: 'rgba(90,110,48,0.65)',  fillH: 'rgba(90,110,48,0.82)',  stroke: '#637A35' },
   values:      { emoji: '⚡', label: '핵심가치',    fill: 'rgba(90,110,48,0.65)',  fillH: 'rgba(90,110,48,0.82)',  stroke: '#637A35' },
 };
 

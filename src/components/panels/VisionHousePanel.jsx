@@ -8,7 +8,7 @@ const TABS = [
   { id: 'team_spirit', label: 'Team Spirit', emoji: '🔥' },
   { id: 'jun_promise', label: "JUN의 약속",  emoji: '🌴' },
   { id: 'vision',      label: '비전',        emoji: '🌟' },
-  { id: 'capability',  label: '핵심역량',    emoji: '💪' },
+  { id: 'competency',  label: '핵심역량',    emoji: '💪' },
   { id: 'values',      label: '핵심가치',    emoji: '⚡' },
 ];
 
@@ -37,7 +37,7 @@ const VISION_CONFIG = {
     bannerShadow: 'rgba(60,80,30,0.55)',
     btnFill:   '#637A35', btnFillHover: '#728C3E', btnStroke: '#4E6228',
   },
-  capability: {
+  competency: {
     title: '우리가 제일 잘하는 것',
     desc: '경쟁사와 다르게 우리만이 할 수 있는 것은? 핵심 역량을 정의해요.',
     placeholder: '예) 팀원의 감정과 맥락을 반영한 직관적인 협업 경험 설계.',

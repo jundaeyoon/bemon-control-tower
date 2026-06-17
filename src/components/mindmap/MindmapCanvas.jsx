@@ -322,7 +322,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     // Compass child nodes — 3-level tree layout
     // Level 1: mission (center)
     // Level 2: team_spirit (left)  |  vision (right)
-    // Level 3: jun_promise (left)  |  capability + values (right)
+    // Level 3: jun_promise (left)  |  competency + values (right)
     if (hubExpanded && expandedSet.has('compass')) {
       const compassNode = result.find(n => n.id === 'compass');
       const bx = compassNode.position.x;
@@ -337,7 +337,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         { id: 'cv-team-spirit', kind: 'team_spirit', x: bx - 120,  y: level2Y  },
         { id: 'cv-jun-promise', kind: 'jun_promise', x: bx - 120,  y: level3Y  },
         { id: 'cv-vision',      kind: 'vision',      x: bx + 220,  y: level2Y  },
-        { id: 'cv-capability',  kind: 'capability',  x: bx + 130,  y: level3Y  },
+        { id: 'cv-competency',  kind: 'competency',  x: bx + 130,  y: level3Y  },
         { id: 'cv-values',      kind: 'values',      x: bx + 330,  y: level3Y  },
       ];
       compassNodes.forEach(({ id, kind, x, y }) => {
@@ -422,7 +422,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         { id: 'e-mission-team',       source: 'cv-mission',     target: 'cv-team-spirit', seed: 81 },
         { id: 'e-team-jun',           source: 'cv-team-spirit', target: 'cv-jun-promise', seed: 82 },
         { id: 'e-mission-vision',     source: 'cv-mission',     target: 'cv-vision',      seed: 83 },
-        { id: 'e-vision-capability',  source: 'cv-vision',      target: 'cv-capability',  seed: 84 },
+        { id: 'e-vision-competency',  source: 'cv-vision',      target: 'cv-competency',  seed: 84 },
         { id: 'e-vision-values',      source: 'cv-vision',      target: 'cv-values',      seed: 85 },
       ];
       compassEdges.forEach(({ id, source, target, seed }) => {
