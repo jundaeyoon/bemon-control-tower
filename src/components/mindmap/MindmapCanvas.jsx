@@ -8,6 +8,7 @@ import BranchNode  from './nodes/BranchNode';
 import ProjectNode, { PROJECT_W, PROJECT_H } from './nodes/ProjectNode';
 import TaskNode,    { TASK_W,    TASK_H    } from './nodes/TaskNode';
 import SessionNode, { SESSION_W, SESSION_H } from './nodes/SessionNode';
+import QuestNode,   { QUEST_W,   QUEST_H   } from './nodes/QuestNode';
 import RoughEdge   from './edges/RoughEdge';
 import NodePanel   from './NodePanel';
 import TaskDetailPanel       from '../panels/TaskDetailPanel';
@@ -24,7 +25,7 @@ import { useBrainstorm }         from '../../hooks/useBrainstorm';
 import { useGoals }              from '../../hooks/useGoals';
 import styles from './MindmapCanvas.module.css';
 
-const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode };
+const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode };
 const EDGE_TYPES = { rough: RoughEdge };
 
 // Zigzag tree layout — X positions
@@ -41,6 +42,10 @@ const PROJ_GAP        = 20;     // gap between adjacent project blocks
 // Brainstorm sessions — vertical stack below the brainstorm branch
 const SESSION_GAP_TOP = 50;     // gap from branch bottom to first session
 const SESSION_STEP    = 75;     // vertical spacing between sessions
+
+// Quest nodes — vertical stack below the goals branch (same pattern as sessions)
+const QUEST_GAP_TOP   = 50;
+const QUEST_STEP      = 80;
 
 // Triggers fitView only when hub/branch level changes (not project/task expansion)
 function FitViewController({ fitKey }) {
@@ -61,23 +66,25 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [showEditProj,   setShowEditProj]   = useState(null); // { projectId, name, pm }
   const [showAddTask,    setShowAddTask]    = useState(null); // { projectId, projectName }
   const [showAddSession, setShowAddSession] = useState(false);
-  const [activeQuest,    setActiveQuest]    = useState(false);
+  const [activeQuest,    setActiveQuest]    = useState(null); // null | yearMonth string
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
 
-  // fitView key: changes whenever the project/brainstorm layout shape changes
+  // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
     const hubE   = expandedSet.has('hub');
     const projE  = expandedSet.has('projects');
     const brainE = expandedSet.has('brainstorm');
+    const goalsE = expandedSet.has('goals');
     const projLayout  = (!hubE || !projE || projects.length === 0)
       ? ''
       : projects.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
     const brainLayout = (!hubE || !brainE) ? '' : brainstorm.sessions.length;
-    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}`;
-  }, [expandedSet, projects, brainstorm.sessions]);
+    const goalsLayout = (!hubE || !goalsE) ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
+    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}`;
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   const toggleNode = useCallback((id) => {
     setExpandedSet(prev => {
@@ -93,12 +100,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     if (node.type === 'branch') {
       if (node.id === 'projects')   return toggleNode('projects');
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
-      if (node.id === 'goals')      return setActiveQuest(true);
+      if (node.id === 'goals')      return toggleNode('goals');
       return setActivePanel(node.id);
     }
     if (node.type === 'project') return toggleNode(node.id);
     if (node.type === 'task')    return setActiveTask({ taskId: node.id, projectId: node.data.projectId });
     if (node.type === 'session') return setActiveSession(node.id);
+    if (node.type === 'quest')   return setActiveQuest(node.data.yearMonth);
   }, [toggleNode]);
 
   const handleDeleteProject = useCallback((projectId) => {
@@ -140,6 +148,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     onEditProject:      handleEditProject,
     onRequestAddSession: () => setShowAddSession(true),
     onDeleteSession:     handleDeleteSession,
+    onRequestOpenQuest:  () => {
+      const d = new Date();
+      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      setActiveQuest(ym);
+    },
   }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
@@ -196,7 +209,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         ...n,
         position: overridePos ?? n.position,
         hidden,
-        data: { ...n.data, isExpanded, addAction: n.id === 'projects' ? 'project' : n.id === 'brainstorm' ? 'session' : null },
+        data: {
+          ...n.data,
+          isExpanded,
+          addAction: n.id === 'projects'   ? 'project' :
+                     n.id === 'brainstorm' ? 'session'  :
+                     n.id === 'goals'      ? 'quest'    : null,
+        },
       });
     });
 
@@ -254,8 +273,29 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    // Quest nodes — vertical stack below the goals branch
+    if (hubExpanded && expandedSet.has('goals')) {
+      const activeQuests = goalsHook.goals.filter(g => g.quest?.trim());
+      if (activeQuests.length > 0) {
+        const goalsNode = result.find(n => n.id === 'goals');
+        const baseX = goalsNode.position.x;
+        const baseY = goalsNode.position.y;
+        activeQuests.forEach((q, i) => {
+          result.push({
+            id:   `quest-${q.year_month}`,
+            type: 'quest',
+            position: { x: baseX, y: baseY + BRANCH_H + QUEST_GAP_TOP + i * QUEST_STEP },
+            data: { ...q, yearMonth: q.year_month },
+            width:  QUEST_W,
+            height: QUEST_H,
+            hidden: false,
+          });
+        });
+      }
+    }
+
     return result;
-  }, [expandedSet, projects, brainstorm.sessions]);
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   // Build dynamic edges
   const allEdges = useMemo(() => {
@@ -305,8 +345,20 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    if (hubExpanded && expandedSet.has('goals')) {
+      goalsHook.goals.filter(g => g.quest?.trim()).forEach((q, i) => {
+        result.push({
+          id:     `e-goals-quest-${q.year_month}`,
+          source: 'goals',
+          target: `quest-${q.year_month}`,
+          type:   'rough',
+          data:   { color: '#D4A843', seed: i + 70 },
+        });
+      });
+    }
+
     return result;
-  }, [expandedSet, projects, brainstorm.sessions]);
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   const handleAddProject = useCallback(({ name, pm }) => {
     addProject(name, pm);
@@ -420,7 +472,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         {activeQuest && (
           <QuestSlidePanel
             goalsHook={goalsHook}
-            onClose={() => setActiveQuest(false)}
+            initialMonth={activeQuest}
+            onClose={() => setActiveQuest(null)}
           />
         )}
 

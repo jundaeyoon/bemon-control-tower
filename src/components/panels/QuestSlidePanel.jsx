@@ -32,9 +32,9 @@ function nextMonth(ym) {
   return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`;
 }
 
-export default function QuestSlidePanel({ goalsHook, onClose }) {
+export default function QuestSlidePanel({ goalsHook, onClose, initialMonth }) {
   const [tab, setTab] = useState('quest');
-  const [yearMonth, setYearMonth] = useState(getYearMonth);
+  const [yearMonth, setYearMonth] = useState(() => initialMonth ?? getYearMonth());
 
   const goal = goalsHook.goals.find(g => g.year_month === yearMonth) ?? null;
 

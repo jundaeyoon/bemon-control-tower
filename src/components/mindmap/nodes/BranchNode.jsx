@@ -91,8 +91,13 @@ export default function BranchNode({ data }) {
             e.stopPropagation();
             if (data.addAction === 'project') actions?.onRequestAddProject();
             if (data.addAction === 'session') actions?.onRequestAddSession();
+            if (data.addAction === 'quest')   actions?.onRequestOpenQuest?.();
           }}
-          title={data.addAction === 'project' ? '프로젝트 추가' : '세션 추가'}
+          title={
+            data.addAction === 'project' ? '프로젝트 추가' :
+            data.addAction === 'session' ? '세션 추가' :
+            '퀘스트 작성'
+          }
         >+</button>
       )}
 
