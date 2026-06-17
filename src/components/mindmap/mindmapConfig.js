@@ -41,7 +41,7 @@ export const INITIAL_NODES = [
     id: 'goals',
     type: 'branch',
     position: { x: 430, y: 71 },
-    data: { label: '목표', emoji: '🎯', accent: 'mustard', parentId: 'hub', side: 'right', hasChildren: false },
+    data: { label: '이달의 퀘스트', emoji: '🎯', accent: 'mustard', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
     hidden: true,

@@ -12,6 +12,7 @@ import RoughEdge   from './edges/RoughEdge';
 import NodePanel   from './NodePanel';
 import TaskDetailPanel       from '../panels/TaskDetailPanel';
 import BrainstormSlidePanel  from '../panels/BrainstormSlidePanel';
+import QuestSlidePanel       from '../panels/QuestSlidePanel';
 import AddProjectModal  from '../modals/AddProjectModal';
 import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
@@ -20,6 +21,7 @@ import MemberTasksModal   from '../modals/MemberTasksModal';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
+import { useGoals }              from '../../hooks/useGoals';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode };
@@ -59,9 +61,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [showEditProj,   setShowEditProj]   = useState(null); // { projectId, name, pm }
   const [showAddTask,    setShowAddTask]    = useState(null); // { projectId, projectName }
   const [showAddSession, setShowAddSession] = useState(false);
+  const [activeQuest,    setActiveQuest]    = useState(false);
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
+  const goalsHook  = useGoals();
 
   // fitView key: changes whenever the project/brainstorm layout shape changes
   const fitKey = useMemo(() => {
@@ -89,6 +93,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     if (node.type === 'branch') {
       if (node.id === 'projects')   return toggleNode('projects');
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
+      if (node.id === 'goals')      return setActiveQuest(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') return toggleNode(node.id);
@@ -409,6 +414,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             session={brainstorm.sessions.find(s => s.id === activeSession)}
             brainstorm={brainstorm}
             onClose={() => setActiveSession(null)}
+          />
+        )}
+
+        {activeQuest && (
+          <QuestSlidePanel
+            goalsHook={goalsHook}
+            onClose={() => setActiveQuest(false)}
           />
         )}
 

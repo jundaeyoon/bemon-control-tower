@@ -1,0 +1,397 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── 월 선택 ─────────────────────────────────────────────────────────────────── */
+
+.monthRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 0;
+  background: rgba(212, 168, 67, 0.08);
+  border-radius: 12px;
+  border: 1.5px solid rgba(212, 168, 67, 0.28);
+}
+
+.monthArrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 168, 67, 0.45);
+  background: transparent;
+  color: #B8903A;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: var(--font-family);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.monthArrow:hover { background: rgba(212, 168, 67, 0.15); }
+
+.monthLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2A2118;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* ── 탭 바 ───────────────────────────────────────────────────────────────────── */
+
+.tabBar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-sub);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.tabActive {
+  border-color: #D4A843;
+  color: #B8903A;
+  background: rgba(212, 168, 67, 0.10);
+  font-weight: 700;
+}
+
+.tabBody {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 공통 탭 콘텐츠 ──────────────────────────────────────────────────────────── */
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #B8903A;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.desc {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  margin: 0;
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+/* ── 퀘스트 탭 ───────────────────────────────────────────────────────────────── */
+
+.questTextarea {
+  width: 100%;
+  min-height: 100px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(212, 168, 67, 0.4);
+  background: #FFFBEE;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: #2A2118;
+  resize: vertical;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+.questTextarea:focus {
+  outline: none;
+  border-color: #D4A843;
+}
+.questTextarea::placeholder { color: rgba(184, 144, 58, 0.45); }
+
+.addBtn {
+  font-size: 12px;
+  font-weight: 700;
+  color: #B8903A;
+  border: 1.4px solid rgba(212, 168, 67, 0.5);
+  background: rgba(212, 168, 67, 0.08);
+  border-radius: 100px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: background 0.15s;
+}
+.addBtn:hover { background: rgba(212, 168, 67, 0.18); }
+
+/* 클리어 조건 카드 */
+.condCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.condTopRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.condTitleInput {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid rgba(212, 168, 67, 0.3);
+  background: transparent;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: #2A2118;
+}
+.condTitleInput:focus { outline: none; border-color: #D4A843; }
+.condTitleInput::placeholder { color: rgba(184,144,58,0.4); font-weight: 400; }
+
+.condNumRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.numField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.numLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+
+.numInput {
+  width: 70px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid rgba(212, 168, 67, 0.3);
+  background: rgba(255, 255, 255, 0.65);
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: #2A2118;
+  text-align: right;
+}
+.numInput:focus { outline: none; border-color: #D4A843; }
+
+.pctBadge {
+  font-size: 15px;
+  font-weight: 900;
+  min-width: 42px;
+  text-align: right;
+  margin-left: auto;
+}
+
+.progressTrack {
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(212, 168, 67, 0.18);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.35s ease, background 0.35s ease;
+}
+
+.deleteIcon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-sub);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deleteIcon:hover { color: var(--color-warning); }
+
+/* ── 파이터 배정 탭 ──────────────────────────────────────────────────────────── */
+
+.fighterGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fighterBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(26, 26, 26, 0.10);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-family);
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.fighterBtn:hover { border-color: rgba(212, 168, 67, 0.4); background: rgba(212, 168, 67, 0.05); }
+
+.fighterOn {
+  border-width: 2px;
+}
+
+.fighterAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.fighterName {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2A2118;
+}
+
+.swordIcon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.selectedRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.avatarRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bigAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ── 잘하고있나!! 탭 ─────────────────────────────────────────────────────────── */
+
+.checkList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.checkTextCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.checkLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2A2118;
+}
+
+.checkDesc {
+  font-size: 11px;
+  color: var(--color-text-sub);
+}
+
+.checkToggle {
+  font-size: 22px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+  transition: transform 0.15s;
+}
+.checkToggle:hover { transform: scale(1.15); }
+
+/* ── 이달의 결과 탭 ──────────────────────────────────────────────────────────── */
+
+.memoTextarea {
+  width: 100%;
+  min-height: 90px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(212, 168, 67, 0.4);
+  background: #FFFBEE;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: var(--font-family);
+  color: #2A2118;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.memoTextarea:focus { outline: none; border-color: #D4A843; }
+.memoTextarea::placeholder { color: rgba(184, 144, 58, 0.45); }
