@@ -16,6 +16,7 @@ import TaskDetailPanel       from '../panels/TaskDetailPanel';
 import BrainstormSlidePanel  from '../panels/BrainstormSlidePanel';
 import QuestSlidePanel       from '../panels/QuestSlidePanel';
 import VisionHousePanel      from '../panels/VisionHousePanel';
+import CalendarPanel         from '../panels/CalendarPanel';
 import AddProjectModal  from '../modals/AddProjectModal';
 import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
@@ -26,6 +27,7 @@ import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
 import { useGoals }              from '../../hooks/useGoals';
 import { useVisionHouse }        from '../../hooks/useVisionHouse';
+import { useSchedule }          from '../../hooks/useSchedule';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -78,11 +80,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [showAddSession, setShowAddSession] = useState(false);
   const [activeQuest,    setActiveQuest]    = useState(null); // null | yearMonth string
   const [activeCompass,  setActiveCompass]  = useState(null); // null | kind string
+  const [activeSchedule, setActiveSchedule] = useState(false);
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
   const vhHook     = useVisionHouse();
+  const schedHook  = useSchedule();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -116,6 +120,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
       if (node.id === 'goals')      return toggleNode('goals');
       if (node.id === 'compass')    return toggleNode('compass');
+      if (node.id === 'schedule')   return setActiveSchedule(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') return toggleNode(node.id);
@@ -555,6 +560,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             vhHook={vhHook}
             initialTab={activeCompass}
             onClose={() => setActiveCompass(null)}
+          />
+        )}
+
+        {activeSchedule && (
+          <CalendarPanel
+            schedHook={schedHook}
+            onClose={() => setActiveSchedule(false)}
           />
         )}
 
