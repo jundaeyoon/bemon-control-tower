@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import rough from 'roughjs';
 import SlidePanel from './SlidePanel';
 import styles from './VisionHousePanel.module.css';
 
@@ -18,6 +19,7 @@ const VISION_CONFIG = {
     placeholder: '예) 팀의 비전을 연결하고, 매일의 일이 의미 있도록 돕는다.',
     bannerColor: 'rgba(75,105,65,0.92)',
     bannerShadow: 'rgba(50,80,40,0.55)',
+    btnFill:   '#4E7040', btnFillHover: '#637A35', btnStroke: '#3A5A2A',
   },
   team_spirit: {
     title: '팀 스피릿',
@@ -25,6 +27,7 @@ const VISION_CONFIG = {
     placeholder: 'JUN — 방향을 잡는다\nSURI — 고객과 연결한다\nSUNNY! — 디자인으로 빛낸다\nZIN — 기반을 탄탄하게\nLENA — 팀의 에너지를 만든다',
     bannerColor: 'rgba(180,90,40,0.92)',
     bannerShadow: 'rgba(140,60,20,0.55)',
+    btnFill:   '#B85828', btnFillHover: '#CC6830', btnStroke: '#8C3A10',
   },
   vision: {
     title: '3년 후 우리',
@@ -32,6 +35,7 @@ const VISION_CONFIG = {
     placeholder: '예) 한국에서 가장 신뢰받는 팀 협업 도구로, 500개 팀이 매일 사용한다.',
     bannerColor: 'rgba(90,110,48,0.92)',
     bannerShadow: 'rgba(60,80,30,0.55)',
+    btnFill:   '#637A35', btnFillHover: '#728C3E', btnStroke: '#4E6228',
   },
   capability: {
     title: '우리가 제일 잘하는 것',
@@ -39,6 +43,7 @@ const VISION_CONFIG = {
     placeholder: '예) 팀원의 감정과 맥락을 반영한 직관적인 협업 경험 설계.',
     bannerColor: 'rgba(90,110,48,0.88)',
     bannerShadow: 'rgba(60,80,30,0.50)',
+    btnFill:   '#637A35', btnFillHover: '#728C3E', btnStroke: '#4E6228',
   },
   values: {
     title: '우리의 방식',
@@ -46,8 +51,65 @@ const VISION_CONFIG = {
     placeholder: '예) 솔직한 피드백 / 빠른 실행 / 서로를 위한 여유 / 재미있게 일하기',
     bannerColor: 'rgba(90,110,48,0.88)',
     bannerShadow: 'rgba(60,80,30,0.50)',
+    btnFill:   '#637A35', btnFillHover: '#728C3E', btnStroke: '#4E6228',
   },
 };
+
+// ── Rough.js 저장 버튼 ────────────────────────────────────────────────────────
+
+const BTN_W = 162;
+const BTN_H = 40;
+
+function RoughSaveButton({ onClick, saved, cfg }) {
+  const canvasRef  = useRef(null);
+  const [hovered, setHovered] = useState(false);
+
+  const fill   = saved ? '#4E7E4E' : hovered ? cfg.btnFillHover : cfg.btnFill;
+  const stroke = saved ? '#3A6A3A' : cfg.btnStroke;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = BTN_W * dpr;
+    canvas.height = BTN_H * dpr;
+    canvas.style.width  = `${BTN_W}px`;
+    canvas.style.height = `${BTN_H}px`;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, BTN_W, BTN_H);
+
+    const rc = rough.canvas(canvas);
+    rc.rectangle(2, 2, BTN_W - 4, BTN_H - 4, {
+      fill,
+      fillStyle: 'solid',
+      stroke,
+      strokeWidth: hovered && !saved ? 2.2 : 1.8,
+      roughness: 1.4,
+      bowing:    0.6,
+      seed:      77,
+    });
+  }, [hovered, saved, fill, stroke]);
+
+  return (
+    <button
+      className={styles.saveBtn}
+      style={{ width: BTN_W, height: BTN_H }}
+      onClick={saved ? undefined : onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      disabled={saved}
+    >
+      <canvas ref={canvasRef} className={styles.saveBtnCanvas} aria-hidden="true" />
+      <span className={styles.saveBtnLabel}>
+        {saved ? '저장됐어요! ✅' : '저장하기'}
+      </span>
+    </button>
+  );
+}
+
+// ── 패널 루트 ─────────────────────────────────────────────────────────────────
 
 export default function VisionHousePanel({ vhHook, initialTab = 'mission', onClose }) {
   const [tab, setTab] = useState(initialTab);
@@ -89,13 +151,28 @@ export default function VisionHousePanel({ vhHook, initialTab = 'mission', onClo
 // ── 일반 비전 탭 ─────────────────────────────────────────────────────────────
 
 function VisionTab({ kind, cfg, value, onSave }) {
-  const [text, setText] = useState(value);
+  const [text,  setText]  = useState(value);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => { setText(value); }, [value]);
 
+  // blur 자동저장 (기존 유지)
   const handleBlur = useCallback(() => {
     if (text !== value) onSave(text);
   }, [text, value, onSave]);
+
+  // 버튼 수동저장
+  const handleSave = useCallback(async () => {
+    await onSave(text);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }, [text, onSave]);
+
+  // 타이핑 시작하면 "저장됐어요" 상태 즉시 해제
+  const handleChange = useCallback((e) => {
+    setText(e.target.value);
+    if (saved) setSaved(false);
+  }, [saved]);
 
   return (
     <div className={styles.tabContent}>
@@ -116,9 +193,11 @@ function VisionTab({ kind, cfg, value, onSave }) {
         className={styles.textarea}
         value={text}
         placeholder={cfg.placeholder}
-        onChange={e => setText(e.target.value)}
+        onChange={handleChange}
         onBlur={handleBlur}
       />
+
+      <RoughSaveButton onClick={handleSave} saved={saved} cfg={cfg} />
     </div>
   );
 }
