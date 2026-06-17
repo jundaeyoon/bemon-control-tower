@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SlidePanel from './SlidePanel';
 import RoughCard from '../rough/RoughCard';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
@@ -116,20 +116,33 @@ function QuestTab({ goal, yearMonth, onUpdate }) {
 
   return (
     <div className={styles.tabContent}>
-      <div className={styles.section}>
-        <div className={styles.sectionLabel}>퀘스트 Objective</div>
-        <textarea
-          className={styles.questTextarea}
-          value={quest}
-          placeholder={`${formatDisplay(yearMonth)} 우리 팀의 퀘스트를 입력하세요...`}
-          onChange={e => setQuest(e.target.value)}
-          onBlur={() => { if (quest !== (goal?.quest ?? '')) onUpdate({ quest }); }}
-        />
+
+      {/* ── 퀘스트 배너 ── */}
+      <div className={styles.questBanner}>
+        <span className={styles.questBannerEmoji}>🎯</span>
+        <span className={styles.questBannerTitle}>이달의 퀘스트</span>
+        <span className={styles.questBannerSub}>OBJECTIVE</span>
       </div>
 
+      <textarea
+        className={styles.questTextarea}
+        value={quest}
+        placeholder={`${formatDisplay(yearMonth)}에 우리가 반드시 달성할 것!`}
+        onChange={e => setQuest(e.target.value)}
+        onBlur={() => { if (quest !== (goal?.quest ?? '')) onUpdate({ quest }); }}
+      />
+
+      {/* ── KR 구분선 ── */}
+      <div className={styles.krDivider}>
+        <span className={styles.krDividerLine} />
+        <span className={styles.krDividerLabel}>KEY RESULTS</span>
+        <span className={styles.krDividerLine} />
+      </div>
+
+      {/* ── 클리어 조건 ── */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <div className={styles.sectionLabel}>클리어 조건 Key Results</div>
+          <div className={styles.sectionLabel}>클리어 조건</div>
           {conditions.length < 3 && (
             <button className={styles.addBtn} onClick={addCondition}>+ 추가</button>
           )}
@@ -193,62 +206,113 @@ function QuestTab({ goal, yearMonth, onUpdate }) {
 
 // ── 파이터 배정 탭 ────────────────────────────────────────────────────────────
 
-function FightersTab({ goal, onUpdate }) {
-  const fighters = goal?.fighters ?? [];
+// DB에 저장된 fighters가 구버전 string[] 일 수 있으므로 정규화
+function normalizeFighters(raw) {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return MEMBERS.map(m => ({ name: m, selected: false, task: '' }));
+  }
+  if (typeof raw[0] === 'string') {
+    return MEMBERS.map(m => ({ name: m, selected: raw.includes(m), task: '' }));
+  }
+  const mapped = Object.fromEntries(raw.map(f => [f.name, f]));
+  return MEMBERS.map(m => mapped[m] ?? { name: m, selected: false, task: '' });
+}
 
-  const toggle = (member) => {
-    const next = fighters.includes(member)
-      ? fighters.filter(f => f !== member)
-      : [...fighters, member];
+function FightersTab({ goal, onUpdate }) {
+  const [fighters, setFighters] = useState(() => normalizeFighters(goal?.fighters ?? []));
+
+  // ref로 항상 최신 fighters를 추적 (onBlur 클로저 stale 방지)
+  const fightersRef = useRef(fighters);
+  useEffect(() => { fightersRef.current = fighters; }, [fighters]);
+
+  useEffect(() => {
+    const normalized = normalizeFighters(goal?.fighters ?? []);
+    setFighters(normalized);
+    fightersRef.current = normalized;
+  }, [goal?.id]);
+
+  const toggle = useCallback((name) => {
+    const next = fightersRef.current.map(f =>
+      f.name === name ? { ...f, selected: !f.selected } : f
+    );
+    setFighters(next);
+    fightersRef.current = next;
     onUpdate({ fighters: next });
-  };
+  }, [onUpdate]);
+
+  const handleTaskChange = useCallback((name, task) => {
+    const next = fightersRef.current.map(f =>
+      f.name === name ? { ...f, task } : f
+    );
+    setFighters(next);
+    fightersRef.current = next;
+  }, []);
+
+  const handleTaskBlur = useCallback(() => {
+    onUpdate({ fighters: fightersRef.current });
+  }, [onUpdate]);
+
+  const selectedFighters = fighters.filter(f => f.selected);
 
   return (
     <div className={styles.tabContent}>
-      <p className={styles.desc}>이달의 퀘스트에 함께할 파이터를 선택하세요</p>
+      <p className={styles.desc}>파이터를 선택하고 이번 달 맡을 일을 입력해주세요</p>
       <div className={styles.fighterGrid}>
-        {MEMBERS.map(m => {
-          const mc  = getMemberColor(m);
-          const on  = fighters.includes(m);
+        {fighters.map(f => {
+          const mc = getMemberColor(f.name);
           return (
-            <button
-              key={m}
-              className={`${styles.fighterBtn} ${on ? styles.fighterOn : ''}`}
-              style={on ? { background: mc.bg, borderColor: mc.border } : {}}
-              onClick={() => toggle(m)}
+            <div
+              key={f.name}
+              className={`${styles.fighterCard} ${f.selected ? styles.fighterCardOn : ''}`}
+              style={f.selected ? { borderColor: mc.border, background: mc.bg } : {}}
             >
-              <span
-                className={styles.fighterAvatar}
-                style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
-              >
-                {getMemberInitial(m)}
-              </span>
-              <span
-                className={styles.fighterName}
-                style={on ? { color: mc.text, fontWeight: 800 } : {}}
-              >
-                {m}
-              </span>
-              <span className={styles.swordIcon}>{on ? '⚔️' : ''}</span>
-            </button>
+              {/* 클릭 영역: 아바타 + 이름 + 검 아이콘 */}
+              <div className={styles.fighterCardHeader} onClick={() => toggle(f.name)}>
+                <span
+                  className={styles.fighterAvatar}
+                  style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
+                >
+                  {getMemberInitial(f.name)}
+                </span>
+                <span
+                  className={styles.fighterName}
+                  style={f.selected ? { color: mc.text, fontWeight: 800 } : {}}
+                >
+                  {f.name}
+                </span>
+                <span className={styles.swordIcon}>{f.selected ? '⚔️' : ''}</span>
+              </div>
+
+              {/* 선택됐을 때만 태스크 입력창 펼쳐짐 */}
+              {f.selected && (
+                <input
+                  className={styles.fighterTaskInput}
+                  style={{ '--task-border': mc.border }}
+                  value={f.task}
+                  placeholder="이번 달 맡을 일..."
+                  onChange={e => handleTaskChange(f.name, e.target.value)}
+                  onBlur={handleTaskBlur}
+                />
+              )}
+            </div>
           );
         })}
       </div>
 
-      {fighters.length > 0 && (
+      {selectedFighters.length > 0 && (
         <div className={styles.selectedRow}>
           <span className={styles.sectionLabel}>선발된 파이터</span>
           <div className={styles.avatarRow}>
-            {fighters.map(m => {
-              const mc = getMemberColor(m);
+            {selectedFighters.map(f => {
+              const mc = getMemberColor(f.name);
               return (
                 <span
-                  key={m}
+                  key={f.name}
                   className={styles.bigAvatar}
                   style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
-                  title={m}
+                  title={f.task ? `${f.name}: ${f.task}` : f.name}
                 >
-                  {getMemberInitial(m)}
+                  {getMemberInitial(f.name)}
                 </span>
               );
             })}

@@ -79,7 +79,7 @@
   flex-direction: column;
 }
 
-/* ── 공통 탭 콘텐츠 ──────────────────────────────────────────────────────────── */
+/* ── 공통 ────────────────────────────────────────────────────────────────────── */
 
 .tabContent {
   display: flex;
@@ -103,7 +103,7 @@
   font-size: 11px;
   font-weight: 700;
   color: #B8903A;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
@@ -121,27 +121,118 @@
   margin: 0;
 }
 
-/* ── 퀘스트 탭 ───────────────────────────────────────────────────────────────── */
+/* ── 퀘스트 배너 ─────────────────────────────────────────────────────────────── */
+
+.questBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 24px 16px;
+  background: #D4A843;
+  border-radius: 16px;
+  /* offset shadow으로 Rough.js 손그림 느낌 */
+  box-shadow: 4px 4px 0px #B8903A, 1px 1px 0 rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 대각선 해치 텍스처로 스케치 느낌 강화 */
+.questBanner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 9px,
+    rgba(255, 255, 255, 0.06) 9px,
+    rgba(255, 255, 255, 0.06) 10px
+  );
+  pointer-events: none;
+}
+
+.questBannerEmoji {
+  font-size: 30px;
+  line-height: 1;
+  position: relative;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+}
+
+.questBannerTitle {
+  font-size: 20px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
+  font-family: var(--font-family);
+  position: relative;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.12);
+}
+
+.questBannerSub {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 3px;
+  position: relative;
+}
+
+/* ── 퀘스트 입력창 ───────────────────────────────────────────────────────────── */
 
 .questTextarea {
   width: 100%;
-  min-height: 100px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid rgba(212, 168, 67, 0.4);
+  min-height: 130px;
+  border-radius: 14px;
+  border: 2px solid rgba(212, 168, 67, 0.45);
   background: #FFFBEE;
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 16px 18px;
+  font-size: 18px;
   font-family: var(--font-family);
   color: #2A2118;
   resize: vertical;
-  font-weight: 500;
+  font-weight: 700;
+  text-align: center;
   box-sizing: border-box;
+  line-height: 1.55;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .questTextarea:focus {
   outline: none;
   border-color: #D4A843;
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
 }
-.questTextarea::placeholder { color: rgba(184, 144, 58, 0.45); }
+.questTextarea::placeholder {
+  color: rgba(184, 144, 58, 0.35);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+/* ── KR 구분선 ───────────────────────────────────────────────────────────────── */
+
+.krDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+.krDividerLine {
+  flex: 1;
+  height: 1.5px;
+  background: rgba(212, 168, 67, 0.3);
+  border-radius: 100px;
+  display: block;
+}
+
+.krDividerLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #B8903A;
+  letter-spacing: 2.5px;
+  white-space: nowrap;
+}
+
+/* ── 추가 버튼 ───────────────────────────────────────────────────────────────── */
 
 .addBtn {
   font-size: 12px;
@@ -157,7 +248,8 @@
 }
 .addBtn:hover { background: rgba(212, 168, 67, 0.18); }
 
-/* 클리어 조건 카드 */
+/* ── 클리어 조건 카드 ────────────────────────────────────────────────────────── */
+
 .condCard {
   display: flex;
   flex-direction: column;
@@ -183,7 +275,7 @@
   color: #2A2118;
 }
 .condTitleInput:focus { outline: none; border-color: #D4A843; }
-.condTitleInput::placeholder { color: rgba(184,144,58,0.4); font-weight: 400; }
+.condTitleInput::placeholder { color: rgba(184, 144, 58, 0.4); font-weight: 400; }
 
 .condNumRow {
   display: flex;
@@ -264,23 +356,28 @@
   gap: 8px;
 }
 
-.fighterBtn {
+/* button 대신 div 카드 — 내부에 input이 들어가기 때문 */
+.fighterCard {
+  border-radius: 12px;
+  border: 1.5px solid rgba(26, 26, 26, 0.10);
+  background: transparent;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+}
+.fighterCard:hover { border-color: rgba(212, 168, 67, 0.35); }
+
+.fighterCardOn {
+  border-width: 2px;
+}
+
+/* 클릭 가능한 상단 행 */
+.fighterCardHeader {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid rgba(26, 26, 26, 0.10);
-  background: transparent;
   cursor: pointer;
-  font-family: var(--font-family);
-  text-align: left;
-  transition: border-color 0.15s, background 0.15s;
-}
-.fighterBtn:hover { border-color: rgba(212, 168, 67, 0.4); background: rgba(212, 168, 67, 0.05); }
-
-.fighterOn {
-  border-width: 2px;
+  user-select: none;
 }
 
 .fighterAvatar {
@@ -301,6 +398,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #2A2118;
+  font-family: var(--font-family);
 }
 
 .swordIcon {
@@ -308,6 +406,26 @@
   width: 20px;
   text-align: center;
 }
+
+/* 펼쳐지는 태스크 입력창 */
+.fighterTaskInput {
+  display: block;
+  width: 100%;
+  border: none;
+  border-top: 1.5px dashed var(--task-border, rgba(212,168,67,0.4));
+  background: rgba(255, 255, 255, 0.5);
+  padding: 9px 14px;
+  font-size: 12px;
+  font-family: var(--font-family);
+  color: #2A2118;
+  box-sizing: border-box;
+  transition: background 0.15s;
+}
+.fighterTaskInput:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.85);
+}
+.fighterTaskInput::placeholder { color: rgba(100, 80, 40, 0.35); }
 
 .selectedRow {
   display: flex;
