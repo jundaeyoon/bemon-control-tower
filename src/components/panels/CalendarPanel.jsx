@@ -14,7 +14,7 @@ const CHIP_BG = {
   'ZIN':    '#9333EA',
   'LENA':   '#0284C7',
 };
-const MULTI_COLOR = '#A855F7';
+const MULTI_COLOR = '#9CA3AF';
 
 const REPEAT_OPTS = [
   { value: 'none',    label: '없음' },
