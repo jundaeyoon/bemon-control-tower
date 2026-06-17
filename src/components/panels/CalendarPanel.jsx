@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import rough from 'roughjs';
 import SlidePanel from './SlidePanel';
@@ -14,6 +14,7 @@ const CHIP_BG = {
   'ZIN':    '#9333EA',
   'LENA':   '#0284C7',
 };
+const MULTI_COLOR = '#A855F7';
 
 const REPEAT_OPTS = [
   { value: 'none',    label: '없음' },
@@ -21,7 +22,7 @@ const REPEAT_OPTS = [
   { value: 'monthly', label: '매월' },
 ];
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────────────
 
 function toDateStr(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -38,13 +39,26 @@ function getCalendarDays(year, month) {
   return days;
 }
 
+// DB에 저장된 repeat 컬럼 기준 (repeat_type 아님)
 function matchesDate(schedule, dateStr) {
-  if (schedule.repeat_type === 'none') return schedule.date === dateStr;
+  if (schedule.repeat === 'none' || !schedule.repeat) return schedule.date === dateStr;
   const sd = new Date(schedule.date + 'T00:00:00');
   const td = new Date(dateStr + 'T00:00:00');
-  if (schedule.repeat_type === 'weekly')  return sd.getDay() === td.getDay();
-  if (schedule.repeat_type === 'monthly') return sd.getDate() === td.getDate();
+  if (schedule.repeat === 'weekly')  return sd.getDay() === td.getDay();
+  if (schedule.repeat === 'monthly') return sd.getDate() === td.getDate();
   return false;
+}
+
+// 담당자 문자열 → 배열 파싱 ("JUN,SURI" → ["JUN","SURI"])
+function parseAssignees(str) {
+  if (!str) return ['JUN'];
+  return str.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// 칩 배경색: 단독이면 담당자 색, 복수면 보라
+function getChipBg(assigneeStr) {
+  const names = parseAssignees(assigneeStr);
+  return names.length === 1 ? (CHIP_BG[names[0]] ?? '#888') : MULTI_COLOR;
 }
 
 // ── Day header rough.js strip ─────────────────────────────────────────────────
@@ -142,7 +156,7 @@ export default function CalendarPanel({ schedHook, onClose }) {
                       <div
                         key={ev.id}
                         className={styles.chip}
-                        style={{ background: CHIP_BG[ev.assignee] ?? '#888' }}
+                        style={{ background: getChipBg(ev.assignee) }}
                         title={`${ev.title} — ${ev.assignee}`}
                         onClick={e => { e.stopPropagation(); setEditEvent(ev); }}
                       >
@@ -167,10 +181,14 @@ export default function CalendarPanel({ schedHook, onClose }) {
               {m}
             </span>
           ))}
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: MULTI_COLOR }} />
+            복수담당
+          </span>
         </div>
       </div>
 
-      {/* Add modal — portaled to body to avoid transform stacking context */}
+      {/* Add modal */}
       {addDate && createPortal(
         <EventModal
           date={addDate}
@@ -207,16 +225,35 @@ export default function CalendarPanel({ schedHook, onClose }) {
 // ── Event add/edit modal ──────────────────────────────────────────────────────
 
 function EventModal({ date, initial, onSave, onDelete, onClose }) {
-  const [title,      setTitle]      = useState(initial?.title ?? '');
-  const [assignee,   setAssignee]   = useState(initial?.assignee ?? 'JUN');
-  const [repeatType, setRepeatType] = useState(initial?.repeat_type ?? 'none');
-  const [saving,     setSaving]     = useState(false);
+  const [title,     setTitle]     = useState(initial?.title ?? '');
+  // 다중 선택: 콤마 구분 문자열 → 배열
+  const [assignees, setAssignees] = useState(parseAssignees(initial?.assignee));
+  // DB 컬럼명은 repeat (repeat_type 아님)
+  const [repeat,    setRepeat]    = useState(initial?.repeat ?? 'none');
+  const [saving,    setSaving]    = useState(false);
+
+  const toggleAssignee = (mem) => {
+    setAssignees(prev => {
+      if (prev.includes(mem)) {
+        // 마지막 1명이면 해제 불가
+        return prev.length > 1 ? prev.filter(a => a !== mem) : prev;
+      }
+      return [...prev, mem];
+    });
+  };
 
   const handleSave = async () => {
     if (!title.trim()) return;
     setSaving(true);
-    try { await onSave({ title: title.trim(), assignee, repeat_type: repeatType }); }
-    finally { setSaving(false); }
+    try {
+      await onSave({
+        title: title.trim(),
+        assignee: assignees.join(','),  // "JUN" 또는 "JUN,SURI"
+        repeat,
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const [y, m, d] = date.split('-');
@@ -241,21 +278,38 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
           />
 
           <div className={styles.modalSection}>
-            <div className={styles.modalLbl}>담당자</div>
+            <div className={styles.modalLbl}>담당자 (복수 선택 가능)</div>
             <div className={styles.assigneeRow}>
-              {MEMBERS.map(mem => (
-                <button
-                  key={mem}
-                  className={`${styles.assigneeBtn} ${assignee === mem ? styles.assigneeBtnOn : ''}`}
-                  style={assignee === mem
-                    ? { background: CHIP_BG[mem], borderColor: CHIP_BG[mem] }
-                    : {}}
-                  onClick={() => setAssignee(mem)}
-                >
-                  {mem}
-                </button>
-              ))}
+              {MEMBERS.map(mem => {
+                const on = assignees.includes(mem);
+                return (
+                  <button
+                    key={mem}
+                    className={`${styles.assigneeBtn} ${on ? styles.assigneeBtnOn : ''}`}
+                    style={on ? { background: CHIP_BG[mem], borderColor: CHIP_BG[mem] } : {}}
+                    onClick={() => toggleAssignee(mem)}
+                  >
+                    {mem}
+                  </button>
+                );
+              })}
             </div>
+            {/* 선택된 담당자 칩 표시 */}
+            {assignees.length > 0 && (
+              <div className={styles.selectedChips}>
+                {assignees.map(a => (
+                  <span
+                    key={a}
+                    className={styles.selectedChip}
+                    style={{
+                      background: assignees.length > 1 ? MULTI_COLOR : (CHIP_BG[a] ?? '#888'),
+                    }}
+                  >
+                    {a}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className={styles.modalSection}>
@@ -264,8 +318,8 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
               {REPEAT_OPTS.map(opt => (
                 <button
                   key={opt.value}
-                  className={`${styles.repeatBtn} ${repeatType === opt.value ? styles.repeatBtnOn : ''}`}
-                  onClick={() => setRepeatType(opt.value)}
+                  className={`${styles.repeatBtn} ${repeat === opt.value ? styles.repeatBtnOn : ''}`}
+                  onClick={() => setRepeat(opt.value)}
                 >
                   {opt.label}
                 </button>

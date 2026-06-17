@@ -15,10 +15,10 @@ export function useSchedule() {
       });
   }, []);
 
-  const addSchedule = useCallback(async ({ title, date, assignee, repeat_type = 'none' }) => {
+  const addSchedule = useCallback(async ({ title, date, assignee, repeat = 'none' }) => {
     const { data, error } = await supabase
       .from('schedules')
-      .insert({ title, date, assignee, repeat_type })
+      .insert({ title, date, assignee, repeat })
       .select()
       .single();
     if (error) { console.error('[useSchedule] insert 에러:', error); throw error; }
