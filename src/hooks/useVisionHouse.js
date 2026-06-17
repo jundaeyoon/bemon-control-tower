@@ -11,42 +11,53 @@ export function useVisionHouse() {
 
   useEffect(() => {
     (async () => {
-      // .single() 은 행이 0개면 에러를 냄 → 배열로 받아서 직접 처리
+      console.log('[useVisionHouse] 🔍 초기 데이터 로드 시작');
+
       const { data: rows, error } = await supabase
         .from('vision_house')
         .select('*')
         .limit(1);
 
+      console.log('[useVisionHouse] select 결과 →', { rows, error });
+
       if (error) {
-        console.error('[useVisionHouse] select 에러:', error);
+        console.error('[useVisionHouse] ❌ select 에러:', error.code, error.message, error.details);
         return;
       }
 
       if (rows && rows.length > 0) {
+        console.log('[useVisionHouse] ✅ 기존 행 로드 완료 id=', rows[0].id);
         setHouse(rows[0]);
       } else {
-        // 행이 없으면 기본 행 즉시 생성
+        console.log('[useVisionHouse] ⚠️ 행 없음 → 기본 행 생성 시도');
         const { data: created, error: insertErr } = await supabase
           .from('vision_house')
           .insert(DEFAULT_ROW)
           .select()
           .single();
 
+        console.log('[useVisionHouse] insert 결과 →', { created, insertErr });
+
         if (insertErr) {
-          console.error('[useVisionHouse] 기본 행 생성 에러:', insertErr);
+          console.error('[useVisionHouse] ❌ 기본 행 생성 에러:', insertErr.code, insertErr.message, insertErr.details, insertErr.hint);
           return;
         }
+        console.log('[useVisionHouse] ✅ 기본 행 생성 완료 id=', created.id);
         setHouse(created);
       }
     })();
   }, []);
 
   const updateHouse = useCallback(async (fields) => {
+    console.log('[useVisionHouse] 💾 updateHouse 호출 →', { fields, house_id: house?.id, house_is_null: !house });
+
     if (!house) {
-      const err = new Error('[useVisionHouse] house 데이터가 아직 로드되지 않았습니다');
-      console.error(err);
+      const err = new Error('[useVisionHouse] house가 null — 아직 로드 안 됐거나 초기화 실패');
+      console.error('[useVisionHouse] ❌', err.message);
       throw err;
     }
+
+    console.log('[useVisionHouse] Supabase update 실행 → table: vision_house, id:', house.id, ', fields:', fields);
 
     const { data, error } = await supabase
       .from('vision_house')
@@ -55,11 +66,14 @@ export function useVisionHouse() {
       .select()
       .single();
 
+    console.log('[useVisionHouse] update 결과 →', { data, error });
+
     if (error) {
-      console.error('[useVisionHouse] update 에러:', error);
-      throw error; // 호출부에서 catch 할 수 있도록 throw
+      console.error('[useVisionHouse] ❌ update 에러:', error.code, error.message, error.details, error.hint);
+      throw error;
     }
 
+    console.log('[useVisionHouse] ✅ 저장 성공:', data);
     setHouse(data);
     return data;
   }, [house]);
