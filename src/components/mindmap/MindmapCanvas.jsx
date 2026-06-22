@@ -9,7 +9,8 @@ import ProjectNode, { PROJECT_W, PROJECT_H } from './nodes/ProjectNode';
 import TaskNode,    { TASK_W,    TASK_H    } from './nodes/TaskNode';
 import SessionNode, { SESSION_W, SESSION_H } from './nodes/SessionNode';
 import QuestNode,   { QUEST_W,   QUEST_H   } from './nodes/QuestNode';
-import CompassNode, { COMPASS_W, COMPASS_H } from './nodes/CompassNode';
+import CompassNode,      { COMPASS_W, COMPASS_H } from './nodes/CompassNode';
+import TimeCapsuleNode, { CAPSULE_W, CAPSULE_H } from './nodes/TimeCapsuleNode';
 import RoughEdge   from './edges/RoughEdge';
 import NodePanel   from './NodePanel';
 import TaskDetailPanel       from '../panels/TaskDetailPanel';
@@ -26,6 +27,7 @@ import FeedbackModal          from '../modals/FeedbackModal';
 import BemonDashboardPopup    from '../modals/BemonDashboardPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
+import TimeCapsulePanel   from '../panels/TimeCapsulePanel';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
@@ -33,9 +35,10 @@ import { useGoals }              from '../../hooks/useGoals';
 import { useVisionHouse }        from '../../hooks/useVisionHouse';
 import { useSchedule }          from '../../hooks/useSchedule';
 import { useThankYou }          from '../../hooks/useThankYou';
+import { useTimeCapsule }       from '../../hooks/useTimeCapsule';
 import styles from './MindmapCanvas.module.css';
 
-const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
+const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode, capsule: TimeCapsuleNode };
 const EDGE_TYPES = { rough: RoughEdge };
 
 // Zigzag tree layout — X positions
@@ -91,6 +94,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [showDashboard,   setShowDashboard]   = useState(false);
+  const [activeCapsule,   setActiveCapsule]   = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -98,7 +102,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const { deleteGoal } = goalsHook;
   const vhHook     = useVisionHouse();
   const schedHook  = useSchedule();
-  const thankHook  = useThankYou();
+  const thankHook   = useThankYou();
+  const capsuleHook = useTimeCapsule();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -150,6 +155,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     if (node.type === 'session') return setActiveSession(node.id);
     if (node.type === 'quest')   return setActiveQuest(node.data.yearMonth);
     if (node.type === 'compass') return setActiveCompass(node.data.kind);
+    if (node.type === 'capsule') return setActiveCapsule(true);
   }, [toggleNode]);
 
   const handleDeleteProject = useCallback((projectId) => {
@@ -428,8 +434,21 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    // TimeCapsule node — always visible below hub (hub: x=46,y=-54, w=148,h=108)
+    // hub center x = 120 → capsule x = 120 - CAPSULE_W/2 = 60
+    // hub bottom y = 54  → capsule top = 54 + 120 = 174
+    result.push({
+      id:       'timecapsule',
+      type:     'capsule',
+      position: { x: 60, y: 174 },
+      data:     { capsules: capsuleHook.capsules },
+      width:    CAPSULE_W,
+      height:   CAPSULE_H,
+      hidden:   false,
+    });
+
     return result;
-  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house, thankHook.thanks]);
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house, thankHook.thanks, capsuleHook.capsules]);
 
   // Build dynamic edges
   const allEdges = useMemo(() => {
@@ -671,6 +690,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <ThankYouPanel
             thankHook={thankHook}
             onClose={() => setActiveThankyou(false)}
+          />
+        )}
+
+        {activeCapsule && (
+          <TimeCapsulePanel
+            capsuleHook={capsuleHook}
+            onClose={() => setActiveCapsule(false)}
           />
         )}
 
