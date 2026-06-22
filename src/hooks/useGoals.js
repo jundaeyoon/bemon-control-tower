@@ -64,5 +64,17 @@ export function useGoals() {
     setGoals(prev => prev.map(g => g.id === goalId ? data : g));
   }, []);
 
-  return { goals, getOrCreateGoal, updateGoal };
+  const deleteGoal = useCallback(async (yearMonth) => {
+    const { error } = await supabase
+      .from('goals')
+      .delete()
+      .eq('year_month', yearMonth);
+    if (error) {
+      console.error('[useGoals] delete 에러:', error);
+      return;
+    }
+    setGoals(prev => prev.filter(g => g.year_month !== yearMonth));
+  }, []);
+
+  return { goals, getOrCreateGoal, updateGoal, deleteGoal };
 }

@@ -87,6 +87,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
+  const { deleteGoal } = goalsHook;
   const vhHook     = useVisionHouse();
   const schedHook  = useSchedule();
 
@@ -159,6 +160,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     setActiveSession(prev => (prev === sessionId ? null : prev));
   }, [brainstorm]);
 
+  const handleDeleteQuest = useCallback((yearMonth) => {
+    deleteGoal(yearMonth);
+    setActiveQuest(prev => (prev === yearMonth ? null : prev));
+  }, [deleteGoal]);
+
   // Context value
   const ctxValue = useMemo(() => ({
     onRequestAddProject: () => setShowAddProj(true),
@@ -178,7 +184,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     },
     onRequestOpenCompass: () => setActiveCompass('mission'),
     onRequestFeedback:   (projectId, projectName) => setActiveFeedback({ projectId, projectName }),
-  }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession]);
+    onDeleteQuest:       handleDeleteQuest,
+  }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession, handleDeleteQuest]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
   const allNodes = useMemo(() => {

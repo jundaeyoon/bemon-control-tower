@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react';
 import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
+import { useMindmapActions } from '../../../contexts/MindmapActionsContext';
 import styles from './QuestNode.module.css';
 
 export const QUEST_W = 190;
@@ -20,6 +21,7 @@ function fmtMonth(ym) {
 export default function QuestNode({ data }) {
   const canvasRef = useRef(null);
   const [hovered, setHovered] = useState(false);
+  const actions = useMindmapActions();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -71,6 +73,19 @@ export default function QuestNode({ data }) {
         <span className={styles.date}>{fmtMonth(data.yearMonth)}</span>
         <span className={styles.label}>{data.quest}</span>
       </div>
+
+      {hovered && (
+        <button
+          className={styles.deleteBtn}
+          onClick={e => {
+            e.stopPropagation();
+            if (window.confirm(`${fmtMonth(data.yearMonth)} 퀘스트를 삭제할까요?`)) {
+              actions?.onDeleteQuest(data.yearMonth);
+            }
+          }}
+          title="퀘스트 삭제"
+        >✕</button>
+      )}
 
       <Handle type="target" position={Position.Top}    id="tt" style={HANDLE} />
       <Handle type="source" position={Position.Bottom} id="sb" style={HANDLE} />
