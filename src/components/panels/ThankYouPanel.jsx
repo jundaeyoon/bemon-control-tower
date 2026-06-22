@@ -72,6 +72,7 @@ export default function ThankYouPanel({ thankHook, onClose }) {
                   style={{ background: color, transform: `rotate(${rotate}deg)` }}
                   onClick={() => setExpandedId(expanded ? null : t.id)}
                 >
+                  <div className={styles.postitSpacer} />
                   <div className={styles.postitContent}>
                     <p className={styles.toName}>To. {t.to_member}</p>
                     <p className={styles.message}>{t.message}</p>

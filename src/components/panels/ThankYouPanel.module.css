@@ -58,8 +58,15 @@
   max-height: 500px;
 }
 
+/* 60px 빈 영역 — 접혔을 때 색상 블록으로만 보임 */
+.postitSpacer {
+  height: 60px;
+  flex-shrink: 0;
+}
+
+/* 텍스트는 spacer 아래에 위치 → 접히면 overflow:hidden에 의해 완전히 숨겨짐 */
 .postitContent {
-  padding: 12px 12px 14px;
+  padding: 0 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
