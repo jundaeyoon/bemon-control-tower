@@ -49,7 +49,7 @@ export const INITIAL_NODES = [
   {
     id: 'goals',
     type: 'branch',
-    position: { x: -400, y: 300 },
+    position: { x: -260, y: 300 },
     data: { label: '이달의 퀘스트', emoji: '🎯', accent: 'mustard', parentId: 'hub', side: 'left', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
@@ -67,7 +67,7 @@ export const INITIAL_NODES = [
   {
     id: 'thankyou',
     type: 'branch',
-    position: { x: 430, y: 120 },
+    position: { x: 430, y: 270 },
     data: { label: '땡큐 베리 머치', emoji: '🙏', accent: 'coral', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,

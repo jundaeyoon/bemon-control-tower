@@ -278,7 +278,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     if (hubExpanded && dynThankYouY === null) {
       dynThankYouY = expandedSet.has('compass')
         ? -80 + BRANCH_H + COMPASS_SUBTREE + 60
-        : Math.max(120, -80 + BRANCH_H + 220);
+        : Math.max(270, -80 + BRANCH_H + 220);
     }
 
     // Hub + 4 branch nodes
