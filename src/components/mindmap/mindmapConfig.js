@@ -67,7 +67,7 @@ export const INITIAL_NODES = [
   {
     id: 'thankyou',
     type: 'branch',
-    position: { x: 580, y: 450 },
+    position: { x: 580, y: 750 },
     data: { label: '땡큐 베리 머치', emoji: '🙏', accent: 'coral', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
