@@ -55,6 +55,15 @@ export const INITIAL_NODES = [
     height: NODE_HEIGHT.branch,
     hidden: true,
   },
+  {
+    id: 'completed',
+    type: 'branch',
+    position: { x: -400, y: -300 },
+    data: { label: '프로젝트 완수!', emoji: '🏆', accent: 'emerald', parentId: 'hub', side: 'left', hasChildren: false },
+    width:  NODE_WIDTH.branch,
+    height: NODE_HEIGHT.branch,
+    hidden: true,
+  },
 ];
 
 export const INITIAL_EDGES = [
@@ -63,4 +72,5 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-brainstorm', source: 'hub', target: 'brainstorm', type: 'rough', data: { color: '#6B7C5C', seed: 3 } },
   { id: 'e-hub-compass',    source: 'hub', target: 'compass',    type: 'rough', data: { color: '#637A35', seed: 5 } },
   { id: 'e-hub-goals',      source: 'hub', target: 'goals',      type: 'rough', data: { color: '#D4A843', seed: 4 } },
+  { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
 ];

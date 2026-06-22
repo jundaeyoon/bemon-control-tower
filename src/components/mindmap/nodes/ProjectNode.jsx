@@ -125,11 +125,25 @@ export default function ProjectNode({ data }) {
       )}
 
       {isCompleted && (
-        <button
-          className={styles.feedbackBtn}
-          onClick={e => { e.stopPropagation(); actions?.onRequestFeedback(data.id, data.name); }}
-          title="프로젝트 피드백 작성"
-        >🎊 피드백</button>
+        <>
+          <button
+            className={styles.feedbackBtn}
+            onClick={e => { e.stopPropagation(); actions?.onRequestFeedback(data.id, data.name); }}
+            title="프로젝트 피드백 작성"
+          >🎊 피드백</button>
+          {!data.archived && (
+            <button
+              className={styles.archiveBtn}
+              onClick={e => {
+                e.stopPropagation();
+                if (window.confirm(`"${data.name}"을 프로젝트 완수!로 이동할까요?`)) {
+                  actions?.onArchiveProject(data.id);
+                }
+              }}
+              title="프로젝트 완수! 브랜치로 이동"
+            >📦 보관하기</button>
+          )}
+        </>
       )}
 
       <Handle type="target" position={Position.Right} id="tr" style={HANDLE} />

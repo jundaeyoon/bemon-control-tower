@@ -84,7 +84,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeSchedule,  setActiveSchedule]  = useState(false);
   const [activeFeedback,  setActiveFeedback]  = useState(null); // null | { projectId, projectName }
 
-  const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
+  const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
   const { deleteGoal } = goalsHook;
@@ -98,13 +98,16 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     const brainE   = expandedSet.has('brainstorm');
     const goalsE   = expandedSet.has('goals');
     const compassE = expandedSet.has('compass');
-    const projLayout    = (!hubE || !projE || projects.length === 0)
+    const completedE    = expandedSet.has('completed');
+    const activeProjs   = projects.filter(p => !p.archived);
+    const projLayout    = (!hubE || !projE || activeProjs.length === 0)
       ? ''
-      : projects.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
-    const brainLayout   = (!hubE || !brainE)   ? '' : brainstorm.sessions.length;
-    const goalsLayout   = (!hubE || !goalsE)   ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
-    const compassLayout = (!hubE || !compassE) ? '' : 'open';
-    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}-${compassE}-${compassLayout}`;
+      : activeProjs.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
+    const brainLayout     = (!hubE || !brainE)     ? '' : brainstorm.sessions.length;
+    const goalsLayout     = (!hubE || !goalsE)     ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
+    const compassLayout   = (!hubE || !compassE)   ? '' : 'open';
+    const completedLayout = (!hubE || !completedE) ? '' : projects.filter(p => p.archived).length;
+    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}-${compassE}-${compassLayout}-${completedE}-${completedLayout}`;
   }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   const toggleNode = useCallback((id) => {
@@ -123,10 +126,14 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
       if (node.id === 'goals')      return toggleNode('goals');
       if (node.id === 'compass')    return toggleNode('compass');
+      if (node.id === 'completed')  return toggleNode('completed');
       if (node.id === 'schedule')   return setActiveSchedule(true);
       return setActivePanel(node.id);
     }
-    if (node.type === 'project') return toggleNode(node.id);
+    if (node.type === 'project') {
+      if (!node.data.archived) return toggleNode(node.id);
+      return;
+    }
     if (node.type === 'task')    return setActiveTask({ taskId: node.id, projectId: node.data.projectId });
     if (node.type === 'session') return setActiveSession(node.id);
     if (node.type === 'quest')   return setActiveQuest(node.data.yearMonth);
@@ -165,6 +172,16 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     setActiveQuest(prev => (prev === yearMonth ? null : prev));
   }, [deleteGoal]);
 
+  const handleArchiveProject = useCallback((projectId) => {
+    archiveProject(projectId);
+    setExpandedSet(prev => {
+      const next = new Set(prev);
+      next.delete(projectId);
+      return next;
+    });
+    setActiveTask(prev => (prev?.projectId === projectId ? null : prev));
+  }, [archiveProject]);
+
   // Context value
   const ctxValue = useMemo(() => ({
     onRequestAddProject: () => setShowAddProj(true),
@@ -185,7 +202,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     onRequestOpenCompass: () => setActiveCompass('mission'),
     onRequestFeedback:   (projectId, projectName) => setActiveFeedback({ projectId, projectName }),
     onDeleteQuest:       handleDeleteQuest,
-  }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession, handleDeleteQuest]);
+    onArchiveProject:    handleArchiveProject,
+  }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession, handleDeleteQuest, handleArchiveProject]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
   const allNodes = useMemo(() => {
@@ -194,15 +212,18 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     const brainstormExpanded = expandedSet.has('brainstorm');
     const result = [];
 
+    const activeProjects   = projects.filter(p => !p.archived);
+    const archivedProjects = projects.filter(p =>  p.archived);
+
     // STEP 1 — block height for each project (includes its expanded tasks)
-    const blockHeights = projects.map(proj =>
+    const blockHeights = activeProjects.map(proj =>
       (expandedSet.has(proj.id) && proj.tasks.length > 0)
         ? proj.tasks.length * TASK_BLOCK_STEP
         : PROJ_BLOCK_MIN
     );
 
     // STEP 2 — total vertical span of the layout
-    const gapTotal    = projects.length > 1 ? (projects.length - 1) * PROJ_GAP : 0;
+    const gapTotal    = activeProjects.length > 1 ? (activeProjects.length - 1) * PROJ_GAP : 0;
     const totalHeight = blockHeights.reduce((s, h) => s + h, 0) + gapTotal;
 
     // STEP 3 — center Y of each project block, layout anchored at Y=0
@@ -219,10 +240,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     let dynBrainstormY = null;
     let dynCompassY    = null;
     let dynGoalsY      = null;
+    let dynCompletedY  = null;
 
     const compassExpanded = expandedSet.has('compass');
 
-    if (hubExpanded && projectsExpanded && projects.length > 0) {
+    if (hubExpanded && projectsExpanded && activeProjects.length > 0) {
       const startY   = -(totalHeight / 2);
       const endY     = startY + totalHeight;
       dynBranchY     = -BRANCH_H / 2;                  // projects branch centered at Y=0
@@ -232,6 +254,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       dynGoalsY      = compassExpanded
         ? dynCompassY + BRANCH_H + COMPASS_SUBTREE + 60
         : dynCompassY + BRANCH_H + 220;
+      dynCompletedY  = startY - BRANCH_H - 100;
+    }
+
+    if (hubExpanded && dynCompletedY === null) {
+      dynCompletedY = -250;
     }
 
     // Hub + 4 branch nodes
@@ -244,6 +271,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'brainstorm' && dynBrainstormY !== null) overridePos = { ...n.position, y: dynBrainstormY };
       if (n.id === 'compass'    && dynCompassY    !== null) overridePos = { ...n.position, y: dynCompassY };
       if (n.id === 'goals'      && dynGoalsY      !== null) overridePos = { ...n.position, y: dynGoalsY };
+      if (n.id === 'completed'  && dynCompletedY  !== null) overridePos = { x: PROJ_BRANCH_X, y: dynCompletedY };
       result.push({
         ...n,
         position: overridePos ?? n.position,
@@ -259,9 +287,9 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     });
 
-    // STEP 3+4 — project nodes and their tasks
-    if (hubExpanded && projectsExpanded && projects.length > 0) {
-      projects.forEach((proj, i) => {
+    // STEP 3+4 — active project nodes and their tasks
+    if (hubExpanded && projectsExpanded && activeProjects.length > 0) {
+      activeProjects.forEach((proj, i) => {
         const cy = projCenters[i];
 
         result.push({
@@ -368,6 +396,27 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
+    // Archived project nodes under "프로젝트 완수!" branch
+    if (hubExpanded && expandedSet.has('completed') && archivedProjects.length > 0) {
+      const completedNode = result.find(n => n.id === 'completed');
+      if (completedNode) {
+        archivedProjects.forEach((proj, i) => {
+          result.push({
+            id:   proj.id,
+            type: 'project',
+            position: {
+              x: PROJ_X,
+              y: completedNode.position.y + BRANCH_H + 50 + i * PROJ_BLOCK_MIN - PROJECT_H / 2,
+            },
+            data: { ...proj, id: proj.id, parentId: 'completed', isExpanded: false, side: 'left' },
+            width:  PROJECT_W,
+            height: PROJECT_H,
+            hidden: false,
+          });
+        });
+      }
+    }
+
     return result;
   }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house]);
 
@@ -384,8 +433,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       result.push({ ...e, hidden: targetParentId ? !hubExpanded : false });
     });
 
+    const activeProjects   = projects.filter(p => !p.archived);
+    const archivedProjects = projects.filter(p =>  p.archived);
+
     if (hubExpanded && projectsExpanded) {
-      projects.forEach((proj, i) => {
+      activeProjects.forEach((proj, i) => {
         result.push({
           id: `e-projects-${proj.id}`,
           source: 'projects',
@@ -427,6 +479,18 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           target: `quest-${q.year_month}`,
           type:   'rough',
           data:   { color: '#D4A843', seed: i + 70 },
+        });
+      });
+    }
+
+    if (hubExpanded && expandedSet.has('completed')) {
+      archivedProjects.forEach((proj, i) => {
+        result.push({
+          id:     `e-completed-${proj.id}`,
+          source: 'completed',
+          target:  proj.id,
+          type:   'rough',
+          data:   { color: 'rgba(56,142,60,0.55)', seed: i + 90 },
         });
       });
     }

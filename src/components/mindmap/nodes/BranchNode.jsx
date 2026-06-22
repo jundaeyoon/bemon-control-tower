@@ -23,6 +23,7 @@ const ACCENT_COLORS = {
   olive:   { fill: 'rgba(90,110,48,0.72)',   fillHover: 'rgba(90,110,48,0.88)',  stroke: '#637A35' },
   neutral: { fill: 'rgba(110,110,110,0.68)', fillHover: 'rgba(110,110,110,0.82)', stroke: '#888888' },
   salmon:  { fill: 'rgba(180,100,75,0.72)',  fillHover: 'rgba(180,100,75,0.86)', stroke: '#C06850' },
+  emerald: { fill: 'rgba(56,142,60,0.72)',   fillHover: 'rgba(56,142,60,0.86)',  stroke: '#388E3C' },
 };
 
 export default function BranchNode({ data }) {

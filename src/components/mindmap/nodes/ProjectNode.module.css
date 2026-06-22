@@ -192,13 +192,12 @@
   border-color: #C06850;
 }
 
-/* "🎊 피드백" button — bottom-center, visible when project is completed */
+/* "🎊 피드백" button — bottom-left, visible when project is completed */
 .feedbackBtn {
   position: absolute;
   bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 2px 9px;
+  left: 10px;
+  padding: 2px 8px;
   border-radius: 100px;
   background: rgba(76,175,80,0.12);
   border: 1.5px solid rgba(56,142,60,0.50);
@@ -210,11 +209,35 @@
   z-index: 20;
   font-family: var(--font-family);
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .feedbackBtn:hover {
   background: rgba(76,175,80,0.22);
   border-color: #388E3C;
-  transform: translateX(-50%) scale(1.07);
+}
+
+/* "📦 보관하기" button — bottom-right, visible when completed and not archived */
+.archiveBtn {
+  position: absolute;
+  bottom: -22px;
+  right: 10px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(56,142,60,0.10);
+  border: 1.5px solid rgba(56,142,60,0.45);
+  color: #1B5E20;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  z-index: 20;
+  font-family: var(--font-family);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.archiveBtn:hover {
+  background: rgba(56,142,60,0.22);
+  border-color: #388E3C;
 }

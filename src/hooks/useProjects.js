@@ -85,6 +85,13 @@ export function useProjects() {
     setProjects(prev => prev.filter(p => p.id !== projectId));
   }, []);
 
+  const archiveProject = useCallback(async (projectId) => {
+    const { error } = await supabase
+      .from('projects').update({ archived: true }).eq('id', projectId);
+    if (error) { console.error(error); return; }
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, archived: true } : p));
+  }, []);
+
   // ── Tasks ─────────────────────────────────────────────────────────────────
 
   const addTask = useCallback(async (projectId, fields) => {
@@ -211,7 +218,7 @@ export function useProjects() {
 
   return {
     projects,
-    addProject, updateProject, deleteProject,
+    addProject, updateProject, deleteProject, archiveProject,
     addTask, updateTask, updateTaskMemo, toggleTask, deleteTask,
     addTaskImage, removeTaskImage,
   };
