@@ -1,0 +1,12 @@
+.anonNotice {
+  font-size: 12px;
+  font-weight: 600;
+  color: #B55C30;
+  background: rgba(232,137,106,0.12);
+  border: 1px solid rgba(232,137,106,0.28);
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}

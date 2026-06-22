@@ -64,6 +64,15 @@ export const INITIAL_NODES = [
     height: NODE_HEIGHT.branch,
     hidden: true,
   },
+  {
+    id: 'thankyou',
+    type: 'branch',
+    position: { x: 430, y: 200 },
+    data: { label: '땡큐 베리 머치', emoji: '🙏', accent: 'coral', parentId: 'hub', side: 'right', hasChildren: false },
+    width:  NODE_WIDTH.branch,
+    height: NODE_HEIGHT.branch,
+    hidden: true,
+  },
 ];
 
 export const INITIAL_EDGES = [
@@ -73,4 +82,5 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-compass',    source: 'hub', target: 'compass',    type: 'rough', data: { color: '#7C3AED', seed: 5 } },
   { id: 'e-hub-goals',      source: 'hub', target: 'goals',      type: 'rough', data: { color: '#D4A843', seed: 4 } },
   { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
+  { id: 'e-hub-thankyou',  source: 'hub', target: 'thankyou',  type: 'rough', data: { color: '#E8896A', seed: 7 } },
 ];

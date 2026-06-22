@@ -24,12 +24,14 @@ import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
 import FeedbackModal      from '../modals/FeedbackModal';
 import CompletedPanel     from '../panels/CompletedPanel';
+import ThankYouPanel      from '../panels/ThankYouPanel';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
 import { useGoals }              from '../../hooks/useGoals';
 import { useVisionHouse }        from '../../hooks/useVisionHouse';
 import { useSchedule }          from '../../hooks/useSchedule';
+import { useThankYou }          from '../../hooks/useThankYou';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -86,6 +88,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeFeedback,  setActiveFeedback]  = useState(null); // null | { projectId, projectName }
   const [activeCompleted, setActiveCompleted] = useState(false);
   const [feedbackVersion, setFeedbackVersion] = useState(0);
+  const [activeThankyou,  setActiveThankyou]  = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -93,6 +96,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const { deleteGoal } = goalsHook;
   const vhHook     = useVisionHouse();
   const schedHook  = useSchedule();
+  const thankHook  = useThankYou();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -129,6 +133,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'compass')    return toggleNode('compass');
       if (node.id === 'completed')  return setActiveCompleted(true);
       if (node.id === 'schedule')   return setActiveSchedule(true);
+      if (node.id === 'thankyou')   return setActiveThankyou(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') {
@@ -241,6 +246,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     let dynCompassY    = null;
     let dynGoalsY      = null;
     let dynCompletedY  = null;
+    let dynThankYouY   = null;
 
     const compassExpanded = expandedSet.has('compass');
 
@@ -255,6 +261,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         ? dynCompassY + BRANCH_H + COMPASS_SUBTREE + 60
         : dynCompassY + BRANCH_H + 220;
       dynCompletedY  = startY - BRANCH_H - 100;
+      dynThankYouY   = dynGoalsY + BRANCH_H + 100;
     }
 
     if (hubExpanded && dynCompletedY === null) {
@@ -272,6 +279,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'compass'    && dynCompassY    !== null) overridePos = { ...n.position, y: dynCompassY };
       if (n.id === 'goals'      && dynGoalsY      !== null) overridePos = { ...n.position, y: dynGoalsY };
       if (n.id === 'completed'  && dynCompletedY  !== null) overridePos = { x: PROJ_BRANCH_X, y: dynCompletedY };
+      if (n.id === 'thankyou'   && dynThankYouY   !== null) overridePos = { ...n.position, y: dynThankYouY };
       result.push({
         ...n,
         position: overridePos ?? n.position,
@@ -623,6 +631,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             projectId={activeFeedback.projectId}
             projectName={activeFeedback.projectName}
             onClose={() => { setActiveFeedback(null); setFeedbackVersion(v => v + 1); }}
+          />
+        )}
+
+        {activeThankyou && (
+          <ThankYouPanel
+            thankHook={thankHook}
+            onClose={() => setActiveThankyou(false)}
           />
         )}
 
