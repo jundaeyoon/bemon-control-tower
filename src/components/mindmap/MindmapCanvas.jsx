@@ -257,15 +257,28 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       dynScheduleY   = Math.min(-200, startY - 120);
       dynBrainstormY = Math.max(200,  endY   + 120);
       dynCompassY    = dynScheduleY + 230;
-      dynGoalsY      = compassExpanded
+      dynCompletedY  = startY - BRANCH_H - 100;
+      const brainstormBottom = brainstormExpanded && brainstorm.sessions.length > 0
+        ? dynBrainstormY + BRANCH_H + SESSION_GAP_TOP + brainstorm.sessions.length * SESSION_STEP
+        : dynBrainstormY + BRANCH_H;
+      dynGoalsY    = brainstormBottom + 80;
+      dynThankYouY = compassExpanded
         ? dynCompassY + BRANCH_H + COMPASS_SUBTREE + 60
         : dynCompassY + BRANCH_H + 220;
-      dynCompletedY  = startY - BRANCH_H - 100;
-      dynThankYouY   = dynGoalsY + BRANCH_H + 100;
     }
 
     if (hubExpanded && dynCompletedY === null) {
       dynCompletedY = -250;
+    }
+    if (hubExpanded && dynGoalsY === null) {
+      const bSessions = expandedSet.has('brainstorm') ? brainstorm.sessions.length : 0;
+      const bBottom   = 71 + BRANCH_H + (bSessions > 0 ? SESSION_GAP_TOP + bSessions * SESSION_STEP : 0);
+      dynGoalsY = Math.max(300, bBottom + 80);
+    }
+    if (hubExpanded && dynThankYouY === null) {
+      dynThankYouY = expandedSet.has('compass')
+        ? -80 + BRANCH_H + COMPASS_SUBTREE + 60
+        : Math.max(120, -80 + BRANCH_H + 220);
     }
 
     // Hub + 4 branch nodes
