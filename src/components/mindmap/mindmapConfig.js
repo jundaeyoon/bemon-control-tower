@@ -23,7 +23,7 @@ export const INITIAL_NODES = [
     id: 'schedule',
     type: 'branch',
     position: { x: 430, y: -250 },
-    data: { label: '베몽 달력', emoji: '📅', accent: 'olive', parentId: 'hub', side: 'right', hasChildren: false },
+    data: { label: '베몽 달력', emoji: '📅', accent: 'sky', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
     hidden: true,
@@ -41,7 +41,7 @@ export const INITIAL_NODES = [
     id: 'compass',
     type: 'branch',
     position: { x: 430, y: -80 },
-    data: { label: 'BEMON 나침반', emoji: '🧭', accent: 'olive', parentId: 'hub', side: 'right', hasChildren: false },
+    data: { label: 'BEMON 나침반', emoji: '🧭', accent: 'violet', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
     hidden: true,
@@ -68,9 +68,9 @@ export const INITIAL_NODES = [
 
 export const INITIAL_EDGES = [
   { id: 'e-hub-projects',   source: 'hub', target: 'projects',   type: 'rough', data: { color: '#C06850', seed: 1 } },
-  { id: 'e-hub-schedule',   source: 'hub', target: 'schedule',   type: 'rough', data: { color: '#637A35', seed: 2 } },
+  { id: 'e-hub-schedule',   source: 'hub', target: 'schedule',   type: 'rough', data: { color: '#0284C7', seed: 2 } },
   { id: 'e-hub-brainstorm', source: 'hub', target: 'brainstorm', type: 'rough', data: { color: '#6B7C5C', seed: 3 } },
-  { id: 'e-hub-compass',    source: 'hub', target: 'compass',    type: 'rough', data: { color: '#637A35', seed: 5 } },
+  { id: 'e-hub-compass',    source: 'hub', target: 'compass',    type: 'rough', data: { color: '#7C3AED', seed: 5 } },
   { id: 'e-hub-goals',      source: 'hub', target: 'goals',      type: 'rough', data: { color: '#D4A843', seed: 4 } },
   { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
 ];
