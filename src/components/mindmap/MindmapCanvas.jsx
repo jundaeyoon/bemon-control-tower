@@ -22,7 +22,8 @@ import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
 import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
-import FeedbackModal      from '../modals/FeedbackModal';
+import FeedbackModal          from '../modals/FeedbackModal';
+import BemonDashboardPopup    from '../modals/BemonDashboardPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
@@ -89,6 +90,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeCompleted, setActiveCompleted] = useState(false);
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
+  const [showDashboard,   setShowDashboard]   = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -125,7 +127,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   }, []);
 
   const handleNodeClick = useCallback((_ev, node) => {
-    if (node.type === 'hub')    return toggleNode('hub');
+    if (node.type === 'hub') {
+      toggleNode('hub');
+      setShowDashboard(true);
+      return;
+    }
     if (node.type === 'branch') {
       if (node.id === 'projects')   return toggleNode('projects');
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
@@ -220,6 +226,12 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
 
     const activeProjects = projects.filter(p => !p.archived);
 
+    const _td = new Date();
+    const _todayStr = `${_td.getFullYear()}-${String(_td.getMonth()+1).padStart(2,'0')}-${String(_td.getDate()).padStart(2,'0')}`;
+    const badgeCount =
+      projects.flatMap(p => p.tasks ?? []).filter(t => t.deadline === _todayStr && !t.completed).length +
+      thankHook.thanks.filter(t => t.created_at?.startsWith(_todayStr)).length;
+
     // STEP 1 — block height for each project (includes its expanded tasks)
     const blockHeights = activeProjects.map(proj =>
       (expandedSet.has(proj.id) && proj.tasks.length > 0)
@@ -302,6 +314,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
                      n.id === 'brainstorm' ? 'session'  :
                      n.id === 'goals'      ? 'quest'    :
                      n.id === 'compass'    ? 'compass'  : null,
+          ...(n.id === 'hub' ? { badgeCount } : {}),
         },
       });
     });
@@ -416,7 +429,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     }
 
     return result;
-  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house]);
+  }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house, thankHook.thanks]);
 
   // Build dynamic edges
   const allEdges = useMemo(() => {
@@ -642,6 +655,15 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             projectId={activeFeedback.projectId}
             projectName={activeFeedback.projectName}
             onClose={() => { setActiveFeedback(null); setFeedbackVersion(v => v + 1); }}
+          />
+        )}
+
+        {showDashboard && (
+          <BemonDashboardPopup
+            projects={projects}
+            goals={goalsHook.goals}
+            thanks={thankHook.thanks}
+            onClose={() => setShowDashboard(false)}
           />
         )}
 

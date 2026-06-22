@@ -75,6 +75,9 @@ export default function HubNode({ data }) {
         <span className={styles.label} translate="no">BEMON</span>
         <span className={styles.sublabel} translate="no">{data.sublabel}</span>
       </div>
+      {data.badgeCount > 0 && (
+        <div className={styles.badge}>{data.badgeCount > 9 ? '9+' : data.badgeCount}</div>
+      )}
 
       <Handle type="source" position={Position.Left}   id="left"   style={HANDLE} />
       <Handle type="source" position={Position.Right}  id="right"  style={HANDLE} />
