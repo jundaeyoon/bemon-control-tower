@@ -45,39 +45,31 @@
   cursor: pointer;
   box-shadow: 2px 3px 8px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.6) inset;
   overflow: hidden;
-  transition: box-shadow 0.15s;
+  max-height: 60px;
+  transition: max-height 0.35s ease, box-shadow 0.15s;
   position: relative;
-  min-height: 60px;
 }
 
 .postit:hover {
   box-shadow: 3px 5px 14px rgba(0,0,0,0.16), 0 1px 0 rgba(255,255,255,0.6) inset;
 }
 
+.postitOpen {
+  max-height: 500px;
+}
+
+.postitContent {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .toName {
   font-size: 13px;
   font-weight: 700;
   color: rgba(0,0,0,0.65);
-  margin: 0 0 6px;
-}
-
-/* ── Expandable body (grid-template-rows trick) ── */
-.postitBody {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.28s ease;
-}
-
-.postitOpen .postitBody {
-  grid-template-rows: 1fr;
-}
-
-.postitBodyInner {
-  overflow: hidden;
-  padding: 0 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin: 0;
 }
 
 .message {

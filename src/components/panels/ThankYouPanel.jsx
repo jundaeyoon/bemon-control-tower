@@ -72,20 +72,18 @@ export default function ThankYouPanel({ thankHook, onClose }) {
                   style={{ background: color, transform: `rotate(${rotate}deg)` }}
                   onClick={() => setExpandedId(expanded ? null : t.id)}
                 >
-                  <div className={styles.postitBody}>
-                    <div className={styles.postitBodyInner}>
-                      <p className={styles.toName}>To. {t.to_member}</p>
-                      <p className={styles.message}>{t.message}</p>
-                      <div className={styles.postitFooter}>
-                        <span className={styles.dateText}>{fmtDate(t.created_at)}</span>
-                        <span className={styles.anonTag}>익명 🙈</span>
-                        <button
-                          className={styles.heartBtn}
-                          onClick={e => { e.stopPropagation(); toggleHeart(t.id); }}
-                        >
-                          ❤️ {t.hearts ?? 0}
-                        </button>
-                      </div>
+                  <div className={styles.postitContent}>
+                    <p className={styles.toName}>To. {t.to_member}</p>
+                    <p className={styles.message}>{t.message}</p>
+                    <div className={styles.postitFooter}>
+                      <span className={styles.dateText}>{fmtDate(t.created_at)}</span>
+                      <span className={styles.anonTag}>익명 🙈</span>
+                      <button
+                        className={styles.heartBtn}
+                        onClick={e => { e.stopPropagation(); toggleHeart(t.id); }}
+                      >
+                        ❤️ {t.hearts ?? 0}
+                      </button>
                     </div>
                   </div>
                 </div>
