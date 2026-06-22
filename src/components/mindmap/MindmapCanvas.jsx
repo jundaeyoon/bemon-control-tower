@@ -22,6 +22,7 @@ import EditProjectModal from '../modals/EditProjectModal';
 import AddTaskModal        from '../modals/AddTaskModal';
 import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
+import FeedbackModal      from '../modals/FeedbackModal';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
@@ -80,7 +81,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [showAddSession, setShowAddSession] = useState(false);
   const [activeQuest,    setActiveQuest]    = useState(null); // null | yearMonth string
   const [activeCompass,  setActiveCompass]  = useState(null); // null | kind string
-  const [activeSchedule, setActiveSchedule] = useState(false);
+  const [activeSchedule,  setActiveSchedule]  = useState(false);
+  const [activeFeedback,  setActiveFeedback]  = useState(null); // null | { projectId, projectName }
 
   const { projects, addProject, updateProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -175,6 +177,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       setActiveQuest(ym);
     },
     onRequestOpenCompass: () => setActiveCompass('mission'),
+    onRequestFeedback:   (projectId, projectName) => setActiveFeedback({ projectId, projectName }),
   }), [projects, toggleTask, handleDeleteProject, handleEditProject, handleDeleteSession]);
 
   // Build dynamic nodes — X-Mind style tree layout (guaranteed no overlap)
@@ -575,6 +578,14 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             member={selectedMember}
             projects={projects}
             onClose={onCloseSelectedMember}
+          />
+        )}
+
+        {activeFeedback && (
+          <FeedbackModal
+            projectId={activeFeedback.projectId}
+            projectName={activeFeedback.projectName}
+            onClose={() => setActiveFeedback(null)}
           />
         )}
 

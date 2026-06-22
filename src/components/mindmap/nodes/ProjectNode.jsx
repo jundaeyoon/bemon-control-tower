@@ -10,9 +10,12 @@ export const PROJECT_H = 54;
 
 const HANDLE = { opacity: 0, background: 'transparent', border: 'none', width: 8, height: 8, minWidth: 0, minHeight: 0 };
 
-const FILL       = 'rgba(180,100,75,0.62)';
-const FILL_HOVER = 'rgba(180,100,75,0.80)';
-const STROKE     = '#C06850';
+const FILL         = 'rgba(180,100,75,0.62)';
+const FILL_HOVER   = 'rgba(180,100,75,0.80)';
+const STROKE       = '#C06850';
+const FILL_DONE    = 'rgba(76,175,80,0.65)';
+const FILL_DONE_HV = 'rgba(76,175,80,0.82)';
+const STROKE_DONE  = '#388E3C';
 
 export default function ProjectNode({ data }) {
   const canvasRef = useRef(null);
@@ -20,6 +23,10 @@ export default function ProjectNode({ data }) {
   const actions = useMindmapActions();
 
   const pmMc = data.pm ? getMemberColor(data.pm) : null;
+  const isCompleted = data.tasks?.length > 0 && data.tasks.every(t => t.completed);
+
+  const fill   = isCompleted ? (hovered ? FILL_DONE_HV : FILL_DONE) : (hovered ? FILL_HOVER : FILL);
+  const stroke = isCompleted ? STROKE_DONE : STROKE;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -39,9 +46,9 @@ export default function ProjectNode({ data }) {
     const seed = (data.name ?? 'p').charCodeAt(0);
 
     rc.rectangle(pad, pad, PROJECT_W - pad * 2, PROJECT_H - pad * 2, {
-      fill: hovered ? FILL_HOVER : FILL,
+      fill,
       fillStyle: 'solid',
-      stroke: STROKE,
+      stroke,
       strokeWidth: hovered || data.isExpanded ? 2.0 : 1.5,
       roughness: 1.3,
       bowing: 0.5,
@@ -49,13 +56,13 @@ export default function ProjectNode({ data }) {
     });
     rc.rectangle(pad + 3, pad + 3, PROJECT_W - (pad + 3) * 2, PROJECT_H - (pad + 3) * 2, {
       fill: 'none',
-      stroke: `${STROKE}33`,
+      stroke: `${stroke}33`,
       strokeWidth: 0.7,
       roughness: 1.6,
       bowing: 0.6,
       seed: seed + 5,
     });
-  }, [hovered, data.isExpanded, data.name]);
+  }, [hovered, data.isExpanded, data.name, fill, stroke]);
 
   return (
     <div
@@ -115,6 +122,14 @@ export default function ProjectNode({ data }) {
             title="프로젝트 삭제"
           >✕</button>
         </>
+      )}
+
+      {isCompleted && (
+        <button
+          className={styles.feedbackBtn}
+          onClick={e => { e.stopPropagation(); actions?.onRequestFeedback(data.id, data.name); }}
+          title="프로젝트 피드백 작성"
+        >🎊 피드백</button>
       )}
 
       <Handle type="target" position={Position.Right} id="tr" style={HANDLE} />
