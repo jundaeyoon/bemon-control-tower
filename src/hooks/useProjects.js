@@ -86,10 +86,11 @@ export function useProjects() {
   }, []);
 
   const archiveProject = useCallback(async (projectId) => {
+    const archived_at = new Date().toISOString();
     const { error } = await supabase
-      .from('projects').update({ archived: true }).eq('id', projectId);
+      .from('projects').update({ archived: true, archived_at }).eq('id', projectId);
     if (error) { console.error(error); return; }
-    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, archived: true } : p));
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, archived: true, archived_at } : p));
   }, []);
 
   // ── Tasks ─────────────────────────────────────────────────────────────────

@@ -23,6 +23,7 @@ import AddTaskModal        from '../modals/AddTaskModal';
 import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
 import FeedbackModal      from '../modals/FeedbackModal';
+import CompletedPanel     from '../panels/CompletedPanel';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
@@ -83,6 +84,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeCompass,  setActiveCompass]  = useState(null); // null | kind string
   const [activeSchedule,  setActiveSchedule]  = useState(false);
   const [activeFeedback,  setActiveFeedback]  = useState(null); // null | { projectId, projectName }
+  const [activeCompleted, setActiveCompleted] = useState(false);
+  const [feedbackVersion, setFeedbackVersion] = useState(0);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -98,16 +101,14 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     const brainE   = expandedSet.has('brainstorm');
     const goalsE   = expandedSet.has('goals');
     const compassE = expandedSet.has('compass');
-    const completedE    = expandedSet.has('completed');
     const activeProjs   = projects.filter(p => !p.archived);
     const projLayout    = (!hubE || !projE || activeProjs.length === 0)
       ? ''
       : activeProjs.map((p, i) => `${i}:${expandedSet.has(p.id) ? p.tasks.length : 0}`).join(',');
-    const brainLayout     = (!hubE || !brainE)     ? '' : brainstorm.sessions.length;
-    const goalsLayout     = (!hubE || !goalsE)     ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
-    const compassLayout   = (!hubE || !compassE)   ? '' : 'open';
-    const completedLayout = (!hubE || !completedE) ? '' : projects.filter(p => p.archived).length;
-    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}-${compassE}-${compassLayout}-${completedE}-${completedLayout}`;
+    const brainLayout   = (!hubE || !brainE)   ? '' : brainstorm.sessions.length;
+    const goalsLayout   = (!hubE || !goalsE)   ? '' : goalsHook.goals.filter(g => g.quest?.trim()).length;
+    const compassLayout = (!hubE || !compassE) ? '' : 'open';
+    return `${hubE}-${projE}-${projLayout}-${brainE}-${brainLayout}-${goalsE}-${goalsLayout}-${compassE}-${compassLayout}`;
   }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals]);
 
   const toggleNode = useCallback((id) => {
@@ -126,7 +127,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'brainstorm') return toggleNode('brainstorm');
       if (node.id === 'goals')      return toggleNode('goals');
       if (node.id === 'compass')    return toggleNode('compass');
-      if (node.id === 'completed')  return toggleNode('completed');
+      if (node.id === 'completed')  return setActiveCompleted(true);
       if (node.id === 'schedule')   return setActiveSchedule(true);
       return setActivePanel(node.id);
     }
@@ -212,8 +213,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     const brainstormExpanded = expandedSet.has('brainstorm');
     const result = [];
 
-    const activeProjects   = projects.filter(p => !p.archived);
-    const archivedProjects = projects.filter(p =>  p.archived);
+    const activeProjects = projects.filter(p => !p.archived);
 
     // STEP 1 — block height for each project (includes its expanded tasks)
     const blockHeights = activeProjects.map(proj =>
@@ -396,27 +396,6 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       });
     }
 
-    // Archived project nodes under "프로젝트 완수!" branch
-    if (hubExpanded && expandedSet.has('completed') && archivedProjects.length > 0) {
-      const completedNode = result.find(n => n.id === 'completed');
-      if (completedNode) {
-        archivedProjects.forEach((proj, i) => {
-          result.push({
-            id:   proj.id,
-            type: 'project',
-            position: {
-              x: PROJ_X,
-              y: completedNode.position.y + BRANCH_H + 50 + i * PROJ_BLOCK_MIN - PROJECT_H / 2,
-            },
-            data: { ...proj, id: proj.id, parentId: 'completed', isExpanded: false, side: 'left' },
-            width:  PROJECT_W,
-            height: PROJECT_H,
-            hidden: false,
-          });
-        });
-      }
-    }
-
     return result;
   }, [expandedSet, projects, brainstorm.sessions, goalsHook.goals, vhHook.house]);
 
@@ -433,8 +412,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       result.push({ ...e, hidden: targetParentId ? !hubExpanded : false });
     });
 
-    const activeProjects   = projects.filter(p => !p.archived);
-    const archivedProjects = projects.filter(p =>  p.archived);
+    const activeProjects = projects.filter(p => !p.archived);
 
     if (hubExpanded && projectsExpanded) {
       activeProjects.forEach((proj, i) => {
@@ -479,18 +457,6 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           target: `quest-${q.year_month}`,
           type:   'rough',
           data:   { color: '#D4A843', seed: i + 70 },
-        });
-      });
-    }
-
-    if (hubExpanded && expandedSet.has('completed')) {
-      archivedProjects.forEach((proj, i) => {
-        result.push({
-          id:     `e-completed-${proj.id}`,
-          source: 'completed',
-          target:  proj.id,
-          type:   'rough',
-          data:   { color: 'rgba(56,142,60,0.55)', seed: i + 90 },
         });
       });
     }
@@ -656,7 +622,16 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <FeedbackModal
             projectId={activeFeedback.projectId}
             projectName={activeFeedback.projectName}
-            onClose={() => setActiveFeedback(null)}
+            onClose={() => { setActiveFeedback(null); setFeedbackVersion(v => v + 1); }}
+          />
+        )}
+
+        {activeCompleted && (
+          <CompletedPanel
+            projects={projects}
+            onFeedback={(projectId, projectName) => setActiveFeedback({ projectId, projectName })}
+            onClose={() => setActiveCompleted(false)}
+            refreshKey={feedbackVersion}
           />
         )}
 

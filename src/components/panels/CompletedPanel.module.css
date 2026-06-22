@@ -1,0 +1,143 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 0;
+  color: var(--color-text-sub);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.emptyIcon {
+  font-size: 40px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  background: rgba(56,142,60,0.06);
+  border: 1.5px solid rgba(56,142,60,0.22);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s;
+}
+
+.card:hover {
+  border-color: rgba(56,142,60,0.40);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.projName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1B5E20;
+  flex: 1;
+  word-break: break-word;
+}
+
+.pmRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.pmAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.4px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pmName {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+
+.date {
+  font-size: 11px;
+  font-weight: 600;
+  color: #388E3C;
+}
+
+.fbPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(56,142,60,0.05);
+  border: 1px solid rgba(56,142,60,0.15);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.fbRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.fbLabel {
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.fbText {
+  color: var(--color-text-main);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.noFb {
+  font-size: 11px;
+  color: var(--color-text-sub);
+  font-style: italic;
+}
+
+.fbBtn {
+  align-self: flex-end;
+  padding: 5px 14px;
+  border-radius: 100px;
+  background: rgba(56,142,60,0.10);
+  border: 1.5px solid rgba(56,142,60,0.38);
+  color: #1B5E20;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.fbBtn:hover {
+  background: rgba(56,142,60,0.20);
+  border-color: #388E3C;
+}
