@@ -312,6 +312,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'goals'      && dynGoalsY      !== null) overridePos = { ...n.position, y: dynGoalsY };
       if (n.id === 'completed'  && dynCompletedY  !== null) overridePos = { x: PROJ_BRANCH_X, y: dynCompletedY };
       if (n.id === 'thankyou'   && dynThankYouY   !== null) overridePos = { ...n.position, y: dynThankYouY };
+      if (n.id === 'ideabank'   && projectsExpanded)        overridePos = { ...n.position, x: n.position.x - 150 };
       result.push({
         ...n,
         position: overridePos ?? n.position,
