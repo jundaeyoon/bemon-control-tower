@@ -139,6 +139,7 @@
   line-height: 1.4;
 }
 .chip:hover { opacity: 0.80; }
+.chipDone { opacity: 0.5; text-decoration: line-through; }
 .chipMore {
   font-family: var(--font-family);
   font-size: 9px;
@@ -166,6 +167,11 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  flex-shrink: 0;
+}
+.legendIcon {
+  font-size: 11px;
+  line-height: 1;
   flex-shrink: 0;
 }
 
@@ -351,3 +357,57 @@
   box-shadow: 1px 1px 0 #4E6228;
 }
 .saveBtn:disabled { opacity: 0.52; cursor: default; }
+
+/* ── Task Info Modal ── */
+.taskInfoTitle {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 800;
+  color: #2A2118;
+  margin-bottom: 16px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.taskInfoRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.taskInfoLabel {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: 800;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.taskInfoValue {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+}
+
+.taskInfoChip {
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+
+.taskInfoDone {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  color: #22c55e;
+  margin-bottom: 4px;
+}

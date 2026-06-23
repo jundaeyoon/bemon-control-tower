@@ -30,7 +30,7 @@ function toDateStr(d) {
 
 function getCalendarDays(year, month) {
   const firstDay = new Date(year, month, 1);
-  const startDow = (firstDay.getDay() + 6) % 7; // 0=Mon
+  const startDow = (firstDay.getDay() + 6) % 7;
   const days = [];
   for (let i = 0; i < 42; i++) {
     const date = new Date(year, month, 1 - startDow + i);
@@ -39,7 +39,6 @@ function getCalendarDays(year, month) {
   return days;
 }
 
-// DB에 저장된 repeat 컬럼 기준 (repeat_type 아님)
 function matchesDate(schedule, dateStr) {
   if (schedule.repeat === 'none' || !schedule.repeat) return schedule.date === dateStr;
   const sd = new Date(schedule.date + 'T00:00:00');
@@ -49,16 +48,27 @@ function matchesDate(schedule, dateStr) {
   return false;
 }
 
-// 담당자 문자열 → 배열 파싱 ("JUN,SURI" → ["JUN","SURI"])
 function parseAssignees(str) {
   if (!str) return ['JUN'];
   return str.split(',').map(s => s.trim()).filter(Boolean);
 }
 
-// 칩 배경색: 단독이면 담당자 색, 복수면 보라
 function getChipBg(assigneeStr) {
+  if (!assigneeStr) return MULTI_COLOR;
   const names = parseAssignees(assigneeStr);
   return names.length === 1 ? (CHIP_BG[names[0]] ?? '#888') : MULTI_COLOR;
+}
+
+function getEventLabel(ev) {
+  if (ev._kind === 'personal') return `👤 ${ev.content} — ${ev.assignee ?? '미지정'}`;
+  if (ev._kind === 'project')  return `📂 ${ev.name} — ${ev.assignee ?? '미지정'}`;
+  return `${ev.title} — ${ev.assignee}`;
+}
+
+function getEventText(ev) {
+  if (ev._kind === 'personal') return `👤 ${ev.content}`;
+  if (ev._kind === 'project')  return `📂 ${ev.name}`;
+  return ev.title;
 }
 
 // ── Day header rough.js strip ─────────────────────────────────────────────────
@@ -93,6 +103,7 @@ export default function CalendarPanel({ schedHook, onClose }) {
   const [month, setMonth] = useState(today.getMonth());
   const [addDate,   setAddDate]   = useState(null);
   const [editEvent, setEditEvent] = useState(null);
+  const [infoEvent, setInfoEvent] = useState(null);
   const gridRef = useRef(null);
   const [gridW, setGridW] = useState(0);
 
@@ -136,7 +147,15 @@ export default function CalendarPanel({ schedHook, onClose }) {
             {days.map(({ date, cur }, i) => {
               const ds  = toDateStr(date);
               const dow = (date.getDay() + 6) % 7;
-              const evs = schedHook.schedules.filter(s => matchesDate(s, ds));
+
+              const schedEvs   = schedHook.schedules.filter(s => matchesDate(s, ds))
+                                   .map(s => ({ ...s, _kind: 'schedule' }));
+              const personalEvs = (schedHook.personalTasks ?? []).filter(t => t.deadline === ds)
+                                   .map(t => ({ ...t, _kind: 'personal' }));
+              const projectEvs  = (schedHook.projectTasks ?? []).filter(t => t.deadline === ds)
+                                   .map(t => ({ ...t, _kind: 'project' }));
+              const evs = [...schedEvs, ...personalEvs, ...projectEvs];
+
               return (
                 <div
                   key={i}
@@ -154,13 +173,17 @@ export default function CalendarPanel({ schedHook, onClose }) {
                   <div className={styles.eventsWrap}>
                     {evs.slice(0, 3).map(ev => (
                       <div
-                        key={ev.id}
-                        className={styles.chip}
+                        key={`${ev._kind}-${ev.id}`}
+                        className={`${styles.chip} ${ev.completed ? styles.chipDone : ''}`}
                         style={{ background: getChipBg(ev.assignee) }}
-                        title={`${ev.title} — ${ev.assignee}`}
-                        onClick={e => { e.stopPropagation(); setEditEvent(ev); }}
+                        title={getEventLabel(ev)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          if (ev._kind === 'schedule') setEditEvent(ev);
+                          else setInfoEvent(ev);
+                        }}
                       >
-                        {ev.title}
+                        {getEventText(ev)}
                       </div>
                     ))}
                     {evs.length > 3 && (
@@ -173,7 +196,7 @@ export default function CalendarPanel({ schedHook, onClose }) {
           </div>
         </div>
 
-        {/* Member legend */}
+        {/* Legend */}
         <div className={styles.legend}>
           {MEMBERS.map(m => (
             <span key={m} className={styles.legendItem}>
@@ -184,6 +207,14 @@ export default function CalendarPanel({ schedHook, onClose }) {
           <span className={styles.legendItem}>
             <span className={styles.legendDot} style={{ background: MULTI_COLOR }} />
             복수담당
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendIcon}>📂</span>
+            프로젝트
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendIcon}>👤</span>
+            개인업무
           </span>
         </div>
       </div>
@@ -201,7 +232,7 @@ export default function CalendarPanel({ schedHook, onClose }) {
         document.body
       )}
 
-      {/* Edit modal */}
+      {/* Edit modal (schedule only) */}
       {editEvent && createPortal(
         <EventModal
           date={editEvent.date}
@@ -218,7 +249,71 @@ export default function CalendarPanel({ schedHook, onClose }) {
         />,
         document.body
       )}
+
+      {/* Info modal (personal / project task) */}
+      {infoEvent && createPortal(
+        <TaskInfoModal event={infoEvent} onClose={() => setInfoEvent(null)} />,
+        document.body
+      )}
     </SlidePanel>
+  );
+}
+
+// ── Task Info Modal ───────────────────────────────────────────────────────────
+
+function TaskInfoModal({ event, onClose }) {
+  const isPersonal = event._kind === 'personal';
+  const title      = isPersonal ? event.content : event.name;
+  const assignee   = event.assignee;
+  const color      = assignee ? (CHIP_BG[assignee] ?? '#888') : MULTI_COLOR;
+  const projName   = event.projects?.name;
+
+  const [y, m, d] = event.deadline.split('-');
+  const dateLabel = `${parseInt(y)}년 ${parseInt(m)}월 ${parseInt(d)}일`;
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalInner}>
+          <div className={styles.modalHeader}>
+            <span className={styles.modalDateLbl}>
+              {isPersonal ? '👤 개인 업무' : '📂 프로젝트 업무'}
+            </span>
+            <button className={styles.modalCloseBtn} onClick={onClose}>✕</button>
+          </div>
+
+          <div className={styles.taskInfoTitle}>{title}</div>
+
+          {projName && (
+            <div className={styles.taskInfoRow}>
+              <span className={styles.taskInfoLabel}>프로젝트</span>
+              <span className={styles.taskInfoValue}>{projName}</span>
+            </div>
+          )}
+
+          <div className={styles.taskInfoRow}>
+            <span className={styles.taskInfoLabel}>담당자</span>
+            {assignee
+              ? <span className={styles.taskInfoChip} style={{ background: color }}>{assignee}</span>
+              : <span className={styles.taskInfoValue}>미지정</span>
+            }
+          </div>
+
+          <div className={styles.taskInfoRow}>
+            <span className={styles.taskInfoLabel}>기한</span>
+            <span className={styles.taskInfoValue}>{dateLabel}</span>
+          </div>
+
+          {event.completed && (
+            <div className={styles.taskInfoDone}>✅ 완료된 업무입니다</div>
+          )}
+
+          <div className={styles.modalActions}>
+            <button className={styles.saveBtn} onClick={onClose}>확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -226,16 +321,13 @@ export default function CalendarPanel({ schedHook, onClose }) {
 
 function EventModal({ date, initial, onSave, onDelete, onClose }) {
   const [title,     setTitle]     = useState(initial?.title ?? '');
-  // 다중 선택: 콤마 구분 문자열 → 배열
   const [assignees, setAssignees] = useState(parseAssignees(initial?.assignee));
-  // DB 컬럼명은 repeat (repeat_type 아님)
   const [repeat,    setRepeat]    = useState(initial?.repeat ?? 'none');
   const [saving,    setSaving]    = useState(false);
 
   const toggleAssignee = (mem) => {
     setAssignees(prev => {
       if (prev.includes(mem)) {
-        // 마지막 1명이면 해제 불가
         return prev.length > 1 ? prev.filter(a => a !== mem) : prev;
       }
       return [...prev, mem];
@@ -248,7 +340,7 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
     try {
       await onSave({
         title: title.trim(),
-        assignee: assignees.join(','),  // "JUN" 또는 "JUN,SURI"
+        assignee: assignees.join(','),
         repeat,
       });
     } finally {
@@ -294,16 +386,13 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
                 );
               })}
             </div>
-            {/* 선택된 담당자 칩 표시 */}
             {assignees.length > 0 && (
               <div className={styles.selectedChips}>
                 {assignees.map(a => (
                   <span
                     key={a}
                     className={styles.selectedChip}
-                    style={{
-                      background: assignees.length > 1 ? MULTI_COLOR : (CHIP_BG[a] ?? '#888'),
-                    }}
+                    style={{ background: assignees.length > 1 ? MULTI_COLOR : (CHIP_BG[a] ?? '#888') }}
                   >
                     {a}
                   </span>

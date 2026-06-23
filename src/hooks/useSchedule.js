@@ -2,7 +2,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export function useSchedule() {
-  const [schedules, setSchedules] = useState([]);
+  const [schedules,     setSchedules]     = useState([]);
+  const [personalTasks, setPersonalTasks] = useState([]);
+  const [projectTasks,  setProjectTasks]  = useState([]);
 
   useEffect(() => {
     supabase
@@ -10,8 +12,26 @@ export function useSchedule() {
       .select('*')
       .order('date', { ascending: true })
       .then(({ data, error }) => {
-        if (error) { console.error('[useSchedule] fetch 에러:', error); return; }
+        if (error) { console.error('[useSchedule] schedules 에러:', error); return; }
         setSchedules(data ?? []);
+      });
+
+    supabase
+      .from('personal_tasks')
+      .select('*')
+      .not('deadline', 'is', null)
+      .then(({ data, error }) => {
+        if (error) { console.error('[useSchedule] personal_tasks 에러:', error); return; }
+        setPersonalTasks(data ?? []);
+      });
+
+    supabase
+      .from('tasks')
+      .select('*, projects(name)')
+      .not('deadline', 'is', null)
+      .then(({ data, error }) => {
+        if (error) { console.error('[useSchedule] tasks 에러:', error); return; }
+        setProjectTasks(data ?? []);
       });
   }, []);
 
@@ -44,5 +64,5 @@ export function useSchedule() {
     setSchedules(prev => prev.filter(s => s.id !== id));
   }, []);
 
-  return { schedules, addSchedule, updateSchedule, deleteSchedule };
+  return { schedules, personalTasks, projectTasks, addSchedule, updateSchedule, deleteSchedule };
 }
