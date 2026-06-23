@@ -76,7 +76,7 @@ export const INITIAL_NODES = [
   {
     id: 'ideabank',
     type: 'branch',
-    position: { x: 25, y: 204 },
+    position: { x: 430, y: -220 },
     data: { label: '이건 대박!', emoji: '💡', accent: 'hotpink', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
