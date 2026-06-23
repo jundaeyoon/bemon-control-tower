@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { usePersonalTasks } from '../../hooks/usePersonalTasks';
 import styles from './MemberTasksModal.module.css';
 
 function getDaysLeft(deadline) {
@@ -39,8 +40,44 @@ function TaskRow({ task, mc }) {
   );
 }
 
+function PersonalTaskRow({ task, mc, onToggle, onDelete }) {
+  const d = getDaysLeft(task.deadline);
+  const isToday  = d === 0;
+  const isOverdue = d !== null && d < 0;
+  return (
+    <div className={`${styles.personalRow} ${task.completed ? styles.taskDone : ''}`}>
+      <input
+        type="checkbox"
+        className={styles.checkbox}
+        checked={task.completed}
+        onChange={() => onToggle(task.id)}
+        style={{ accentColor: mc.border }}
+      />
+      <span className={styles.taskName}>{task.content}</span>
+      {task.deadline && (
+        <span
+          className={styles.deadline}
+          style={isToday ? { color: '#e05050', fontWeight: 700 } : isOverdue ? { color: '#e05050' } : {}}
+        >
+          {isToday ? 'D-Day' : isOverdue ? `D+${Math.abs(d)}` : `D-${d}`}
+        </span>
+      )}
+      <button
+        className={styles.deleteBtn}
+        onClick={() => onDelete(task.id)}
+        title="삭제"
+      >✕</button>
+    </div>
+  );
+}
+
 export default function MemberTasksModal({ member, projects, onClose }) {
   const mc = getMemberColor(member);
+  const personalHook = usePersonalTasks(member);
+
+  const [showForm, setShowForm] = useState(false);
+  const [formContent, setFormContent] = useState('');
+  const [formDeadline, setFormDeadline] = useState('');
 
   const projectTasks = projects
     .map(proj => ({
@@ -58,6 +95,14 @@ export default function MemberTasksModal({ member, projects, onClose }) {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  const handleAddPersonal = async () => {
+    if (!formContent.trim()) return;
+    await personalHook.addTask(formContent.trim(), formDeadline || null);
+    setFormContent('');
+    setFormDeadline('');
+    setShowForm(false);
+  };
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
@@ -88,7 +133,7 @@ export default function MemberTasksModal({ member, projects, onClose }) {
         {/* Body */}
         <div className={styles.body}>
           {projectTasks.length === 0 ? (
-            <p className={styles.empty}>담당 업무가 없습니다</p>
+            <p className={styles.empty}>담당 프로젝트 업무가 없습니다</p>
           ) : (
             projectTasks.map(proj => (
               <div
@@ -109,6 +154,78 @@ export default function MemberTasksModal({ member, projects, onClose }) {
               </div>
             ))
           )}
+
+          {/* ── 개인 업무 섹션 ── */}
+          <div className={styles.personalDivider} />
+          <div className={styles.personalSection} style={{ '--accent': mc.border }}>
+            <div className={styles.personalHeader}>
+              <div className={styles.personalTitle}>
+                <span className={styles.personalDot} style={{ background: mc.border }} />
+                <span className={styles.personalTitleText} style={{ color: mc.text }}>개인 업무</span>
+                {personalHook.tasks.length > 0 && (
+                  <span className={styles.projCount} style={{ color: mc.text }}>
+                    {personalHook.tasks.filter(t => t.completed).length}/{personalHook.tasks.length}
+                  </span>
+                )}
+              </div>
+              {!showForm && (
+                <button
+                  className={styles.addBtn}
+                  style={{ color: mc.text, borderColor: mc.border }}
+                  onClick={() => setShowForm(true)}
+                >
+                  + 업무 추가
+                </button>
+              )}
+            </div>
+
+            {showForm && (
+              <div className={styles.addForm} style={{ borderColor: mc.border }}>
+                <input
+                  className={styles.formInput}
+                  placeholder="업무 내용을 입력하세요"
+                  value={formContent}
+                  onChange={e => setFormContent(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleAddPersonal(); if (e.key === 'Escape') setShowForm(false); }}
+                  autoFocus
+                />
+                <div className={styles.formRow}>
+                  <input
+                    type="date"
+                    className={styles.formDate}
+                    value={formDeadline}
+                    onChange={e => setFormDeadline(e.target.value)}
+                  />
+                  <div className={styles.formBtns}>
+                    <button
+                      className={styles.cancelBtn}
+                      onClick={() => { setShowForm(false); setFormContent(''); setFormDeadline(''); }}
+                    >취소</button>
+                    <button
+                      className={styles.confirmBtn}
+                      style={{ background: mc.border, color: '#fff' }}
+                      onClick={handleAddPersonal}
+                      disabled={!formContent.trim()}
+                    >확인</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {personalHook.tasks.length === 0 && !showForm ? (
+              <p className={styles.personalEmpty}>개인 업무가 없습니다</p>
+            ) : (
+              personalHook.tasks.map(task => (
+                <PersonalTaskRow
+                  key={task.id}
+                  task={task}
+                  mc={mc}
+                  onToggle={personalHook.toggleTask}
+                  onDelete={personalHook.deleteTask}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
