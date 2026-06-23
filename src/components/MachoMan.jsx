@@ -138,7 +138,7 @@ export default function MachoMan({ projects, goals }) {
         <button className={styles.floatBtn} onClick={toggleOpen} aria-label="마초맨 AI">
           🤖
         </button>
-        <span className={styles.floatLabel}>마초맨</span>
+        <span className={styles.floatLabel}>MACHOMAN</span>
       </div>
 
       {/* Chat Window */}
