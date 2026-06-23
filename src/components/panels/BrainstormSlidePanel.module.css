@@ -143,6 +143,21 @@
   font-weight: 700;
   color: #4A3728;
   word-break: break-word;
+  cursor: text;
+}
+
+.titleEditInput {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4A3728;
+  font-family: var(--font-family);
+  border: none;
+  border-bottom: 1.5px solid #C06850;
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  min-width: 0;
 }
 
 .statusBadge {

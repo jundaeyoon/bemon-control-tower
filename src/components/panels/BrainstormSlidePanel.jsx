@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import SlidePanel  from './SlidePanel';
 import RoughCard    from '../rough/RoughCard';
 import RoughButton  from '../rough/RoughButton';
@@ -106,7 +106,7 @@ function TodosTab({ sessionId, todos, brainstorm }) {
               <div className={styles.todoCard}>
                 <div className={styles.todoTopRow}>
                   <span className={styles.statusDot} style={{ background: st.color }} />
-                  <span className={`${styles.todoTitle} ${t.status === 'done' ? styles.itemDone : ''}`}>{t.content}</span>
+                  <EditableTodoTitle todo={t} done={t.status === 'done'} onSave={brainstorm.updateTodo} />
                   {t.assignee && <MemberAvatar name={t.assignee} />}
                   <button
                     className={styles.deleteIcon}
@@ -379,6 +379,53 @@ function RecordingTab({ sessionId, recordings, brainstorm }) {
 }
 
 // ── 공용 ────────────────────────────────────────────────────────────────────
+
+function EditableTodoTitle({ todo, onSave, done }) {
+  const [editing, setEditing] = useState(false);
+  const [value,   setValue]   = useState(todo.content);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  const commit = () => {
+    const trimmed = value.trim();
+    if (trimmed && trimmed !== todo.content) {
+      onSave(todo.id, { content: trimmed });
+    } else {
+      setValue(todo.content);
+    }
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        className={styles.titleEditInput}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onBlur={commit}
+        onKeyDown={e => {
+          if (e.key === 'Enter') commit();
+          if (e.key === 'Escape') { setValue(todo.content); setEditing(false); }
+        }}
+        onClick={e => e.stopPropagation()}
+      />
+    );
+  }
+
+  return (
+    <span
+      className={`${styles.todoTitle} ${done ? styles.itemDone : ''}`}
+      title="클릭해서 수정"
+      onClick={e => { e.stopPropagation(); setEditing(true); }}
+    >
+      {todo.content}
+    </span>
+  );
+}
 
 function MemberPicker({ value, onChange }) {
   return (
