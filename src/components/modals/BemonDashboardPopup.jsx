@@ -44,7 +44,7 @@ export default function BemonDashboardPopup({ projects, goals, thanks, onClose, 
     const H      = el.offsetHeight;
     const margin = 12;
     const cx     = anchor ? anchor.x : window.innerWidth  / 2;
-    const topY   = anchor ? anchor.y + 60 : margin;
+    const topY   = anchor ? anchor.y - H / 2 : margin;
     const left   = Math.min(Math.max(cx - W / 2, margin), window.innerWidth  - W - margin);
     const top    = Math.min(Math.max(topY,        margin), window.innerHeight - H - margin);
     setPopupStyle({ left, top, transform: 'none' });
