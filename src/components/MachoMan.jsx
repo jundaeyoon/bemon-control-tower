@@ -116,13 +116,16 @@ export default function MachoMan({ projects, goals }) {
         }),
       });
 
-      if (!res.ok) throw new Error(`API ${res.status}`);
-      const { reply } = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-    } catch {
+      const json = await res.json();
+      if (!res.ok) {
+        const msg = json.hint ?? json.detail ?? json.error ?? `오류 (${res.status})`;
+        throw new Error(msg);
+      }
+      setMessages(prev => [...prev, { role: 'assistant', content: json.reply }]);
+    } catch (err) {
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: '앗, 오류났어 😅 다시 시도해봐!' },
+        { role: 'assistant', content: `❌ ${err.message}` },
       ]);
     } finally {
       setLoading(false);

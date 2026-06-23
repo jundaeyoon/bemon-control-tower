@@ -1,12 +1,34 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // ── 1. API 키 확인 ───────────────────────────────────────────────────────────
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY가 서버에 설정되지 않았습니다.' });
+  if (!apiKey) {
+    console.error('[machoman] ANTHROPIC_API_KEY 환경변수 없음');
+    return res.status(500).json({
+      error: 'ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다.',
+      stage: 'env',
+      hint: 'Vercel 대시보드 → Settings → Environment Variables에서 ANTHROPIC_API_KEY를 추가하세요.',
+    });
+  }
 
+  // ── 2. 요청 바디 파싱 ────────────────────────────────────────────────────────
   const { member, messages, projects, quest } = req.body ?? {};
-  if (!messages?.length) return res.status(400).json({ error: 'messages가 비어있습니다.' });
 
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'messages 배열이 비어있습니다.', stage: 'input' });
+  }
+
+  // Claude API는 첫 메시지가 반드시 role: 'user' 여야 함
+  const apiMessages = messages.filter(m => m.role === 'user' || m.role === 'assistant');
+  if (!apiMessages.length || apiMessages[0].role !== 'user') {
+    return res.status(400).json({
+      error: '메시지 배열 형식 오류: 첫 번째 메시지는 role: "user" 여야 합니다.',
+      stage: 'input',
+    });
+  }
+
+  // ── 3. 시스템 프롬프트 구성 ──────────────────────────────────────────────────
   const projectSummary = (projects ?? [])
     .filter(p => !p.archived)
     .map(p => {
@@ -29,8 +51,12 @@ ${projectSummary}
 - 이모지 적극 활용
 - 베몽 응원단처럼 에너지 넘치게`;
 
+  // ── 4. Claude API 호출 ───────────────────────────────────────────────────────
+  let claudeRes;
+  let rawBody;
+
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -41,20 +67,71 @@ ${projectSummary}
         model: 'claude-sonnet-4-6',
         max_tokens: 512,
         system: systemPrompt,
-        messages: messages.map(m => ({ role: m.role, content: m.content })),
+        messages: apiMessages,
       }),
     });
-
-    if (!response.ok) {
-      const errBody = await response.text();
-      throw new Error(`Claude API 오류 (${response.status}): ${errBody}`);
-    }
-
-    const data = await response.json();
-    const reply = data.content?.[0]?.text ?? '';
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error('[api/machoman] 에러:', err);
-    res.status(500).json({ error: err.message });
+  } catch (networkErr) {
+    console.error('[machoman] 네트워크 오류:', networkErr);
+    return res.status(502).json({
+      error: 'Claude API 네트워크 오류',
+      stage: 'network',
+      detail: networkErr.message,
+    });
   }
+
+  // ── 5. Claude API 응답 처리 ──────────────────────────────────────────────────
+  try {
+    rawBody = await claudeRes.text();
+  } catch (readErr) {
+    console.error('[machoman] 응답 읽기 실패:', readErr);
+    return res.status(502).json({
+      error: 'Claude API 응답을 읽을 수 없습니다.',
+      stage: 'response_read',
+      detail: readErr.message,
+    });
+  }
+
+  if (!claudeRes.ok) {
+    let parsed = null;
+    try { parsed = JSON.parse(rawBody); } catch {}
+
+    const claudeMsg = parsed?.error?.message ?? rawBody;
+    const statusCode = claudeRes.status;
+
+    const hint =
+      statusCode === 401 ? 'API 키가 잘못되었거나 만료되었습니다. Vercel 환경변수를 확인하세요.' :
+      statusCode === 403 ? 'API 키 권한이 없습니다.' :
+      statusCode === 429 ? '요청 한도(Rate Limit)를 초과했습니다. 잠시 후 다시 시도하세요.' :
+      statusCode === 400 ? '요청 형식 오류입니다. 메시지 배열 구조를 확인하세요.' :
+      statusCode === 529 ? 'Claude API가 과부하 상태입니다. 잠시 후 다시 시도하세요.' :
+      null;
+
+    console.error(`[machoman] Claude API ${statusCode}:`, claudeMsg);
+    return res.status(statusCode).json({
+      error: `Claude API 오류 (${statusCode})`,
+      stage: 'claude_api',
+      detail: claudeMsg,
+      ...(hint ? { hint } : {}),
+    });
+  }
+
+  // ── 6. 정상 응답 파싱 ────────────────────────────────────────────────────────
+  let data;
+  try {
+    data = JSON.parse(rawBody);
+  } catch (parseErr) {
+    console.error('[machoman] JSON 파싱 실패:', rawBody);
+    return res.status(502).json({
+      error: 'Claude API 응답 JSON 파싱 실패',
+      stage: 'response_parse',
+      detail: rawBody.slice(0, 200),
+    });
+  }
+
+  const reply = data.content?.[0]?.text ?? '';
+  if (!reply) {
+    console.warn('[machoman] 빈 응답:', JSON.stringify(data));
+  }
+
+  return res.status(200).json({ reply });
 }
