@@ -28,7 +28,12 @@ export default function IdeaDetailModal({ idea, onSave, onDelete, onClose }) {
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h3 className={styles.title}>👍 {idea.votes ?? 0}</h3>
+        <h3 className={styles.title}>
+          <span style={{ color: '#16a34a' }}>👍 {idea.votes ?? 0}</span>
+          {idea.downvotes != null && (
+            <span style={{ color: '#dc2626', marginLeft: 12 }}>👎 {idea.downvotes}</span>
+          )}
+        </h3>
 
         <div className={styles.field}>
           <span className={styles.label}>제목</span>

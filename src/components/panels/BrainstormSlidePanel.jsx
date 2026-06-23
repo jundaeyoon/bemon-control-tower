@@ -11,10 +11,9 @@ import styles from './BrainstormSlidePanel.module.css';
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
 const TABS = [
-  { id: 'todos',     label: '할일',         emoji: '📋' },
-  { id: 'feedback',  label: '피드백',       emoji: '🔄' },
-  { id: 'ideas',     label: '아이디어 뱅크', emoji: '💡' },
-  { id: 'recording', label: '회의록',       emoji: '🎬' },
+  { id: 'todos',     label: '할일',   emoji: '📋' },
+  { id: 'feedback',  label: '피드백', emoji: '🔄' },
+  { id: 'recording', label: '회의록', emoji: '🎬' },
 ];
 
 // canvas fillStyle은 CSS 변수(var(...))를 해석하지 못해 검은 배경으로 렌더링되므로 실제 색상값을 사용
@@ -41,7 +40,6 @@ export default function BrainstormSlidePanel({
 
   const todos      = brainstorm.todos.filter(t => t.session_id === sessionId);
   const feedbacks   = brainstorm.feedbacks.filter(f => f.session_id === sessionId);
-  const ideas       = brainstorm.ideas.filter(i => i.session_id === sessionId);
   const recordings  = brainstorm.recordings.filter(r => r.session_id === sessionId);
 
   return (
@@ -60,9 +58,8 @@ export default function BrainstormSlidePanel({
         </div>
 
         <div className={styles.tabBody}>
-          {tab === 'todos'     && <TodosTab     sessionId={sessionId} todos={todos}         brainstorm={brainstorm} />}
-          {tab === 'feedback'  && <FeedbackTab  sessionId={sessionId} todos={todos} feedbacks={feedbacks}  brainstorm={brainstorm} />}
-          {tab === 'ideas'     && <IdeasTab     sessionId={sessionId} ideas={ideas}          brainstorm={brainstorm} />}
+          {tab === 'todos'     && <TodosTab     sessionId={sessionId} todos={todos}          brainstorm={brainstorm} />}
+          {tab === 'feedback'  && <FeedbackTab  sessionId={sessionId} todos={todos} feedbacks={feedbacks} brainstorm={brainstorm} />}
           {tab === 'recording' && <RecordingTab sessionId={sessionId} recordings={recordings} brainstorm={brainstorm} />}
         </div>
       </div>

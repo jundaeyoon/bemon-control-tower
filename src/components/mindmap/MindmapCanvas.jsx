@@ -26,6 +26,7 @@ import FeedbackModal          from '../modals/FeedbackModal';
 import BemonDashboardPopup    from '../modals/BemonDashboardPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
+import IdeaBankPanel      from '../panels/IdeaBankPanel';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
@@ -33,6 +34,7 @@ import { useGoals }              from '../../hooks/useGoals';
 import { useVisionHouse }        from '../../hooks/useVisionHouse';
 import { useSchedule }          from '../../hooks/useSchedule';
 import { useThankYou }          from '../../hooks/useThankYou';
+import { useIdeaBank }          from '../../hooks/useIdeaBank';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -91,6 +93,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [showDashboard,   setShowDashboard]   = useState(false);
+  const [activeIdeaBank,  setActiveIdeaBank]  = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -98,7 +101,8 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const { deleteGoal } = goalsHook;
   const vhHook     = useVisionHouse();
   const schedHook  = useSchedule();
-  const thankHook   = useThankYou();
+  const thankHook    = useThankYou();
+  const ideaBankHook = useIdeaBank();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -140,6 +144,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'completed')  return setActiveCompleted(true);
       if (node.id === 'schedule')   return setActiveSchedule(true);
       if (node.id === 'thankyou')   return setActiveThankyou(true);
+      if (node.id === 'ideabank')   return setActiveIdeaBank(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') {
@@ -284,11 +289,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       const bBottom   = 71 + BRANCH_H + (bSessions > 0 ? SESSION_GAP_TOP + bSessions * SESSION_STEP : 0);
       dynGoalsY = Math.max(300, bBottom + 80);
     }
+    const IDEABANK_Y = 130; // ideabank fixed position — thankyou must stay below it
     if (hubExpanded) {
       const effectiveCompassY = dynCompassY ?? -80;
-      dynThankYouY = compassExpanded
+      const compassCalc = compassExpanded
         ? effectiveCompassY + BRANCH_H + COMPASS_SUBTREE + 150
         : effectiveCompassY + BRANCH_H + 200;
+      dynThankYouY = Math.max(compassCalc, IDEABANK_Y + BRANCH_H + 80);
     }
 
     // Hub + 4 branch nodes
@@ -671,6 +678,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <ThankYouPanel
             thankHook={thankHook}
             onClose={() => setActiveThankyou(false)}
+          />
+        )}
+
+        {activeIdeaBank && (
+          <IdeaBankPanel
+            ideaBankHook={ideaBankHook}
+            onClose={() => setActiveIdeaBank(false)}
           />
         )}
 
