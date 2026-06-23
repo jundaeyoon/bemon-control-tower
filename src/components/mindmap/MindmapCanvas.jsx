@@ -93,6 +93,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [showDashboard,   setShowDashboard]   = useState(false);
+  const [hubAnchor,       setHubAnchor]       = useState(null);
   const [activeIdeaBank,  setActiveIdeaBank]  = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
@@ -133,6 +134,9 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const handleNodeClick = useCallback((_ev, node) => {
     if (node.type === 'hub') {
       toggleNode('hub');
+      const hubEl = document.querySelector('.react-flow__node[data-id="hub"]');
+      const rect  = hubEl?.getBoundingClientRect() ?? null;
+      setHubAnchor(rect ? { x: rect.left + rect.width / 2, y: rect.top } : null);
       setShowDashboard(true);
       return;
     }
@@ -668,6 +672,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             projects={projects}
             goals={goalsHook.goals}
             thanks={thankHook.thanks}
+            anchor={hubAnchor}
             onClose={() => setShowDashboard(false)}
           />
         )}

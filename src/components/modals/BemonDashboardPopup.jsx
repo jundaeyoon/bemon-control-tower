@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './BemonDashboardPopup.module.css';
@@ -32,7 +33,23 @@ function getQuestRate(goals) {
   return Math.round((totalCurrent / totalTarget) * 100);
 }
 
-export default function BemonDashboardPopup({ projects, goals, thanks, onClose }) {
+export default function BemonDashboardPopup({ projects, goals, thanks, onClose, anchor }) {
+  const popupRef = useRef(null);
+  const [popupStyle, setPopupStyle] = useState({ left: -9999, top: -9999, transform: 'none' });
+
+  useLayoutEffect(() => {
+    const el = popupRef.current;
+    if (!el) return;
+    const W      = el.offsetWidth;
+    const H      = el.offsetHeight;
+    const margin = 12;
+    const cx     = anchor ? anchor.x : window.innerWidth  / 2;
+    const topY   = anchor ? anchor.y - H - 20 : margin;
+    const left   = Math.min(Math.max(cx - W / 2, margin), window.innerWidth  - W - margin);
+    const top    = Math.min(Math.max(topY,        margin), window.innerHeight - H - margin);
+    setPopupStyle({ left, top, transform: 'none' });
+  }, [anchor]);
+
   const today    = new Date();
   const todayStr = toDateStr(today);
 
@@ -53,7 +70,7 @@ export default function BemonDashboardPopup({ projects, goals, thanks, onClose }
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 
   return createPortal(
-    <div className={styles.popup}>
+    <div className={styles.popup} ref={popupRef} style={popupStyle}>
       {/* Header */}
       <div className={styles.header}>
         <div>
