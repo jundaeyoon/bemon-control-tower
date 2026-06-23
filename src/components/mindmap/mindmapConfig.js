@@ -92,4 +92,5 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-goals',      source: 'hub', target: 'goals',      type: 'rough', data: { color: '#D4A843', seed: 4 } },
   { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
   { id: 'e-hub-thankyou',  source: 'hub', target: 'thankyou',  type: 'rough', data: { color: '#E8896A', seed: 7 } },
+  { id: 'e-hub-ideabank',  source: 'hub', target: 'ideabank',  type: 'rough', data: { color: '#EC4899', seed: 9 } },
 ];
