@@ -289,13 +289,11 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       const bBottom   = 71 + BRANCH_H + (bSessions > 0 ? SESSION_GAP_TOP + bSessions * SESSION_STEP : 0);
       dynGoalsY = Math.max(300, bBottom + 80);
     }
-    const IDEABANK_Y = 130; // ideabank fixed position — thankyou must stay below it
     if (hubExpanded) {
       const effectiveCompassY = dynCompassY ?? -80;
-      const compassCalc = compassExpanded
+      dynThankYouY = compassExpanded
         ? effectiveCompassY + BRANCH_H + COMPASS_SUBTREE + 150
         : effectiveCompassY + BRANCH_H + 200;
-      dynThankYouY = Math.max(compassCalc, IDEABANK_Y + BRANCH_H + 80);
     }
 
     // Hub + 4 branch nodes
