@@ -27,6 +27,7 @@ import BemonDashboardPopup    from '../modals/BemonDashboardPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
 import IdeaBankPanel      from '../panels/IdeaBankPanel';
+import MachoMan           from '../MachoMan';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
 import { useBrainstorm }         from '../../hooks/useBrainstorm';
@@ -701,6 +702,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           />
         )}
 
+        <MachoMan projects={projects} goals={goalsHook.goals} />
         <p className={styles.hint}>BEMON 허브를 클릭하면 메뉴가 펼쳐집니다</p>
       </div>
     </MindmapActionsContext.Provider>

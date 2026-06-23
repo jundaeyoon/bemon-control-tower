@@ -1,7 +1,79 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
+import { supabase } from '../../lib/supabase';
 import styles from './MemberTasksModal.module.css';
+
+// ── MachoMan 대화 기록 helpers ────────────────────────────────────────────────
+
+function formatChatDate(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}`;
+}
+
+function getChatPreview(messages) {
+  const first = (messages ?? []).find(m => m.role === 'user');
+  if (!first) return '(대화 없음)';
+  const c = first.content ?? '';
+  return c.length > 35 ? c.slice(0, 35) + '…' : c;
+}
+
+function ChatViewModal({ chat, onClose }) {
+  const [unlocked,  setUnlocked]  = useState(false);
+  const [pw,        setPw]        = useState('');
+  const [pwError,   setPwError]   = useState(false);
+
+  const tryUnlock = () => {
+    if (pw === chat.password_hash) { setUnlocked(true); setPwError(false); }
+    else { setPwError(true); }
+  };
+
+  return (
+    <div className={styles.chatOverlay} onClick={onClose}>
+      <div className={styles.chatModal} onClick={e => e.stopPropagation()}>
+        <div className={styles.chatModalHeader}>
+          <span className={styles.chatModalTitle}>🤖 {formatChatDate(chat.created_at)} 대화</span>
+          <button className={styles.chatModalClose} onClick={onClose}>✕</button>
+        </div>
+
+        {!unlocked ? (
+          <div className={styles.chatPwSection}>
+            <div className={styles.chatPwLabel}>🔑 비밀번호를 입력해주세요</div>
+            <input
+              className={styles.chatPwInput}
+              type="password"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="0000"
+              value={pw}
+              onChange={e => { setPw(e.target.value.replace(/\D/g, '').slice(0, 4)); setPwError(false); }}
+              onKeyDown={e => { if (e.key === 'Enter') tryUnlock(); }}
+              autoFocus
+            />
+            {pwError && <span className={styles.chatPwError}>비밀번호가 틀렸어요</span>}
+            <button
+              className={styles.chatUnlockBtn}
+              onClick={tryUnlock}
+              disabled={pw.length !== 4}
+            >확인</button>
+          </div>
+        ) : (
+          <div className={styles.chatMsgList}>
+            {(chat.messages ?? []).map((msg, i) => (
+              <div
+                key={i}
+                className={`${styles.viewBubble} ${msg.role === 'user' ? styles.viewUserBubble : styles.viewBotBubble}`}
+              >
+                {msg.content}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function getDaysLeft(deadline) {
   if (!deadline) return null;
@@ -78,6 +150,23 @@ export default function MemberTasksModal({ member, projects, onClose }) {
   const [showForm, setShowForm] = useState(false);
   const [formContent, setFormContent] = useState('');
   const [formDeadline, setFormDeadline] = useState('');
+
+  // ── MachoMan 대화 기록 ──────────────────────────────────
+  const [chats,     setChats]     = useState([]);
+  const [viewChat,  setViewChat]  = useState(null);
+
+  useEffect(() => {
+    supabase.from('machoman_chats')
+      .select('*')
+      .eq('member', member)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setChats(data ?? []));
+  }, [member]);
+
+  const handleDeleteChat = async (chatId) => {
+    await supabase.from('machoman_chats').delete().eq('id', chatId);
+    setChats(prev => prev.filter(c => c.id !== chatId));
+  };
 
   const projectTasks = projects
     .map(proj => ({
@@ -226,8 +315,43 @@ export default function MemberTasksModal({ member, projects, onClose }) {
               ))
             )}
           </div>
+          {/* ── 마초맨 대화 기록 ── */}
+          <div className={styles.personalDivider} />
+          <div className={styles.chatSection}>
+            <div className={styles.chatSectionHeader}>
+              <span className={styles.chatSectionTitle}>🤖 마초맨 대화 기록</span>
+            </div>
+            {chats.length === 0 ? (
+              <p className={styles.chatEmpty}>저장된 대화가 없습니다</p>
+            ) : (
+              chats.map(chat => (
+                <div key={chat.id} className={styles.chatItem}>
+                  <div className={styles.chatItemLeft}>
+                    <span className={styles.chatDate}>{formatChatDate(chat.created_at)}</span>
+                    <span className={styles.chatPreview}>{getChatPreview(chat.messages)}</span>
+                  </div>
+                  <div className={styles.chatItemBtns}>
+                    <button
+                      className={styles.viewBtn}
+                      style={{ color: mc.text, borderColor: mc.border }}
+                      onClick={() => setViewChat(chat)}
+                    >열람</button>
+                    <button
+                      className={styles.chatDelBtn}
+                      onClick={() => handleDeleteChat(chat.id)}
+                    >✕</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
+
+      {viewChat && createPortal(
+        <ChatViewModal chat={viewChat} onClose={() => setViewChat(null)} />,
+        document.body
+      )}
     </div>
   );
 }
