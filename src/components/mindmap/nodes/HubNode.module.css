@@ -41,23 +41,3 @@
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
 }
-
-.badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #DC2626;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  font-family: var(--font-family);
-  min-width: 18px;
-  height: 18px;
-  border-radius: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  z-index: 2;
-  box-shadow: 0 1px 4px rgba(220,38,38,0.4);
-}
