@@ -23,6 +23,7 @@ import AddTaskModal        from '../modals/AddTaskModal';
 import AddSessionModal     from '../modals/AddSessionModal';
 import MemberTasksModal   from '../modals/MemberTasksModal';
 import FeedbackModal          from '../modals/FeedbackModal';
+import HubCheckinPopup        from '../modals/HubCheckinPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
 import IdeaBankPanel      from '../panels/IdeaBankPanel';
@@ -93,6 +94,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [activeIdeaBank,  setActiveIdeaBank]  = useState(false);
+  const [showCheckin,     setShowCheckin]     = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
@@ -132,6 +134,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const handleNodeClick = useCallback((_ev, node) => {
     if (node.type === 'hub') {
       toggleNode('hub');
+      setShowCheckin(true);
       return;
     }
     if (node.type === 'branch') {
@@ -675,6 +678,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             onFeedback={(projectId, projectName) => setActiveFeedback({ projectId, projectName })}
             onClose={() => setActiveCompleted(false)}
             refreshKey={feedbackVersion}
+          />
+        )}
+
+        {showCheckin && (
+          <HubCheckinPopup
+            projects={projects}
+            onClose={() => setShowCheckin(false)}
           />
         )}
 
