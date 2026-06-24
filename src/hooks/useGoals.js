@@ -1,8 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import { addMemberXP } from './useMemberXP';
 
 export function useGoals() {
   const [goals, setGoals] = useState([]);
+  const goalsRef = useRef([]);
+  useEffect(() => { goalsRef.current = goals; }, [goals]);
 
   useEffect(() => {
     async function fetchAll() {
@@ -62,6 +65,25 @@ export function useGoals() {
       return;
     }
     setGoals(prev => prev.map(g => g.id === goalId ? data : g));
+
+    // 클리어 조건 달성 시 파이터에게 +50 XP
+    if (fields.clear_conditions) {
+      const currentGoal = goalsRef.current.find(g => g.id === goalId);
+      if (currentGoal) {
+        const oldConds = currentGoal.clear_conditions ?? [];
+        fields.clear_conditions.forEach(nc => {
+          const oc = oldConds.find(c => c.id === nc.id);
+          const wasCleared = oc && Number(oc.current) >= Number(oc.target) && Number(oc.target) > 0;
+          const isNowCleared = Number(nc.current) >= Number(nc.target) && Number(nc.target) > 0;
+          if (!wasCleared && isNowCleared) {
+            const fighters = (currentGoal.fighters ?? [])
+              .filter(f => f.selected)
+              .map(f => (typeof f === 'string' ? f : f.name));
+            fighters.forEach(member => addMemberXP(member, 50));
+          }
+        });
+      }
+    }
   }, []);
 
   const deleteGoal = useCallback(async (yearMonth) => {

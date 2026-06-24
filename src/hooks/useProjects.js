@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { addMemberXP } from './useMemberXP';
 
 // Images stay in localStorage (Supabase Storage 연결 전)
 const imgKey   = (taskId) => `bemon-img-${taskId}`;
@@ -172,6 +173,9 @@ export function useProjects() {
       const completed = !task.completed;
       supabase.from('tasks').update({ completed }).eq('id', taskId)
         .then(({ error }) => { if (error) console.error(error); });
+      if (completed && task.assignee) {
+        addMemberXP(task.assignee, 10);
+      }
       return prev.map(p =>
         p.id === projectId
           ? { ...p, tasks: p.tasks.map(t => t.id === taskId ? { ...t, completed } : t) }

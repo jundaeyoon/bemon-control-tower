@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
-  height: 52px;
+  height: 64px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -50,12 +50,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
+  position: relative;
 }
 
 .memberBtn {
   cursor: pointer;
   border-radius: var(--radius-sm);
-  padding: 3px 5px;
+  padding: 4px 6px;
   transition: background 0.15s;
 }
 
@@ -63,9 +64,54 @@
   background: rgba(0,0,0,0.05);
 }
 
+/* ── Tooltip ──────────────────────────────────────────────────────────────── */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 130px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.memberBtn:hover .tooltip {
+  opacity: 1;
+}
+
+.tooltipXP {
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--font-family);
+}
+
+.tooltipLevel {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  font-family: var(--font-family);
+}
+
+.tooltipNext {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  font-family: var(--font-family);
+}
+
+/* ── Avatar ───────────────────────────────────────────────────────────────── */
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -77,10 +123,18 @@
   transition: transform 0.15s, box-shadow 0.15s, border-width 0.15s;
 }
 
+/* ── Info block ───────────────────────────────────────────────────────────── */
 .info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
+  min-width: 52px;
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
 
 .name {
@@ -88,7 +142,6 @@
   font-weight: 700;
   color: var(--color-text-main);
   line-height: 1;
-  transition: color 0.15s;
 }
 
 .role {
@@ -98,9 +151,45 @@
   line-height: 1;
 }
 
+/* ── Level row ────────────────────────────────────────────────────────────── */
+.levelRow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.levelBadge {
+  font-size: 9px;
+  font-weight: 800;
+  font-family: var(--font-family);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.levelEmoji {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* ── XP Gauge bar ─────────────────────────────────────────────────────────── */
+.gauge {
+  height: 3px;
+  width: 100%;
+  background: rgba(0,0,0,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.gaugeFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @media (max-width: 640px) {
-  .header { padding: 0 16px; }
+  .header { padding: 0 16px; height: 56px; }
   .logoSub { display: none; }
   .info { display: none; }
   .team { gap: 10px; }
+  .tooltip { display: none; }
 }
