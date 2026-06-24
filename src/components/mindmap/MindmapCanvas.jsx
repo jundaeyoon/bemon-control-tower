@@ -647,6 +647,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             member={selectedMember}
             projects={projects}
             onClose={onCloseSelectedMember}
+            onOpenTask={(taskId, projectId) => setActiveTask({ taskId, projectId })}
           />
         )}
 

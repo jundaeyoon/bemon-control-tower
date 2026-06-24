@@ -44,5 +44,11 @@ export function usePersonalTasks(assignee) {
     setTasks(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  return { tasks, addTask, toggleTask, deleteTask };
+  const updateTask = useCallback(async (id, fields) => {
+    supabase.from('personal_tasks').update(fields).eq('id', id)
+      .then(({ error }) => { if (error) console.error('[usePersonalTasks] update:', error); });
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...fields } : t));
+  }, []);
+
+  return { tasks, addTask, toggleTask, deleteTask, updateTask };
 }
