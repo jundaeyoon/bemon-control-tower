@@ -291,9 +291,9 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         : effectiveCompassY + BRANCH_H + 200;
     }
 
-    // Hub + 4 branch nodes
+    // Hub + branch nodes — branch nodes are excluded (not just hidden) when hub is collapsed
     INITIAL_NODES.forEach(n => {
-      const hidden     = n.data.parentId ? !hubExpanded : false;
+      if (n.data.parentId && !hubExpanded) return;
       const isExpanded = expandedSet.has(n.id);
       let overridePos  = null;
       if (n.id === 'projects'   && dynBranchY     !== null) overridePos = { x: PROJ_BRANCH_X, y: dynBranchY };
@@ -307,7 +307,6 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       result.push({
         ...n,
         position: overridePos ?? n.position,
-        hidden,
         data: {
           ...n.data,
           isExpanded,
@@ -439,9 +438,9 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     const result = [];
 
     INITIAL_EDGES.forEach(e => {
-      const targetNode     = INITIAL_NODES.find(n => n.id === e.target);
-      const targetParentId = targetNode?.data?.parentId;
-      result.push({ ...e, hidden: targetParentId ? !hubExpanded : false });
+      const targetNode = INITIAL_NODES.find(n => n.id === e.target);
+      if (targetNode?.data?.parentId && !hubExpanded) return;
+      result.push({ ...e });
     });
 
     const activeProjects = projects.filter(p => !p.archived);
