@@ -67,7 +67,7 @@
 /* ── Tooltip ──────────────────────────────────────────────────────────────── */
 .tooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: #1a1a1a;
@@ -83,6 +83,16 @@
   transition: opacity 0.15s;
   z-index: 200;
   white-space: nowrap;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: #1a1a1a;
 }
 
 .memberBtn:hover .tooltip {
