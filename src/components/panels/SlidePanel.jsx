@@ -4,7 +4,7 @@ export default function SlidePanel({ title, emoji, onClose, children, width = 52
   return (
     <>
       <div className={styles.backdrop} onClick={onClose} />
-      <aside className={styles.panel} style={{ width: `min(${width}px, 100vw)` }}>
+      <aside className={styles.panel} style={{ width: `min(${width}px, 100vw)` }} onClick={e => e.stopPropagation()}>
         <div className={styles.dragHandle} />
         <div className={styles.header}>
           <div className={styles.titleRow}>
