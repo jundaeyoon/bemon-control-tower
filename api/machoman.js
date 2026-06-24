@@ -19,13 +19,28 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'messages 배열이 비어있습니다.', stage: 'input' });
   }
 
-  // Claude API는 첫 메시지가 반드시 role: 'user' 여야 함
-  const apiMessages = messages.filter(m => m.role === 'user' || m.role === 'assistant');
-  if (!apiMessages.length || apiMessages[0].role !== 'user') {
+  // Claude API requires strictly alternating user/assistant roles, starting with user
+  const filtered = messages.filter(m => m.role === 'user' || m.role === 'assistant');
+  let startIdx = 0;
+  while (startIdx < filtered.length && filtered[startIdx].role !== 'user') startIdx++;
+
+  if (startIdx >= filtered.length) {
     return res.status(400).json({
-      error: '메시지 배열 형식 오류: 첫 번째 메시지는 role: "user" 여야 합니다.',
+      error: 'messages 배열에 user 메시지가 없습니다.',
       stage: 'input',
     });
+  }
+
+  // Merge consecutive same-role messages to enforce strict alternation
+  const apiMessages = [];
+  for (let i = startIdx; i < filtered.length; i++) {
+    const msg = filtered[i];
+    const prev = apiMessages[apiMessages.length - 1];
+    if (prev && prev.role === msg.role) {
+      prev.content = prev.content + '\n' + String(msg.content);
+    } else {
+      apiMessages.push({ role: msg.role, content: String(msg.content) });
+    }
   }
 
   // ── 3. 시스템 프롬프트 구성 ──────────────────────────────────────────────────

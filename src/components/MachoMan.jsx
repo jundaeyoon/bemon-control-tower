@@ -118,7 +118,7 @@ export default function MachoMan({ projects, goals }) {
 
       const json = await res.json();
       if (!res.ok) {
-        const msg = json.hint ?? json.detail ?? json.error ?? `오류 (${res.status})`;
+        const msg = json.detail ?? json.hint ?? json.error ?? `오류 (${res.status})`;
         throw new Error(msg);
       }
       setMessages(prev => [...prev, { role: 'assistant', content: json.reply }]);
