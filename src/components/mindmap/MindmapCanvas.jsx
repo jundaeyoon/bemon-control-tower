@@ -686,6 +686,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <HubCheckinPopup
             projects={projects}
             onClose={() => setShowCheckin(false)}
+            onOpenTask={(taskId, projectId) => setActiveTask({ taskId, projectId })}
           />
         )}
 

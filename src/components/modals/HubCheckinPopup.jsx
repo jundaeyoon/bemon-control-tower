@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './HubCheckinPopup.module.css';
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
@@ -20,17 +21,22 @@ function DeadlineTag({ deadline }) {
   return <span className={`${styles.deadline} ${styles.deadlineNormal}`}>{deadline}</span>;
 }
 
-function MemberView({ member, projects, onClose }) {
+function MemberView({ member, projects, onClose, onOpenTask }) {
   const mc = getMemberColor(member);
-  const { tasks: personalTasks } = usePersonalTasks(member);
+  const personalHook = usePersonalTasks(member);
+  const [activePersonalId, setActivePersonalId] = useState(null);
 
   const myProjectTasks = projects.flatMap(p =>
     (p.tasks ?? [])
       .filter(t => t.assignee === member)
-      .map(t => ({ ...t, projectName: p.name }))
+      .map(t => ({ ...t, projectName: p.name, projectId: p.id }))
   );
 
-  const hasAnything = myProjectTasks.length > 0 || personalTasks.length > 0;
+  const hasAnything = myProjectTasks.length > 0 || personalHook.tasks.length > 0;
+
+  const livePersonalTask = activePersonalId
+    ? (personalHook.tasks.find(t => t.id === activePersonalId) ?? null)
+    : null;
 
   return (
     <>
@@ -54,7 +60,11 @@ function MemberView({ member, projects, onClose }) {
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>📋 프로젝트 태스크</div>
                 {myProjectTasks.map(t => (
-                  <div key={t.id} className={`${styles.taskRow} ${t.completed ? styles.done : ''}`}>
+                  <div
+                    key={t.id}
+                    className={`${styles.taskRow} ${t.completed ? styles.done : ''} ${styles.taskRowClickable}`}
+                    onClick={() => onOpenTask && onOpenTask(t.id, t.projectId)}
+                  >
                     <span className={styles.taskName}>{t.name}</span>
                     <span className={styles.projectTag}>{t.projectName}</span>
                     <DeadlineTag deadline={t.deadline} />
@@ -62,11 +72,15 @@ function MemberView({ member, projects, onClose }) {
                 ))}
               </div>
             )}
-            {personalTasks.length > 0 && (
+            {personalHook.tasks.length > 0 && (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>👤 개인 업무</div>
-                {personalTasks.map(t => (
-                  <div key={t.id} className={`${styles.taskRow} ${t.completed ? styles.done : ''}`}>
+                {personalHook.tasks.map(t => (
+                  <div
+                    key={t.id}
+                    className={`${styles.taskRow} ${t.completed ? styles.done : ''} ${styles.taskRowClickable}`}
+                    onClick={() => setActivePersonalId(t.id)}
+                  >
                     <span className={styles.taskName}>{t.content}</span>
                     <DeadlineTag deadline={t.deadline} />
                   </div>
@@ -78,11 +92,21 @@ function MemberView({ member, projects, onClose }) {
       </div>
 
       <button className={styles.confirmBtn} onClick={onClose}>확인 완료!</button>
+
+      {livePersonalTask && (
+        <PersonalTaskSlide
+          task={livePersonalTask}
+          mc={mc}
+          onUpdate={personalHook.updateTask}
+          onToggle={personalHook.toggleTask}
+          onClose={() => setActivePersonalId(null)}
+        />
+      )}
     </>
   );
 }
 
-export default function HubCheckinPopup({ projects, onClose }) {
+export default function HubCheckinPopup({ projects, onClose, onOpenTask }) {
   const [selected, setSelected] = useState(null);
 
   return createPortal(
@@ -118,7 +142,12 @@ export default function HubCheckinPopup({ projects, onClose }) {
             })}
           </div>
         ) : (
-          <MemberView member={selected} projects={projects} onClose={onClose} />
+          <MemberView
+            member={selected}
+            projects={projects}
+            onClose={onClose}
+            onOpenTask={onOpenTask}
+          />
         )}
       </div>
     </div>,
