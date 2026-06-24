@@ -5,10 +5,15 @@ import SlidePanel from './SlidePanel';
 export default function PersonalTaskSlide({ task, mc, onUpdate, onToggle, onClose }) {
   const [content,  setContent]  = useState(task.content);
   const [deadline, setDeadline] = useState(task.deadline ?? '');
+  const [memo,     setMemo]     = useState(task.memo ?? '');
 
   const handleSave = () => {
-    onUpdate(task.id, { content: content.trim() || task.content, deadline: deadline || null });
+    onUpdate(task.id, { content: content.trim() || task.content, deadline: deadline || null, memo });
     onClose();
+  };
+
+  const handleMemoBlur = () => {
+    onUpdate(task.id, { memo });
   };
 
   return createPortal(
@@ -68,6 +73,28 @@ export default function PersonalTaskSlide({ task, mc, onUpdate, onToggle, onClos
               fontFamily: 'var(--font-family)', color: 'var(--color-text-main)',
               background: 'var(--color-card-bg)', outline: 'none', cursor: 'pointer',
             }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-sub)', fontFamily: 'var(--font-family)', letterSpacing: '0.02em' }}>
+            메모
+          </label>
+          <textarea
+            rows={4}
+            value={memo}
+            onChange={e => setMemo(e.target.value)}
+            onBlur={handleMemoBlur}
+            placeholder="메모를 입력하세요..."
+            style={{
+              resize: 'vertical',
+              border: '1.5px solid var(--color-border)', borderRadius: 8,
+              padding: '10px 12px', fontSize: 14,
+              fontFamily: 'var(--font-family)', color: 'var(--color-text-main)',
+              background: 'var(--color-card-bg)', outline: 'none', lineHeight: 1.5,
+              boxSizing: 'border-box', width: '100%',
+            }}
+            onFocus={e => { e.target.style.borderColor = mc.border; }}
           />
         </div>
 
