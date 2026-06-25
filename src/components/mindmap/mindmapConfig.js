@@ -82,6 +82,15 @@ export const INITIAL_NODES = [
     height: NODE_HEIGHT.branch,
     hidden: true,
   },
+  {
+    id: 'influencer',
+    type: 'branch',
+    position: { x: 430, y: 260 },
+    data: { label: 'SURI 인플루언서 만들기!', emoji: '🌟', accent: 'red', parentId: 'hub', side: 'right', hasChildren: false },
+    width:  NODE_WIDTH.branch,
+    height: NODE_HEIGHT.branch,
+    hidden: true,
+  },
 ];
 
 export const INITIAL_EDGES = [
@@ -92,5 +101,6 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-goals',      source: 'hub', target: 'goals',      type: 'rough', data: { color: '#D4A843', seed: 4 } },
   { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
   { id: 'e-hub-thankyou',  source: 'hub', target: 'thankyou',  type: 'rough', data: { color: '#E8896A', seed: 7 } },
-  { id: 'e-hub-ideabank',  source: 'hub', target: 'ideabank',  type: 'rough', data: { color: '#EC4899', seed: 9 } },
+  { id: 'e-hub-ideabank',    source: 'hub', target: 'ideabank',    type: 'rough', data: { color: '#EC4899', seed: 9  } },
+  { id: 'e-hub-influencer', source: 'hub', target: 'influencer', type: 'rough', data: { color: '#EF4444', seed: 10 } },
 ];
