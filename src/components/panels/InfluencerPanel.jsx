@@ -1,6 +1,22 @@
 import { useState, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import SlidePanel from './SlidePanel';
 import styles from './InfluencerPanel.module.css';
+
+function ImagePreview({ url, name, onClose }) {
+  return createPortal(
+    <div className={styles.previewBackdrop} onClick={onClose}>
+      <button className={styles.previewClose} onClick={onClose} aria-label="닫기">✕</button>
+      <img
+        className={styles.previewImg}
+        src={url}
+        alt={name}
+        onClick={e => e.stopPropagation()}
+      />
+    </div>,
+    document.body
+  );
+}
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
@@ -82,6 +98,7 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
   const [linkDraft, setLinkDraft] = useState('');
   const [contentDraft, setContentDraft] = useState(mission.content ?? '');
   const [uploadError, setUploadError] = useState(null);
+  const [previewImg, setPreviewImg] = useState(null);
   const composingRef = useRef(false);
 
   const handleFileChange = useCallback(async (e) => {
@@ -170,6 +187,7 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
               key={img.id}
               className={styles.imgThumb}
               title={img.name}
+              onClick={() => setPreviewImg(img)}
             >
               <img src={img.url} alt={img.name} />
               {isZin && (
@@ -252,6 +270,14 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
         >
           🗑️ 삭제
         </button>
+      )}
+
+      {previewImg && (
+        <ImagePreview
+          url={previewImg.url}
+          name={previewImg.name}
+          onClose={() => setPreviewImg(null)}
+        />
       )}
     </div>
   );
