@@ -22,8 +22,9 @@ export function useInfluencer() {
       .insert(payload)
       .select()
       .single();
-    if (error) { console.error('[useInfluencer] add:', error); return; }
+    if (error) { console.error('[useInfluencer] add:', error); return null; }
     setMissions(prev => [...prev, data]);
+    return data;
   }, []);
 
   const updateMission = useCallback(async (id, fields) => {

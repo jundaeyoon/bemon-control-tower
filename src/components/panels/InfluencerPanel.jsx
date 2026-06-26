@@ -19,11 +19,13 @@ function ImagePreview({ url, name, onClose }) {
 }
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 export default function InfluencerPanel({ influencerHook, onClose }) {
   const { missions, addMission, updateMission, toggleComplete, deleteMission, uploadImage, removeImage, addLink, removeLink } = influencerHook;
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('bemon_checkin_member'));
   const [showPicker, setShowPicker] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
   const isZin = currentUser === 'ZIN';
 
@@ -33,9 +35,21 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
     setShowPicker(false);
   };
 
-  const handleAddMission = () => {
-    addMission({ type: 'reels', content: '', scheduled_date: null });
+  const handleAddMission = async () => {
+    const newMission = await addMission({ type: 'reels', title: '', content: '', scheduled_date: null });
+    if (newMission?.id) {
+      setExpandedIds(prev => new Set([...prev, newMission.id]));
+    }
   };
+
+  const toggleExpand = useCallback((id) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   return (
     <SlidePanel title="SURI 인플루언서 만들기!" emoji="🌟" onClose={onClose} width={520}>
@@ -78,6 +92,8 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
               key={mission.id}
               mission={mission}
               isZin={isZin}
+              isOpen={expandedIds.has(mission.id)}
+              onToggleOpen={() => toggleExpand(mission.id)}
               onUpdate={(fields) => updateMission(mission.id, fields)}
               onToggle={() => toggleComplete(mission.id)}
               onDelete={() => deleteMission(mission.id)}
@@ -93,7 +109,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
   );
 }
 
-function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
+function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
   const fileInputRef = useRef(null);
   const [linkDraft, setLinkDraft] = useState('');
   const [titleDraft, setTitleDraft] = useState(mission.title ?? '');
@@ -120,173 +136,195 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
     setLinkDraft('');
   }, [linkDraft, onAddLink]);
 
+  const displayTitle = mission.title?.trim() || '(제목 없음)';
+  const hasTitle = !!mission.title?.trim();
+
   return (
     <div className={`${styles.card} ${mission.completed ? styles.cardCompleted : ''}`}>
-      {/* Header: checkbox + type radio */}
-      <div className={styles.cardHeader}>
+
+      {/* ── Accordion header (항상 표시) ── */}
+      <div className={styles.cardHeader} onClick={onToggleOpen}>
         <input
           type="checkbox"
           className={styles.checkBox}
           checked={mission.completed}
           onChange={onToggle}
+          onClick={e => e.stopPropagation()}
           title="완료 체크"
         />
-        <div className={styles.typeRow}>
-          <label className={styles.radioLabel}>
-            <input
-              type="radio"
-              name={`type-${mission.id}`}
-              value="reels"
-              checked={mission.type === 'reels'}
-              onChange={() => onUpdate({ type: 'reels' })}
-            />
-            📱 릴스
-          </label>
-          <label className={styles.radioLabel}>
-            <input
-              type="radio"
-              name={`type-${mission.id}`}
-              value="post"
-              checked={mission.type === 'post'}
-              onChange={() => onUpdate({ type: 'post' })}
-            />
-            🖼️ 게시물
-          </label>
-        </div>
+        <span className={styles.typeBadge}>{TYPE_LABEL[mission.type] ?? '📱 릴스'}</span>
+        <span className={`${styles.headerTitle} ${mission.completed ? styles.headerTitleDone : ''} ${!hasTitle ? styles.headerTitleEmpty : ''}`}>
+          {displayTitle}
+        </span>
+        {mission.scheduled_date && (
+          <span className={styles.dateBadge}>{mission.scheduled_date}</span>
+        )}
+        <span className={`${styles.arrow} ${isOpen ? styles.arrowOpen : ''}`}>▼</span>
       </div>
 
-      {/* Title */}
-      <input
-        type="text"
-        className={`${styles.titleInput} ${mission.completed ? styles.contentInputDone : ''}`}
-        placeholder="임무 제목..."
-        value={titleDraft}
-        onChange={e => {
-          setTitleDraft(e.target.value);
-          if (!titleComposingRef.current) onUpdate({ title: e.target.value });
-        }}
-        onCompositionStart={() => { titleComposingRef.current = true; }}
-        onCompositionEnd={e => { titleComposingRef.current = false; onUpdate({ title: e.target.value }); }}
-      />
+      {/* ── Accordion body (접기/펼치기) ── */}
+      <div className={`${styles.cardBody} ${isOpen ? styles.cardBodyOpen : ''}`}>
+        <div className={styles.cardBodyInner}>
 
-      {/* Content */}
-      <textarea
-        className={`${styles.contentInput} ${mission.completed ? styles.contentInputDone : ''}`}
-        placeholder="무엇을 올릴지 자세히 적어주세요..."
-        value={contentDraft}
-        onChange={e => {
-          setContentDraft(e.target.value);
-          if (!composingRef.current) onUpdate({ content: e.target.value });
-        }}
-        onCompositionStart={() => { composingRef.current = true; }}
-        onCompositionEnd={e => { composingRef.current = false; onUpdate({ content: e.target.value }); }}
-      />
+          {/* Type radio */}
+          <div className={styles.typeRow}>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name={`type-${mission.id}`}
+                value="reels"
+                checked={mission.type === 'reels'}
+                onChange={() => onUpdate({ type: 'reels' })}
+              />
+              📱 릴스
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name={`type-${mission.id}`}
+                value="post"
+                checked={mission.type === 'post'}
+                onChange={() => onUpdate({ type: 'post' })}
+              />
+              🖼️ 게시물
+            </label>
+          </div>
 
-      {/* Date */}
-      <div className={styles.metaRow}>
-        <span className={styles.metaLabel}>📅 업로드 날짜</span>
-        <input
-          type="date"
-          className={styles.dateInput}
-          value={mission.scheduled_date ?? ''}
-          onChange={e => onUpdate({ scheduled_date: e.target.value || null })}
-        />
-      </div>
+          {/* Title */}
+          <input
+            type="text"
+            className={`${styles.titleInput} ${mission.completed ? styles.contentInputDone : ''}`}
+            placeholder="임무 제목..."
+            value={titleDraft}
+            onChange={e => {
+              setTitleDraft(e.target.value);
+              if (!titleComposingRef.current) onUpdate({ title: e.target.value });
+            }}
+            onCompositionStart={() => { titleComposingRef.current = true; }}
+            onCompositionEnd={e => { titleComposingRef.current = false; onUpdate({ title: e.target.value }); }}
+          />
 
-      {/* Reference images */}
-      <div className={styles.imagesSection}>
-        <span className={styles.sectionLabel}>🖼️ 레퍼런스 이미지</span>
-        {uploadError && <span className={styles.uploadError}>{uploadError}</span>}
-        <div className={styles.imageGrid}>
-          {(mission.ref_images ?? []).map(img => (
-            <div
-              key={img.id}
-              className={styles.imgThumb}
-              title={img.name}
-              onClick={() => setPreviewImg(img)}
-            >
-              <img src={img.url} alt={img.name} />
+          {/* Content */}
+          <textarea
+            className={`${styles.contentInput} ${mission.completed ? styles.contentInputDone : ''}`}
+            placeholder="무엇을 올릴지 자세히 적어주세요..."
+            value={contentDraft}
+            onChange={e => {
+              setContentDraft(e.target.value);
+              if (!composingRef.current) onUpdate({ content: e.target.value });
+            }}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={e => { composingRef.current = false; onUpdate({ content: e.target.value }); }}
+          />
+
+          {/* Date */}
+          <div className={styles.metaRow}>
+            <span className={styles.metaLabel}>📅 업로드 날짜</span>
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={mission.scheduled_date ?? ''}
+              onChange={e => onUpdate({ scheduled_date: e.target.value || null })}
+            />
+          </div>
+
+          {/* Reference images */}
+          <div className={styles.imagesSection}>
+            <span className={styles.sectionLabel}>🖼️ 레퍼런스 이미지</span>
+            {uploadError && <span className={styles.uploadError}>{uploadError}</span>}
+            <div className={styles.imageGrid}>
+              {(mission.ref_images ?? []).map(img => (
+                <div
+                  key={img.id}
+                  className={styles.imgThumb}
+                  title={img.name}
+                  onClick={() => setPreviewImg(img)}
+                >
+                  <img src={img.url} alt={img.name} />
+                  {isZin && (
+                    <button
+                      className={styles.imgRemove}
+                      onClick={e => { e.stopPropagation(); onRemoveImage(img.id); }}
+                      title="이미지 삭제"
+                    >✕</button>
+                  )}
+                </div>
+              ))}
               {isZin && (
-                <button
-                  className={styles.imgRemove}
-                  onClick={e => { e.stopPropagation(); onRemoveImage(img.id); }}
-                  title="이미지 삭제"
-                >✕</button>
+                <>
+                  <button
+                    className={styles.imgUploadBtn}
+                    onClick={() => fileInputRef.current?.click()}
+                    title="이미지 업로드"
+                  >+</button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+                </>
               )}
             </div>
-          ))}
+          </div>
+
+          {/* Reference links */}
+          <div className={styles.linksSection}>
+            <span className={styles.sectionLabel}>🔗 레퍼런스 링크</span>
+            {isZin && (
+              <div className={styles.linkAddRow}>
+                <input
+                  type="url"
+                  className={styles.linkInput}
+                  placeholder="https://..."
+                  value={linkDraft}
+                  onChange={e => setLinkDraft(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleAddLink(); }}
+                />
+                <button className={styles.linkAddIconBtn} onClick={handleAddLink} title="링크 추가">+</button>
+              </div>
+            )}
+            {(mission.ref_links ?? []).length > 0 && (
+              <div className={styles.linkList}>
+                {(mission.ref_links ?? []).map(link => (
+                  <div key={link.id} className={styles.linkItem}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.linkAnchor}
+                      title={link.url}
+                    >
+                      {link.url}
+                    </a>
+                    {isZin && (
+                      <button
+                        className={styles.linkRemove}
+                        onClick={() => onRemoveLink(link.id)}
+                        title="링크 삭제"
+                      >✕</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Delete (ZIN only) */}
           {isZin && (
-            <>
-              <button
-                className={styles.imgUploadBtn}
-                onClick={() => fileInputRef.current?.click()}
-                title="이미지 업로드"
-              >+</button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-              />
-            </>
+            <button
+              className={styles.deleteBtn}
+              onClick={() => { if (window.confirm('이 임무를 삭제할까요?')) onDelete(); }}
+              title="임무 삭제"
+            >
+              🗑️ 삭제
+            </button>
           )}
+
         </div>
       </div>
-
-      {/* Reference links */}
-      <div className={styles.linksSection}>
-        <span className={styles.sectionLabel}>🔗 레퍼런스 링크</span>
-        {isZin && (
-          <div className={styles.linkAddRow}>
-            <input
-              type="url"
-              className={styles.linkInput}
-              placeholder="https://..."
-              value={linkDraft}
-              onChange={e => setLinkDraft(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleAddLink(); }}
-            />
-            <button className={styles.linkAddIconBtn} onClick={handleAddLink} title="링크 추가">+</button>
-          </div>
-        )}
-        {(mission.ref_links ?? []).length > 0 && (
-          <div className={styles.linkList}>
-            {(mission.ref_links ?? []).map(link => (
-              <div key={link.id} className={styles.linkItem}>
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.linkAnchor}
-                  title={link.url}
-                >
-                  {link.url}
-                </a>
-                {isZin && (
-                  <button
-                    className={styles.linkRemove}
-                    onClick={() => onRemoveLink(link.id)}
-                    title="링크 삭제"
-                  >✕</button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Delete (ZIN only) */}
-      {isZin && (
-        <button
-          className={styles.deleteBtn}
-          onClick={() => { if (window.confirm('이 임무를 삭제할까요?')) onDelete(); }}
-          title="임무 삭제"
-        >
-          🗑️ 삭제
-        </button>
-      )}
 
       {previewImg && (
         <ImagePreview

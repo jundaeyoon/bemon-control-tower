@@ -140,19 +140,15 @@
 
 /* ── Mission card ─────────────────────── */
 .card {
-  padding: 14px;
   border-radius: var(--radius-md);
   border: 1.5px solid rgba(239,68,68,0.2);
   background: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  overflow: hidden;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .card:hover {
   border-color: rgba(239,68,68,0.4);
-  background: #FFF8F8;
 }
 
 .cardCompleted {
@@ -161,11 +157,93 @@
   background: #F9F9F9;
 }
 
-/* ── Card header row ─────────────────── */
+/* ── Accordion header ────────────────── */
 .cardHeader {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 11px 14px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  transition: background 0.12s;
+}
+
+.cardHeader:hover {
+  background: rgba(239,68,68,0.04);
+}
+
+.typeBadge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+
+.headerTitle {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: var(--color-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.headerTitleDone {
+  text-decoration: line-through;
+  color: var(--color-text-sub);
+}
+
+.headerTitleEmpty {
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.dateBadge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-family: var(--font-family);
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+
+.arrow {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  transition: transform 0.25s ease;
+  display: inline-block;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Accordion body ──────────────────── */
+.cardBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.cardBodyOpen {
+  grid-template-rows: 1fr;
+}
+
+.cardBodyInner {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(239,68,68,0.1);
+  padding-top: 12px;
 }
 
 .checkBox {
