@@ -230,6 +230,7 @@
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.28s ease;
+  overflow: hidden;
 }
 
 .cardBodyOpen {
@@ -237,7 +238,7 @@
 }
 
 .cardBodyInner {
-  overflow: hidden;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
