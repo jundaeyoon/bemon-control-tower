@@ -81,12 +81,15 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
   const fileInputRef = useRef(null);
   const [linkDraft, setLinkDraft] = useState('');
   const [contentDraft, setContentDraft] = useState(mission.content ?? '');
+  const [uploadError, setUploadError] = useState(null);
   const composingRef = useRef(false);
 
   const handleFileChange = useCallback(async (e) => {
     const files = Array.from(e.target.files ?? []);
+    setUploadError(null);
     for (const file of files) {
-      await onUploadImage(file);
+      const result = await onUploadImage(file);
+      if (result?.error) { setUploadError(result.error); break; }
     }
     e.target.value = '';
   }, [onUploadImage]);
@@ -160,12 +163,12 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
       {/* Reference images */}
       <div className={styles.imagesSection}>
         <span className={styles.sectionLabel}>🖼️ 레퍼런스 이미지</span>
+        {uploadError && <span className={styles.uploadError}>{uploadError}</span>}
         <div className={styles.imageGrid}>
           {(mission.ref_images ?? []).map(img => (
             <div
               key={img.id}
               className={styles.imgThumb}
-              onClick={() => window.open(img.url, '_blank')}
               title={img.name}
             >
               <img src={img.url} alt={img.name} />

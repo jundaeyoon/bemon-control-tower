@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
-const BUCKET = 'influencer-refs';
-
 export function useInfluencer() {
   const [missions, setMissions] = useState([]);
 
@@ -52,39 +50,42 @@ export function useInfluencer() {
   }, []);
 
   const deleteMission = useCallback(async (id) => {
-    const mission = missions.find(m => m.id === id);
-    if (mission?.ref_images?.length) {
-      const paths = mission.ref_images.map(img => img.path).filter(Boolean);
-      if (paths.length) {
-        await supabase.storage.from(BUCKET).remove(paths);
-      }
-    }
     const { error } = await supabase.from('influencer_missions').delete().eq('id', id);
     if (error) { console.error('[useInfluencer] delete:', error); return; }
     setMissions(prev => prev.filter(m => m.id !== id));
-  }, [missions]);
+  }, []);
 
-  const uploadImage = useCallback(async (missionId, file) => {
-    const ext  = file.name.split('.').pop();
-    const path = `${missionId}/${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
-    if (upErr) { console.error('[useInfluencer] upload:', upErr); return; }
-
-    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    const newImg = { id: path, path, url: urlData.publicUrl, name: file.name };
-
-    setMissions(prev => {
-      const mission = prev.find(m => m.id === missionId);
-      if (!mission) return prev;
-      const ref_images = [...(mission.ref_images ?? []), newImg];
-      supabase.from('influencer_missions').update({ ref_images }).eq('id', missionId)
-        .then(({ error }) => { if (error) console.error('[useInfluencer] img update:', error); });
-      return prev.map(m => m.id === missionId ? { ...m, ref_images } : m);
+  const uploadImage = useCallback((missionId, file) => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith('image/')) {
+        resolve({ error: '이미지 파일만 업로드할 수 있어요.' });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newImg = {
+          id:   `img-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          name: file.name,
+          url:  e.target.result,
+        };
+        setMissions(prev => {
+          const mission = prev.find(m => m.id === missionId);
+          if (!mission) { resolve({ error: '임무를 찾을 수 없어요.' }); return prev; }
+          const ref_images = [...(mission.ref_images ?? []), newImg];
+          supabase.from('influencer_missions').update({ ref_images }).eq('id', missionId)
+            .then(({ error }) => {
+              if (error) { console.error('[useInfluencer] img update:', error); resolve({ error: error.message }); }
+              else resolve({ error: null });
+            });
+          return prev.map(m => m.id === missionId ? { ...m, ref_images } : m);
+        });
+      };
+      reader.onerror = () => resolve({ error: '파일 읽기에 실패했어요.' });
+      reader.readAsDataURL(file);
     });
   }, []);
 
-  const removeImage = useCallback(async (missionId, imgId) => {
-    await supabase.storage.from(BUCKET).remove([imgId]);
+  const removeImage = useCallback((missionId, imgId) => {
     setMissions(prev => {
       const mission = prev.find(m => m.id === missionId);
       if (!mission) return prev;
