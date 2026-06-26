@@ -6,17 +6,18 @@ const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
 
 export default function InfluencerPanel({ influencerHook, onClose }) {
   const { missions, addMission, updateMission, toggleComplete, deleteMission, uploadImage, removeImage, addLink, removeLink } = influencerHook;
-  const [currentUser, setCurrentUser] = useState(null);
-  const [zinWarn, setZinWarn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('bemon_checkin_member'));
+  const [showPicker, setShowPicker] = useState(false);
 
   const isZin = currentUser === 'ZIN';
 
+  const selectUser = (m) => {
+    localStorage.setItem('bemon_checkin_member', m);
+    setCurrentUser(m);
+    setShowPicker(false);
+  };
+
   const handleAddMission = () => {
-    if (!isZin) {
-      setZinWarn(true);
-      setTimeout(() => setZinWarn(false), 3000);
-      return;
-    }
     addMission({ type: 'reels', content: '', scheduled_date: null });
   };
 
@@ -26,19 +27,29 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
         {/* Author bar */}
         <div className={styles.authorBar}>
           <span className={styles.authorLabel}>✍️ 작성자: ZIN</span>
-          <select
-            className={styles.memberSelect}
-            value={currentUser ?? ''}
-            onChange={e => { setCurrentUser(e.target.value || null); setZinWarn(false); }}
-          >
-            <option value="">나는 누구?</option>
-            {MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-          <button className={styles.addBtn} onClick={handleAddMission}>+ 임무 추가</button>
+          {currentUser ? (
+            <>
+              <button className={styles.currentUserBtn} onClick={() => setShowPicker(p => !p)}>
+                {currentUser} ▾
+              </button>
+              {isZin
+                ? <button className={styles.addBtn} onClick={handleAddMission}>+ 임무 추가</button>
+                : <span className={styles.notZinMsg}>ZIN만 임무를 추가할 수 있어요!</span>
+              }
+            </>
+          ) : (
+            <button className={styles.selectUserBtn} onClick={() => setShowPicker(p => !p)}>
+              이름 선택
+            </button>
+          )}
         </div>
 
-        {zinWarn && (
-          <div className={styles.zinToast}>ZIN만 임무를 추가할 수 있어요! 🔒</div>
+        {showPicker && (
+          <div className={styles.memberPicker}>
+            {MEMBERS.map(m => (
+              <button key={m} className={styles.pickerBtn} onClick={() => selectUser(m)}>{m}</button>
+            ))}
+          </div>
         )}
 
         {/* Missions list */}

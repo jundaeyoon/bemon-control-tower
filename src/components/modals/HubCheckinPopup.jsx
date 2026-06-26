@@ -131,7 +131,7 @@ export default function HubCheckinPopup({ projects, onClose, onOpenTask }) {
                   key={m}
                   className={styles.memberBtn}
                   style={{ background: mc.bg, color: mc.text, borderColor: mc.border }}
-                  onClick={() => setSelected(m)}
+                  onClick={() => { localStorage.setItem('bemon_checkin_member', m); setSelected(m); }}
                 >
                   <span className={styles.memberBtnAvatar} style={{ color: mc.text }}>
                     {getMemberInitial(m)}
