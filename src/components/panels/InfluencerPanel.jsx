@@ -80,6 +80,8 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
 function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
   const fileInputRef = useRef(null);
   const [linkDraft, setLinkDraft] = useState('');
+  const [contentDraft, setContentDraft] = useState(mission.content ?? '');
+  const composingRef = useRef(false);
 
   const handleFileChange = useCallback(async (e) => {
     const files = Array.from(e.target.files ?? []);
@@ -135,8 +137,13 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
       <textarea
         className={`${styles.contentInput} ${mission.completed ? styles.contentInputDone : ''}`}
         placeholder="무엇을 올릴지 적어주세요..."
-        value={mission.content ?? ''}
-        onChange={e => onUpdate({ content: e.target.value })}
+        value={contentDraft}
+        onChange={e => {
+          setContentDraft(e.target.value);
+          if (!composingRef.current) onUpdate({ content: e.target.value });
+        }}
+        onCompositionStart={() => { composingRef.current = true; }}
+        onCompositionEnd={e => { composingRef.current = false; onUpdate({ content: e.target.value }); }}
       />
 
       {/* Date */}
