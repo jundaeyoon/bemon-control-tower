@@ -227,18 +227,17 @@
 
 /* ── Accordion body ──────────────────── */
 .cardBody {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.28s ease;
+  max-height: 0;
   overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
 .cardBodyOpen {
-  grid-template-rows: 1fr;
+  max-height: 1000px;
+  overflow: visible;
 }
 
 .cardBodyInner {
-  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
