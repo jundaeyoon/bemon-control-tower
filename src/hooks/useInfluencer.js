@@ -15,8 +15,8 @@ export function useInfluencer() {
       });
   }, []);
 
-  const addMission = useCallback(async ({ type = 'reels', content = '', scheduled_date = null }) => {
-    const payload = { type, content, scheduled_date, completed: false, ref_images: [], ref_links: [] };
+  const addMission = useCallback(async ({ type = 'reels', title = '', content = '', scheduled_date = null }) => {
+    const payload = { type, title, content, scheduled_date, completed: false, ref_images: [], ref_links: [] };
     const { data, error } = await supabase
       .from('influencer_missions')
       .insert(payload)

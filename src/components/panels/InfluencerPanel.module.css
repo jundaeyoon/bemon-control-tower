@@ -220,6 +220,32 @@
   cursor: pointer;
 }
 
+/* ── Title input ─────────────────────── */
+.titleInput {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid rgba(239,68,68,0.25);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  padding: 4px 2px 6px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.titleInput::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.titleInput:focus {
+  border-bottom-color: rgba(239,68,68,0.6);
+}
+
 /* ── Content input ────────────────────── */
 .contentInput {
   width: 100%;

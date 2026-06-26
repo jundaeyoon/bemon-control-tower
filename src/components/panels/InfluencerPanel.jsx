@@ -96,10 +96,12 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
 function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
   const fileInputRef = useRef(null);
   const [linkDraft, setLinkDraft] = useState('');
+  const [titleDraft, setTitleDraft] = useState(mission.title ?? '');
   const [contentDraft, setContentDraft] = useState(mission.content ?? '');
   const [uploadError, setUploadError] = useState(null);
   const [previewImg, setPreviewImg] = useState(null);
   const composingRef = useRef(false);
+  const titleComposingRef = useRef(false);
 
   const handleFileChange = useCallback(async (e) => {
     const files = Array.from(e.target.files ?? []);
@@ -153,10 +155,24 @@ function MissionCard({ mission, isZin, onUpdate, onToggle, onDelete, onUploadIma
         </div>
       </div>
 
+      {/* Title */}
+      <input
+        type="text"
+        className={`${styles.titleInput} ${mission.completed ? styles.contentInputDone : ''}`}
+        placeholder="임무 제목..."
+        value={titleDraft}
+        onChange={e => {
+          setTitleDraft(e.target.value);
+          if (!titleComposingRef.current) onUpdate({ title: e.target.value });
+        }}
+        onCompositionStart={() => { titleComposingRef.current = true; }}
+        onCompositionEnd={e => { titleComposingRef.current = false; onUpdate({ title: e.target.value }); }}
+      />
+
       {/* Content */}
       <textarea
         className={`${styles.contentInput} ${mission.completed ? styles.contentInputDone : ''}`}
-        placeholder="무엇을 올릴지 적어주세요..."
+        placeholder="무엇을 올릴지 자세히 적어주세요..."
         value={contentDraft}
         onChange={e => {
           setContentDraft(e.target.value);
