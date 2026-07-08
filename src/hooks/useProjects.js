@@ -87,10 +87,16 @@ export function useProjects() {
   }, []);
 
   const archiveProject = useCallback(async (projectId) => {
+    // DB 컬럼: projects 테이블에 archived_at 컬럼이 없어 archived_at을 같이 보내면
+    // PGRST204 에러로 업데이트 전체가 실패한다 (archived만 존재).
     const archived_at = new Date().toISOString();
     const { error } = await supabase
-      .from('projects').update({ archived: true, archived_at }).eq('id', projectId);
-    if (error) { console.error(error); return; }
+      .from('projects').update({ archived: true }).eq('id', projectId);
+    if (error) {
+      console.error('[archiveProject] 에러:', error);
+      alert(`❌ 프로젝트 보관 실패\n코드: ${error.code}\n메시지: ${error.message}\n힌트: ${error.hint ?? '-'}`);
+      return;
+    }
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, archived: true, archived_at } : p));
   }, []);
 
