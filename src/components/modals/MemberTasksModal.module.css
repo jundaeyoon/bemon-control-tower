@@ -427,6 +427,57 @@
   font-family: var(--font-family);
 }
 
+/* ── 완료된 업무 섹션 ─────────────────── */
+.completedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.completedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 6px;
+  cursor: pointer;
+}
+
+.completedTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+}
+
+.completedChevron {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.completedChevronOpen {
+  transform: rotate(-180deg);
+}
+
+.completedList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.completedProjectTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: rgba(0,0,0,0.05);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: var(--font-family);
+}
+
 /* ── MachoMan 대화 기록 섹션 ─────────── */
 .chatSection {
   display: flex;

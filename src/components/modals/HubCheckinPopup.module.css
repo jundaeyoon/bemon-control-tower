@@ -271,6 +271,33 @@
   background: rgba(217, 119, 6, 0.10);
 }
 
+/* ── Completed section ───────────────── */
+.completedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 2px 2px 3px;
+}
+
+.completedChevron {
+  font-size: 11px;
+  color: rgba(74, 55, 40, 0.4);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.completedChevronOpen {
+  transform: rotate(-180deg);
+}
+
+.completedList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 3px;
+}
+
 /* ── Confirm button ──────────────────── */
 .confirmBtn {
   margin: 10px 16px 14px;

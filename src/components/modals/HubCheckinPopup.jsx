@@ -25,6 +25,7 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
   const mc = getMemberColor(member);
   const personalHook = usePersonalTasks(member);
   const [activePersonalId, setActivePersonalId] = useState(null);
+  const [completedOpen, setCompletedOpen] = useState(false);
 
   const myProjectTasks = projects.flatMap(p =>
     (p.tasks ?? [])
@@ -32,7 +33,13 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
       .map(t => ({ ...t, projectName: p.name, projectId: p.id }))
   );
 
-  const hasAnything = myProjectTasks.length > 0 || personalHook.tasks.length > 0;
+  const activeProjectTasks = myProjectTasks.filter(t => !t.completed);
+  const completedProjectTasks = myProjectTasks.filter(t => t.completed);
+  const activePersonalTasks = personalHook.tasks.filter(t => !t.completed);
+  const completedPersonalTasks = personalHook.tasks.filter(t => t.completed);
+
+  const hasAnything = activeProjectTasks.length > 0 || activePersonalTasks.length > 0;
+  const completedCount = completedProjectTasks.length + completedPersonalTasks.length;
 
   const livePersonalTask = activePersonalId
     ? (personalHook.tasks.find(t => t.id === activePersonalId) ?? null)
@@ -52,42 +59,76 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
       </div>
 
       <div className={styles.taskList}>
-        {!hasAnything ? (
+        {!hasAnything && completedCount === 0 && (
           <div className={styles.empty}>오늘은 여유롭네요! 🎉</div>
-        ) : (
-          <>
-            {myProjectTasks.length > 0 && (
-              <div className={styles.section}>
-                <div className={styles.sectionTitle}>📋 프로젝트 태스크</div>
-                {myProjectTasks.map(t => (
+        )}
+        {!hasAnything && completedCount > 0 && (
+          <div className={styles.empty}>진행중인 업무가 없어요! 🎉</div>
+        )}
+        {activeProjectTasks.length > 0 && (
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>📋 프로젝트 태스크</div>
+            {activeProjectTasks.map(t => (
+              <div
+                key={t.id}
+                className={`${styles.taskRow} ${styles.taskRowClickable}`}
+                onClick={() => onOpenTask && onOpenTask(t.id, t.projectId)}
+              >
+                <span className={styles.taskName}>{t.name}</span>
+                <span className={styles.projectTag}>{t.projectName}</span>
+                <DeadlineTag deadline={t.deadline} />
+              </div>
+            ))}
+          </div>
+        )}
+        {activePersonalTasks.length > 0 && (
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>👤 개인 업무</div>
+            {activePersonalTasks.map(t => (
+              <div
+                key={t.id}
+                className={`${styles.taskRow} ${styles.taskRowClickable}`}
+                onClick={() => setActivePersonalId(t.id)}
+              >
+                <span className={styles.taskName}>{t.content}</span>
+                <DeadlineTag deadline={t.deadline} />
+              </div>
+            ))}
+          </div>
+        )}
+        {completedCount > 0 && (
+          <div className={styles.section}>
+            <div
+              className={styles.completedHeader}
+              onClick={() => setCompletedOpen(o => !o)}
+            >
+              <span className={styles.sectionTitle}>✅ 완료된 업무 ({completedCount}개)</span>
+              <span className={`${styles.completedChevron} ${completedOpen ? styles.completedChevronOpen : ''}`}>▾</span>
+            </div>
+            {completedOpen && (
+              <div className={styles.completedList}>
+                {completedProjectTasks.map(t => (
                   <div
                     key={t.id}
-                    className={`${styles.taskRow} ${t.completed ? styles.done : ''} ${styles.taskRowClickable}`}
+                    className={`${styles.taskRow} ${styles.done} ${styles.taskRowClickable}`}
                     onClick={() => onOpenTask && onOpenTask(t.id, t.projectId)}
                   >
                     <span className={styles.taskName}>{t.name}</span>
                     <span className={styles.projectTag}>{t.projectName}</span>
-                    <DeadlineTag deadline={t.deadline} />
                   </div>
                 ))}
-              </div>
-            )}
-            {personalHook.tasks.length > 0 && (
-              <div className={styles.section}>
-                <div className={styles.sectionTitle}>👤 개인 업무</div>
-                {personalHook.tasks.map(t => (
+                {completedPersonalTasks.map(t => (
                   <div
                     key={t.id}
-                    className={`${styles.taskRow} ${t.completed ? styles.done : ''} ${styles.taskRowClickable}`}
+                    className={`${styles.taskRow} ${styles.done} ${styles.taskRowClickable}`}
                     onClick={() => setActivePersonalId(t.id)}
                   >
                     <span className={styles.taskName}>{t.content}</span>
-                    <DeadlineTag deadline={t.deadline} />
                   </div>
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 

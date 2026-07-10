@@ -160,6 +160,7 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
   const [formContent,       setFormContent]       = useState('');
   const [formDeadline,      setFormDeadline]      = useState('');
   const [activePersonalId,  setActivePersonalId]  = useState(null);
+  const [completedOpen,     setCompletedOpen]     = useState(false);
 
   // ── MachoMan 대화 기록 ──────────────────────────────────
   const [chats,     setChats]     = useState([]);
@@ -188,6 +189,19 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
 
   const totalCount     = projectTasks.reduce((s, p) => s + p.tasks.length, 0);
   const completedCount = projectTasks.reduce((s, p) => s + p.tasks.filter(t => t.completed).length, 0);
+
+  const activeProjectGroups = projectTasks
+    .map(p => ({ ...p, tasks: p.tasks.filter(t => !t.completed) }))
+    .filter(p => p.tasks.length > 0);
+
+  const completedProjectTasks = projectTasks.flatMap(p =>
+    p.tasks.filter(t => t.completed).map(t => ({ ...t, projectName: p.name, projectId: p.id }))
+  );
+
+  const activePersonalTasks    = personalHook.tasks.filter(t => !t.completed);
+  const completedPersonalTasks = personalHook.tasks.filter(t => t.completed);
+
+  const totalCompletedCount = completedProjectTasks.length + completedPersonalTasks.length;
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -231,10 +245,10 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
 
         {/* Body */}
         <div className={styles.body}>
-          {projectTasks.length === 0 ? (
+          {activeProjectGroups.length === 0 ? (
             <p className={styles.empty}>담당 프로젝트 업무가 없습니다</p>
           ) : (
-            projectTasks.map(proj => (
+            activeProjectGroups.map(proj => (
               <div
                 key={proj.id}
                 className={styles.projectGroup}
@@ -314,10 +328,10 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
               </div>
             )}
 
-            {personalHook.tasks.length === 0 && !showForm ? (
+            {activePersonalTasks.length === 0 && !showForm ? (
               <p className={styles.personalEmpty}>개인 업무가 없습니다</p>
             ) : (
-              personalHook.tasks.map(task => (
+              activePersonalTasks.map(task => (
                 <PersonalTaskRow
                   key={task.id}
                   task={task}
@@ -359,6 +373,47 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
               ))
             )}
           </div>
+
+          {/* ── 완료된 업무 ── */}
+          {totalCompletedCount > 0 && (
+            <>
+              <div className={styles.personalDivider} />
+              <div className={styles.completedSection}>
+                <div
+                  className={styles.completedHeader}
+                  onClick={() => setCompletedOpen(o => !o)}
+                >
+                  <span className={styles.completedTitle}>✅ 완료된 업무 ({totalCompletedCount}개)</span>
+                  <span className={`${styles.completedChevron} ${completedOpen ? styles.completedChevronOpen : ''}`}>▾</span>
+                </div>
+                {completedOpen && (
+                  <div className={styles.completedList}>
+                    {completedProjectTasks.map(task => (
+                      <div
+                        key={task.id}
+                        className={`${styles.taskRow} ${styles.taskDone} ${onOpenTask ? styles.taskRowClickable : ''}`}
+                        onClick={onOpenTask ? () => onOpenTask(task.id, task.projectId) : undefined}
+                      >
+                        <span className={styles.bullet}>└</span>
+                        <span className={styles.taskName}>{task.name}</span>
+                        <span className={styles.completedProjectTag}>{task.projectName}</span>
+                      </div>
+                    ))}
+                    {completedPersonalTasks.map(task => (
+                      <PersonalTaskRow
+                        key={task.id}
+                        task={task}
+                        mc={mc}
+                        onToggle={personalHook.toggleTask}
+                        onDelete={personalHook.deleteTask}
+                        onRowClick={() => setActivePersonalId(task.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
