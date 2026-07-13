@@ -36,7 +36,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
   };
 
   const handleAddMission = async () => {
-    const newMission = await addMission({ type: 'reels', title: '', content: '', scheduled_date: null });
+    const newMission = await addMission({ type: 'reels', title: '', content: '', scheduled_date: null, author: currentUser ?? '' });
     if (newMission?.id) {
       setExpandedIds(prev => new Set([...prev, newMission.id]));
     }
@@ -56,7 +56,6 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
       <div className={styles.wrap}>
         {/* Author bar */}
         <div className={styles.authorBar}>
-          <span className={styles.authorLabel}>✍️ 작성자: ZIN</span>
           {currentUser ? (
             <>
               <button className={styles.currentUserBtn} onClick={() => setShowPicker(p => !p)}>
@@ -82,7 +81,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
         {/* Missions list */}
         <div className={styles.list}>
           {missions.length === 0 && (
-            <p className={styles.empty}>아직 임무가 없어요 🌟<br />ZIN이 임무를 추가해 보세요!</p>
+            <p className={styles.empty}>아직 임무가 없어요 🌟<br />임무를 추가해 보세요!</p>
           )}
           {missions.map(mission => (
             <MissionCard
@@ -153,6 +152,12 @@ function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle,
         <span className={`${styles.headerTitle} ${mission.completed ? styles.headerTitleDone : ''} ${!hasTitle ? styles.headerTitleEmpty : ''}`}>
           {displayTitle}
         </span>
+        {mission.author && (
+          <span className={styles.authorBadge} title={mission.author}>
+            <span className={styles.authorAvatar}>{mission.author[0]}</span>
+            {mission.author}
+          </span>
+        )}
         {mission.scheduled_date && (
           <span className={styles.dateBadge}>{mission.scheduled_date}</span>
         )}
