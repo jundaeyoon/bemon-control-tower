@@ -62,10 +62,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
               <button className={styles.currentUserBtn} onClick={() => setShowPicker(p => !p)}>
                 {currentUser} ▾
               </button>
-              {isZin
-                ? <button className={styles.addBtn} onClick={handleAddMission}>+ 임무 추가</button>
-                : <span className={styles.notZinMsg}>ZIN만 임무를 추가할 수 있어요!</span>
-              }
+              <button className={styles.addBtn} onClick={handleAddMission}>+ 임무 추가</button>
             </>
           ) : (
             <button className={styles.selectUserBtn} onClick={() => setShowPicker(p => !p)}>
@@ -312,16 +309,14 @@ function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle,
             )}
           </div>
 
-          {/* Delete (ZIN only) */}
-          {isZin && (
-            <button
-              className={styles.deleteBtn}
-              onClick={() => { if (window.confirm('이 임무를 삭제할까요?')) onDelete(); }}
-              title="임무 삭제"
-            >
-              🗑️ 삭제
-            </button>
-          )}
+          {/* Delete */}
+          <button
+            className={styles.deleteBtn}
+            onClick={() => { if (window.confirm('이 임무를 삭제할까요?')) onDelete(); }}
+            title="임무 삭제"
+          >
+            🗑️ 삭제
+          </button>
 
         </div>
       </div>
