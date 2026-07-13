@@ -52,7 +52,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
   }, []);
 
   return (
-    <SlidePanel title="SURI 인플루언서 만들기!" emoji="🌟" onClose={onClose} width={520}>
+    <SlidePanel title="바지에 미친 사람들! (컨텐츠)" emoji="🌟" onClose={onClose} width={520}>
       <div className={styles.wrap}>
         {/* Author bar */}
         <div className={styles.authorBar}>

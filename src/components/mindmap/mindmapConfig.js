@@ -86,7 +86,7 @@ export const INITIAL_NODES = [
     id: 'influencer',
     type: 'branch',
     position: { x: 430, y: 260 },
-    data: { label: 'SURI 인플루언서 만들기!', emoji: '🌟', accent: 'red', parentId: 'hub', side: 'right', hasChildren: false },
+    data: { label: '바지에 미친 사람들! (컨텐츠)', emoji: '🌟', accent: 'red', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
     hidden: true,
