@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 export const LEVEL_TABLE = [
   { level: 1, min: 0,    emoji: '🌱', title: '베몽 새싹' },

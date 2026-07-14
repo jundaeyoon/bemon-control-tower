@@ -5,13 +5,12 @@ import SlidePanel from './SlidePanel';
 import styles from './CalendarPanel.module.css';
 
 const DOW_KO = ['월', '화', '수', '목', '금', '토', '일'];
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 const CHIP_BG = {
   'JUN':    '#E8896A',
   'SURI':   '#6B7C45',
   'SUNNY!': '#F59E0B',
-  'ZIN':    '#9333EA',
   'LENA':   '#0284C7',
 };
 const MULTI_COLOR = '#9CA3AF';

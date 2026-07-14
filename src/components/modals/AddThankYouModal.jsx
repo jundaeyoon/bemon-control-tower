@@ -4,7 +4,7 @@ import RoughButton from '../rough/RoughButton';
 import baseStyles from './AddProjectModal.module.css';
 import styles from './AddThankYouModal.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA', '팀 전체'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA', '팀 전체'];
 
 export default function AddThankYouModal({ onAdd, onClose }) {
   const [to,   setTo]   = useState(null);

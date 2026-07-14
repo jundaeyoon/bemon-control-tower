@@ -6,7 +6,7 @@ import ImageGallery  from '../modals/ImageGallery';
 import { getMemberColor } from '../../constants/memberColors';
 import styles from './TaskDetailPanel.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 export default function TaskDetailPanel({
   taskId, projectId, projects,

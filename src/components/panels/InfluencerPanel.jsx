@@ -18,7 +18,7 @@ function ImagePreview({ url, name, onClose }) {
   );
 }
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 const TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 export default function InfluencerPanel({ influencerHook, onClose }) {
@@ -26,8 +26,6 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('bemon_checkin_member'));
   const [showPicker, setShowPicker] = useState(false);
   const [expandedIds, setExpandedIds] = useState(new Set());
-
-  const isZin = currentUser === 'ZIN';
 
   const selectUser = (m) => {
     localStorage.setItem('bemon_checkin_member', m);
@@ -87,7 +85,6 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
             <MissionCard
               key={mission.id}
               mission={mission}
-              isZin={isZin}
               isOpen={expandedIds.has(mission.id)}
               onToggleOpen={() => toggleExpand(mission.id)}
               onUpdate={(fields) => updateMission(mission.id, fields)}
@@ -105,7 +102,7 @@ export default function InfluencerPanel({ influencerHook, onClose }) {
   );
 }
 
-function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
+function MissionCard({ mission, isOpen, onToggleOpen, onUpdate, onToggle, onDelete, onUploadImage, onRemoveImage, onAddLink, onRemoveLink }) {
   const fileInputRef = useRef(null);
   const [linkDraft, setLinkDraft] = useState('');
   const [titleDraft, setTitleDraft] = useState(mission.title ?? '');
@@ -243,51 +240,43 @@ function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle,
                   onClick={() => setPreviewImg(img)}
                 >
                   <img src={img.url} alt={img.name} />
-                  {isZin && (
-                    <button
-                      className={styles.imgRemove}
-                      onClick={e => { e.stopPropagation(); onRemoveImage(img.id); }}
-                      title="이미지 삭제"
-                    >✕</button>
-                  )}
+                  <button
+                    className={styles.imgRemove}
+                    onClick={e => { e.stopPropagation(); onRemoveImage(img.id); }}
+                    title="이미지 삭제"
+                  >✕</button>
                 </div>
               ))}
-              {isZin && (
-                <>
-                  <button
-                    className={styles.imgUploadBtn}
-                    onClick={() => fileInputRef.current?.click()}
-                    title="이미지 업로드"
-                  >+</button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                  />
-                </>
-              )}
+              <button
+                className={styles.imgUploadBtn}
+                onClick={() => fileInputRef.current?.click()}
+                title="이미지 업로드"
+              >+</button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
             </div>
           </div>
 
           {/* Reference links */}
           <div className={styles.linksSection}>
             <span className={styles.sectionLabel}>🔗 레퍼런스 링크</span>
-            {isZin && (
-              <div className={styles.linkAddRow}>
-                <input
-                  type="url"
-                  className={styles.linkInput}
-                  placeholder="https://..."
-                  value={linkDraft}
-                  onChange={e => setLinkDraft(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleAddLink(); }}
-                />
-                <button className={styles.linkAddIconBtn} onClick={handleAddLink} title="링크 추가">+</button>
-              </div>
-            )}
+            <div className={styles.linkAddRow}>
+              <input
+                type="url"
+                className={styles.linkInput}
+                placeholder="https://..."
+                value={linkDraft}
+                onChange={e => setLinkDraft(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleAddLink(); }}
+              />
+              <button className={styles.linkAddIconBtn} onClick={handleAddLink} title="링크 추가">+</button>
+            </div>
             {(mission.ref_links ?? []).length > 0 && (
               <div className={styles.linkList}>
                 {(mission.ref_links ?? []).map(link => (
@@ -301,13 +290,11 @@ function MissionCard({ mission, isZin, isOpen, onToggleOpen, onUpdate, onToggle,
                     >
                       {link.url}
                     </a>
-                    {isZin && (
-                      <button
-                        className={styles.linkRemove}
-                        onClick={() => onRemoveLink(link.id)}
-                        title="링크 삭제"
-                      >✕</button>
-                    )}
+                    <button
+                      className={styles.linkRemove}
+                      onClick={() => onRemoveLink(link.id)}
+                      title="링크 삭제"
+                    >✕</button>
                   </div>
                 ))}
               </div>

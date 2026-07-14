@@ -5,7 +5,7 @@ import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './HubCheckinPopup.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 function deadlineDiff(deadline) {
   const today = new Date(); today.setHours(0, 0, 0, 0);

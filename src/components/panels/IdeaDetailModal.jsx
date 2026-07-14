@@ -3,7 +3,7 @@ import RoughButton from '../rough/RoughButton';
 import { getMemberColor } from '../../constants/memberColors';
 import styles from './TodoDetailModal.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 export default function IdeaDetailModal({ idea, onSave, onDelete, onClose }) {
   const [title,   setTitle]   = useState(idea.title ?? '');

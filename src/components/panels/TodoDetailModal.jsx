@@ -3,7 +3,7 @@ import RoughButton from '../rough/RoughButton';
 import { getMemberColor } from '../../constants/memberColors';
 import styles from './TodoDetailModal.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'ZIN', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
 
 const STATUS_OPTIONS = [
   { id: 'todo',  label: '할일',   color: '#9C9C94' },

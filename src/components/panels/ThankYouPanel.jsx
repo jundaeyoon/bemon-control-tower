@@ -7,7 +7,6 @@ const POSTIT_COLORS = {
   'JUN':    '#FDDDD3',
   'SURI':   '#D8E6C0',
   'SUNNY!': '#FDE9A0',
-  'ZIN':    '#E8D8F5',
   'LENA':   '#C8E8F8',
 };
 

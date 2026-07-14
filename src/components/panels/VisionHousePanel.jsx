@@ -24,7 +24,7 @@ const VISION_CONFIG = {
   team_spirit: {
     title: '팀 스피릿',
     desc: '우리 팀 각자의 역할과 다짐을 적어주세요. 서로에 대한 기대와 약속.',
-    placeholder: 'JUN — 방향을 잡는다\nSURI — 고객과 연결한다\nSUNNY! — 디자인으로 빛낸다\nZIN — 기반을 탄탄하게\nLENA — 팀의 에너지를 만든다',
+    placeholder: 'JUN — 방향을 잡는다\nSURI — 고객과 연결한다\nSUNNY! — 디자인으로 빛낸다\nLENA — 팀의 에너지를 만든다',
     bannerColor: 'rgba(180,90,40,0.92)',
     bannerShadow: 'rgba(140,60,20,0.55)',
     btnFill:   '#B85828', btnFillHover: '#CC6830', btnStroke: '#8C3A10',
