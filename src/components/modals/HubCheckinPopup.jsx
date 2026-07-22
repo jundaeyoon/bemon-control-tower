@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
+import { useInfluencer } from '../../hooks/useInfluencer';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './HubCheckinPopup.module.css';
 
 const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
+const CONTENT_TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 function deadlineDiff(deadline) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -24,6 +26,7 @@ function DeadlineTag({ deadline }) {
 function MemberView({ member, projects, onClose, onOpenTask }) {
   const mc = getMemberColor(member);
   const personalHook = usePersonalTasks(member);
+  const influencerHook = useInfluencer();
   const [activePersonalId, setActivePersonalId] = useState(null);
   const [completedOpen, setCompletedOpen] = useState(false);
 
@@ -38,8 +41,12 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
   const activePersonalTasks = personalHook.tasks.filter(t => !t.completed);
   const completedPersonalTasks = personalHook.tasks.filter(t => t.completed);
 
-  const hasAnything = activeProjectTasks.length > 0 || activePersonalTasks.length > 0;
-  const completedCount = completedProjectTasks.length + completedPersonalTasks.length;
+  const myContentMissions = influencerHook.missions.filter(m => m.assignee === member);
+  const activeContentMissions = myContentMissions.filter(m => !m.completed);
+  const completedContentMissions = myContentMissions.filter(m => m.completed);
+
+  const hasAnything = activeProjectTasks.length > 0 || activePersonalTasks.length > 0 || activeContentMissions.length > 0;
+  const completedCount = completedProjectTasks.length + completedPersonalTasks.length + completedContentMissions.length;
 
   const livePersonalTask = activePersonalId
     ? (personalHook.tasks.find(t => t.id === activePersonalId) ?? null)
@@ -96,6 +103,19 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
             ))}
           </div>
         )}
+        {activeContentMissions.length > 0 && (
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>🎬 컨텐츠 임무</div>
+            {activeContentMissions.map(m => (
+              <div key={m.id} className={styles.taskRow}>
+                <span className={styles.taskName}>
+                  {CONTENT_TYPE_LABEL[m.type] ?? '📱 릴스'} {m.title?.trim() || '(제목 없음)'}
+                </span>
+                {m.scheduled_date && <DeadlineTag deadline={m.scheduled_date} />}
+              </div>
+            ))}
+          </div>
+        )}
         {completedCount > 0 && (
           <div className={styles.section}>
             <div
@@ -124,6 +144,13 @@ function MemberView({ member, projects, onClose, onOpenTask }) {
                     onClick={() => setActivePersonalId(t.id)}
                   >
                     <span className={styles.taskName}>{t.content}</span>
+                  </div>
+                ))}
+                {completedContentMissions.map(m => (
+                  <div key={m.id} className={`${styles.taskRow} ${styles.done}`}>
+                    <span className={styles.taskName}>
+                      {CONTENT_TYPE_LABEL[m.type] ?? '📱 릴스'} {m.title?.trim() || '(제목 없음)'}
+                    </span>
                   </div>
                 ))}
               </div>

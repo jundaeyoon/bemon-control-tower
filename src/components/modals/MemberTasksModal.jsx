@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
+import { useInfluencer } from '../../hooks/useInfluencer';
 import { supabase } from '../../lib/supabase';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './MemberTasksModal.module.css';
+
+const CONTENT_TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 // ── MachoMan 대화 기록 helpers ────────────────────────────────────────────────
 
@@ -152,9 +155,24 @@ function PersonalTaskRow({ task, mc, onToggle, onDelete, onRowClick }) {
   );
 }
 
+function ContentMissionRow({ mission }) {
+  return (
+    <div className={`${styles.taskRow} ${mission.completed ? styles.taskDone : ''}`}>
+      <span className={styles.bullet}>└</span>
+      <span className={styles.taskName}>
+        {CONTENT_TYPE_LABEL[mission.type] ?? '📱 릴스'} {mission.title?.trim() || '(제목 없음)'}
+      </span>
+      {mission.scheduled_date && !mission.completed && (
+        <span className={styles.deadline}>{mission.scheduled_date}</span>
+      )}
+    </div>
+  );
+}
+
 export default function MemberTasksModal({ member, projects, onClose, onOpenTask }) {
   const mc = getMemberColor(member);
   const personalHook = usePersonalTasks(member);
+  const influencerHook = useInfluencer();
 
   const [showForm,          setShowForm]          = useState(false);
   const [formContent,       setFormContent]       = useState('');
@@ -201,7 +219,11 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
   const activePersonalTasks    = personalHook.tasks.filter(t => !t.completed);
   const completedPersonalTasks = personalHook.tasks.filter(t => t.completed);
 
-  const totalCompletedCount = completedProjectTasks.length + completedPersonalTasks.length;
+  const myContentMissions       = influencerHook.missions.filter(m => m.assignee === member);
+  const activeContentMissions   = myContentMissions.filter(m => !m.completed);
+  const completedContentMissions = myContentMissions.filter(m => m.completed);
+
+  const totalCompletedCount = completedProjectTasks.length + completedPersonalTasks.length + completedContentMissions.length;
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -343,6 +365,30 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
               ))
             )}
           </div>
+
+          {/* ── 컨텐츠 임무 섹션 ── */}
+          <div className={styles.personalDivider} />
+          <div className={styles.personalSection} style={{ '--accent': mc.border }}>
+            <div className={styles.personalHeader}>
+              <div className={styles.personalTitle}>
+                <span className={styles.personalDot} style={{ background: mc.border }} />
+                <span className={styles.personalTitleText} style={{ color: mc.text }}>🎬 컨텐츠 임무</span>
+                {myContentMissions.length > 0 && (
+                  <span className={styles.projCount} style={{ color: mc.text }}>
+                    {completedContentMissions.length}/{myContentMissions.length}
+                  </span>
+                )}
+              </div>
+            </div>
+            {activeContentMissions.length === 0 ? (
+              <p className={styles.personalEmpty}>진행중인 컨텐츠 임무가 없습니다</p>
+            ) : (
+              activeContentMissions.map(mission => (
+                <ContentMissionRow key={mission.id} mission={mission} />
+              ))
+            )}
+          </div>
+
           {/* ── 마초맨 대화 기록 ── */}
           <div className={styles.personalDivider} />
           <div className={styles.chatSection}>
@@ -408,6 +454,9 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
                         onDelete={personalHook.deleteTask}
                         onRowClick={() => setActivePersonalId(task.id)}
                       />
+                    ))}
+                    {completedContentMissions.map(mission => (
+                      <ContentMissionRow key={mission.id} mission={mission} />
                     ))}
                   </div>
                 )}
