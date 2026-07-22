@@ -131,6 +131,7 @@ function MissionCard({ mission, isOpen, onToggleOpen, onUpdate, onToggle, onDele
 
   const displayTitle = mission.title?.trim() || '(제목 없음)';
   const hasTitle = !!mission.title?.trim();
+  const displayAssignee = mission.assignee || mission.author || '';
 
   return (
     <div className={`${styles.card} ${mission.completed ? styles.cardCompleted : ''}`}>
@@ -153,6 +154,11 @@ function MissionCard({ mission, isOpen, onToggleOpen, onUpdate, onToggle, onDele
           <span className={styles.authorBadge} title={mission.author}>
             <span className={styles.authorAvatar}>{mission.author[0]}</span>
             {mission.author}
+          </span>
+        )}
+        {displayAssignee && (
+          <span className={styles.assigneeAvatar} title={`담당자: ${displayAssignee}`}>
+            {displayAssignee[0]}
           </span>
         )}
         {mission.scheduled_date && (
@@ -225,6 +231,21 @@ function MissionCard({ mission, isOpen, onToggleOpen, onUpdate, onToggle, onDele
               value={mission.scheduled_date ?? ''}
               onChange={e => onUpdate({ scheduled_date: e.target.value || null })}
             />
+          </div>
+
+          {/* Assignee */}
+          <div className={styles.metaRow}>
+            <span className={styles.metaLabel}>👤 담당자</span>
+            <select
+              className={styles.assigneeSelect}
+              value={displayAssignee}
+              onChange={e => onUpdate({ assignee: e.target.value })}
+            >
+              <option value="" disabled>선택</option>
+              {MEMBERS.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
           </div>
 
           {/* Reference images */}
