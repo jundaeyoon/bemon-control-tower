@@ -10,9 +10,9 @@ export const PROJECT_H = 54;
 
 const HANDLE = { opacity: 0, background: 'transparent', border: 'none', width: 8, height: 8, minWidth: 0, minHeight: 0 };
 
-const FILL         = 'rgba(230,190,175,0.55)';
-const FILL_HOVER   = 'rgba(230,190,175,0.75)';
-const STROKE       = '#C06850';
+const FILL         = 'rgba(0,130,160,0.55)';
+const FILL_HOVER   = 'rgba(0,130,160,0.75)';
+const STROKE       = '#0082A0';
 const FILL_DONE    = 'rgba(180,220,182,0.55)';
 const FILL_DONE_HV = 'rgba(180,220,182,0.75)';
 const STROKE_DONE  = '#388E3C';
