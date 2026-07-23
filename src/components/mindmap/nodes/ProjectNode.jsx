@@ -50,16 +50,16 @@ export default function ProjectNode({ data }) {
       fillStyle: 'solid',
       stroke,
       strokeWidth: hovered || data.isExpanded ? 2.0 : 1.5,
-      roughness: 0.8,
-      bowing: 0.25,
+      roughness: 1.3,
+      bowing: 0.5,
       seed,
     });
     rc.rectangle(pad + 3, pad + 3, PROJECT_W - (pad + 3) * 2, PROJECT_H - (pad + 3) * 2, {
       fill: 'none',
-      stroke: `${stroke}1f`,
-      strokeWidth: 0.6,
-      roughness: 1.0,
-      bowing: 0.3,
+      stroke: `${stroke}33`,
+      strokeWidth: 0.7,
+      roughness: 1.6,
+      bowing: 0.6,
       seed: seed + 5,
     });
   }, [hovered, data.isExpanded, data.name, fill, stroke]);
