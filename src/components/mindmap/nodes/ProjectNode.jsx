@@ -10,11 +10,11 @@ export const PROJECT_H = 54;
 
 const HANDLE = { opacity: 0, background: 'transparent', border: 'none', width: 8, height: 8, minWidth: 0, minHeight: 0 };
 
-const FILL         = 'rgba(180,100,75,0.62)';
-const FILL_HOVER   = 'rgba(180,100,75,0.80)';
+const FILL         = 'rgba(230,190,175,0.55)';
+const FILL_HOVER   = 'rgba(230,190,175,0.75)';
 const STROKE       = '#C06850';
-const FILL_DONE    = 'rgba(76,175,80,0.65)';
-const FILL_DONE_HV = 'rgba(76,175,80,0.82)';
+const FILL_DONE    = 'rgba(180,220,182,0.55)';
+const FILL_DONE_HV = 'rgba(180,220,182,0.75)';
 const STROKE_DONE  = '#388E3C';
 
 export default function ProjectNode({ data }) {
