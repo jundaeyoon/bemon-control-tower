@@ -74,6 +74,24 @@
   line-height: 1.35;
 }
 
+.ideaTitleDone {
+  text-decoration: line-through;
+  color: var(--color-text-sub);
+}
+
+/* ── Complete checkbox ───────────────── */
+.completeCheckbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #EC4899;
+}
+
+.completedCard {
+  opacity: 0.5;
+}
+
 .ideaContent {
   font-size: 11px;
   color: var(--color-text-sub);

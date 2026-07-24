@@ -89,5 +89,16 @@ export function useIdeaBank() {
     setIdeas(prev => prev.filter(i => i.id !== ideaId));
   }, []);
 
-  return { ideas, addIdea, updateIdea, toggleUpvote, toggleDownvote, deleteIdea };
+  const toggleComplete = useCallback((ideaId) => {
+    setIdeas(prev => {
+      const idea = prev.find(i => i.id === ideaId);
+      if (!idea) return prev;
+      const completed = !idea.completed;
+      supabase.from('brainstorm_ideas').update({ completed }).eq('id', ideaId)
+        .then(({ error }) => { if (error) console.error('[toggleComplete]', error); });
+      return prev.map(i => i.id === ideaId ? { ...i, completed } : i);
+    });
+  }, []);
+
+  return { ideas, addIdea, updateIdea, toggleUpvote, toggleDownvote, deleteIdea, toggleComplete };
 }

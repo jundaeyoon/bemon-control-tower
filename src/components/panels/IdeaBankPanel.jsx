@@ -18,7 +18,7 @@ export default function IdeaBankPanel({ ideaBankHook, onClose }) {
   const [author,     setAuthor]     = useState(null);
   const [activeIdea, setActiveIdea] = useState(null);
 
-  const { ideas, addIdea, updateIdea, toggleUpvote, toggleDownvote, deleteIdea } = ideaBankHook;
+  const { ideas, addIdea, updateIdea, toggleUpvote, toggleDownvote, deleteIdea, toggleComplete } = ideaBankHook;
 
   const handleAdd = () => {
     const t = title.trim();
@@ -30,9 +30,10 @@ export default function IdeaBankPanel({ ideaBankHook, onClose }) {
     setAuthor(null);
   };
 
-  const sorted = [...ideas].sort((a, b) =>
-    ((b.votes ?? 0) - (b.downvotes ?? 0)) - ((a.votes ?? 0) - (a.downvotes ?? 0))
-  );
+  const sorted = [...ideas].sort((a, b) => {
+    if (!!a.completed !== !!b.completed) return a.completed ? 1 : -1;
+    return ((b.votes ?? 0) - (b.downvotes ?? 0)) - ((a.votes ?? 0) - (a.downvotes ?? 0));
+  });
 
   return (
     <SlidePanel title="이건 대박!" emoji="💡" onClose={onClose} width={480}>
@@ -83,10 +84,19 @@ export default function IdeaBankPanel({ ideaBankHook, onClose }) {
                 {...CARD_COLORS}
                 {...CARD_HOVER_COLORS}
                 onClick={() => setActiveIdea(idea)}
+                className={idea.completed ? styles.completedCard : ''}
               >
                 <div className={styles.ideaRow}>
+                  <input
+                    type="checkbox"
+                    className={styles.completeCheckbox}
+                    checked={!!idea.completed}
+                    onChange={e => { e.stopPropagation(); toggleComplete(idea.id); }}
+                    onClick={e => e.stopPropagation()}
+                    title="완료 처리"
+                  />
                   <span className={styles.ideaTextCol}>
-                    <span className={styles.ideaTitle}>
+                    <span className={`${styles.ideaTitle} ${idea.completed ? styles.ideaTitleDone : ''}`}>
                       {net >= 3 && <span title="인기 아이디어">🎉 </span>}
                       {idea.title || '(제목 없음)'}
                     </span>
