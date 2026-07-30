@@ -18,7 +18,7 @@ function ImagePreview({ url, name, onClose }) {
   );
 }
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 const TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 export default function InfluencerPanel({ influencerHook, onClose }) {

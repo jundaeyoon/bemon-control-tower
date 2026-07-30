@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import styles from './MachoMan.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 const MEMBER_COLORS = {
   'JUN':    '#E8896A',
   'SURI':   '#6B7C45',

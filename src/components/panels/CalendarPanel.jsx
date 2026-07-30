@@ -5,7 +5,7 @@ import SlidePanel from './SlidePanel';
 import styles from './CalendarPanel.module.css';
 
 const DOW_KO = ['월', '화', '수', '목', '금', '토', '일'];
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 const CHIP_BG = {
   'JUN':    '#E8896A',

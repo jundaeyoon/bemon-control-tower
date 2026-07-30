@@ -6,7 +6,7 @@ import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './HubCheckinPopup.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'LENA'];
+const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 const CONTENT_TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
 
 function deadlineDiff(deadline) {
