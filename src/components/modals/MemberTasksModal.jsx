@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
 import { useInfluencer } from '../../hooks/useInfluencer';
 import { supabase } from '../../lib/supabase';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
+import PriorityModal from './PriorityModal';
 import styles from './MemberTasksModal.module.css';
 
 const CONTENT_TYPE_LABEL = { reels: '📱 릴스', post: '🖼️ 게시물' };
@@ -169,7 +170,7 @@ function ContentMissionRow({ mission }) {
   );
 }
 
-export default function MemberTasksModal({ member, projects, onClose, onOpenTask }) {
+export default function MemberTasksModal({ member, projects, onClose, onOpenTask, onUpdateTaskPriority }) {
   const mc = getMemberColor(member);
   const personalHook = usePersonalTasks(member);
   const influencerHook = useInfluencer();
@@ -179,6 +180,7 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
   const [formDeadline,      setFormDeadline]      = useState('');
   const [activePersonalId,  setActivePersonalId]  = useState(null);
   const [completedOpen,     setCompletedOpen]     = useState(false);
+  const [showPriority,      setShowPriority]      = useState(false);
 
   // ── MachoMan 대화 기록 ──────────────────────────────────
   const [chats,     setChats]     = useState([]);
@@ -224,6 +226,40 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
   const completedContentMissions = myContentMissions.filter(m => m.completed);
 
   const totalCompletedCount = completedProjectTasks.length + completedPersonalTasks.length + completedContentMissions.length;
+
+  // ── 우선순위 (프로젝트 업무 + 개인 업무 통합 미완료 리스트) ──────────
+  const priorityItems = useMemo(() => {
+    const fromProjects = activeProjectGroups.flatMap(p =>
+      p.tasks.map(t => ({
+        key: `project-${t.id}`,
+        kind: 'project',
+        id: t.id,
+        projectId: p.id,
+        title: t.name,
+        projectName: p.name,
+        priority_rank: t.priority_rank ?? null,
+      }))
+    );
+    const fromPersonal = activePersonalTasks.map(t => ({
+      key: `personal-${t.id}`,
+      kind: 'personal',
+      id: t.id,
+      title: t.content,
+      projectName: null,
+      priority_rank: t.priority_rank ?? null,
+    }));
+    return [...fromProjects, ...fromPersonal]
+      .sort((a, b) => (a.priority_rank ?? Infinity) - (b.priority_rank ?? Infinity));
+  }, [activeProjectGroups, activePersonalTasks]);
+
+  const handleSavePriority = async (orderedItems) => {
+    await Promise.all(orderedItems.map((item, i) => {
+      const rank = i + 1;
+      return item.kind === 'project'
+        ? onUpdateTaskPriority?.(item.projectId, item.id, rank)
+        : personalHook.updateTask(item.id, { priority_rank: rank });
+    }));
+  };
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -389,6 +425,17 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
             )}
           </div>
 
+          {/* ── 우선순위! ── */}
+          <div className={styles.personalDivider} />
+          <div
+            className={styles.priorityTrigger}
+            style={{ '--accent': mc.border }}
+            onClick={() => setShowPriority(true)}
+          >
+            <span className={styles.priorityTriggerTitle}>🔥 우선순위!</span>
+            <span className={styles.priorityTriggerArrow}>›</span>
+          </div>
+
           {/* ── 마초맨 대화 기록 ── */}
           <div className={styles.personalDivider} />
           <div className={styles.chatSection}>
@@ -468,6 +515,17 @@ export default function MemberTasksModal({ member, projects, onClose, onOpenTask
 
       {viewChat && createPortal(
         <ChatViewModal chat={viewChat} onClose={() => setViewChat(null)} />,
+        document.body
+      )}
+
+      {showPriority && createPortal(
+        <PriorityModal
+          member={member}
+          mc={mc}
+          items={priorityItems}
+          onSave={handleSavePriority}
+          onClose={() => setShowPriority(false)}
+        />,
         document.body
       )}
 

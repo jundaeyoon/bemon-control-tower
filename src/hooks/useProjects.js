@@ -199,6 +199,17 @@ export function useProjects() {
     ));
   }, []);
 
+  const updateTaskPriority = useCallback(async (projectId, taskId, priority_rank) => {
+    const { error } = await supabase
+      .from('tasks').update({ priority_rank }).eq('id', taskId);
+    if (error) { console.error('[updateTaskPriority] 에러:', error); return; }
+    setProjects(prev => prev.map(p =>
+      p.id === projectId
+        ? { ...p, tasks: p.tasks.map(t => t.id === taskId ? { ...t, priority_rank } : t) }
+        : p
+    ));
+  }, []);
+
   // ── Images (localStorage 유지) ─────────────────────────────────────────────
 
   const addTaskImage = useCallback((projectId, taskId, image) => {
@@ -230,7 +241,7 @@ export function useProjects() {
   return {
     projects,
     addProject, updateProject, deleteProject, archiveProject,
-    addTask, updateTask, updateTaskMemo, toggleTask, deleteTask,
+    addTask, updateTask, updateTaskMemo, toggleTask, deleteTask, updateTaskPriority,
     addTaskImage, removeTaskImage,
   };
 }

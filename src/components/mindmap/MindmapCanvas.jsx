@@ -99,7 +99,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeInfluencer, setActiveInfluencer] = useState(false);
   const [showCheckin,      setShowCheckin]      = useState(false);
 
-  const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, addTaskImage, removeTaskImage } = useProjects();
+  const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, updateTaskPriority, addTaskImage, removeTaskImage } = useProjects();
   const brainstorm = useBrainstorm();
   const goalsHook  = useGoals();
   const { deleteGoal } = goalsHook;
@@ -656,6 +656,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
             projects={projects}
             onClose={onCloseSelectedMember}
             onOpenTask={(taskId, projectId) => setActiveTask({ taskId, projectId })}
+            onUpdateTaskPriority={updateTaskPriority}
           />
         )}
 
