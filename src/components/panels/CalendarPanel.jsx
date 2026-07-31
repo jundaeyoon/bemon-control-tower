@@ -2,18 +2,10 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import rough from 'roughjs';
 import SlidePanel from './SlidePanel';
+import { MEMBERS, getMemberColor } from '../../constants/memberColors';
 import styles from './CalendarPanel.module.css';
 
 const DOW_KO = ['월', '화', '수', '목', '금', '토', '일'];
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
-
-const CHIP_BG = {
-  'JUN':    '#E8896A',
-  'SURI':   '#6B7C45',
-  'SUNNY!': '#F59E0B',
-  'WENDY':  '#9333EA',
-  'LENA':   '#0284C7',
-};
 const MULTI_COLOR = '#9CA3AF';
 
 const REPEAT_OPTS = [
@@ -56,7 +48,7 @@ function parseAssignees(str) {
 function getChipBg(assigneeStr) {
   if (!assigneeStr) return MULTI_COLOR;
   const names = parseAssignees(assigneeStr);
-  return names.length === 1 ? (CHIP_BG[names[0]] ?? '#888') : MULTI_COLOR;
+  return names.length === 1 ? getMemberColor(names[0]).border : MULTI_COLOR;
 }
 
 function getEventLabel(ev) {
@@ -200,7 +192,7 @@ export default function CalendarPanel({ schedHook, onClose }) {
         <div className={styles.legend}>
           {MEMBERS.map(m => (
             <span key={m} className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: CHIP_BG[m] }} />
+              <span className={styles.legendDot} style={{ background: getMemberColor(m).border }} />
               {m}
             </span>
           ))}
@@ -265,7 +257,7 @@ function TaskInfoModal({ event, onClose }) {
   const isPersonal = event._kind === 'personal';
   const title      = isPersonal ? event.content : event.name;
   const assignee   = event.assignee;
-  const color      = assignee ? (CHIP_BG[assignee] ?? '#888') : MULTI_COLOR;
+  const color      = assignee ? getMemberColor(assignee).border : MULTI_COLOR;
   const projName   = event.projects?.name;
 
   const [y, m, d] = event.deadline.split('-');
@@ -378,7 +370,7 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
                   <button
                     key={mem}
                     className={`${styles.assigneeBtn} ${on ? styles.assigneeBtnOn : ''}`}
-                    style={on ? { background: CHIP_BG[mem], borderColor: CHIP_BG[mem] } : {}}
+                    style={on ? { background: getMemberColor(mem).border, borderColor: getMemberColor(mem).border } : {}}
                     onClick={() => toggleAssignee(mem)}
                   >
                     {mem}
@@ -392,7 +384,7 @@ function EventModal({ date, initial, onSave, onDelete, onClose }) {
                   <span
                     key={a}
                     className={styles.selectedChip}
-                    style={{ background: assignees.length > 1 ? MULTI_COLOR : (CHIP_BG[a] ?? '#888') }}
+                    style={{ background: assignees.length > 1 ? MULTI_COLOR : getMemberColor(a).border }}
                   >
                     {a}
                   </span>

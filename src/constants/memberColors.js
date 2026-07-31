@@ -6,6 +6,9 @@ export const MEMBER_COLORS = {
   LENA:     { bg: '#E0F2FE', text: '#0284C7', border: '#0284C7' },
 };
 
+// Derived from MEMBER_COLORS so the roster can never drift out of sync with the color map.
+export const MEMBERS = Object.keys(MEMBER_COLORS);
+
 export function getMemberColor(name) {
   return MEMBER_COLORS[name] ?? { bg: 'rgba(180,180,180,0.12)', text: '#888', border: '#888' };
 }
