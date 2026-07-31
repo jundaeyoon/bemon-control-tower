@@ -11,6 +11,7 @@ const CHIP_BG = {
   'JUN':    '#E8896A',
   'SURI':   '#6B7C45',
   'SUNNY!': '#F59E0B',
+  'WENDY':  '#9333EA',
   'LENA':   '#0284C7',
 };
 const MULTI_COLOR = '#9CA3AF';

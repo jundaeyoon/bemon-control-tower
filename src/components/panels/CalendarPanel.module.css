@@ -45,7 +45,7 @@
 /* ── Day Header Row ── */
 .headerRow {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   position: relative;
   height: 34px;
 }
@@ -72,16 +72,18 @@
 /* ── Cell Grid ── */
 .cellGrid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 .cell {
   min-height: 78px;
+  min-width: 0;
   border-right: 1px solid rgba(99,122,53,0.14);
   border-top: 1px solid rgba(99,122,53,0.14);
   padding: 4px 5px 5px;
   cursor: pointer;
   transition: background 0.10s;
   box-sizing: border-box;
+  overflow: hidden;
 }
 .cell:nth-child(7n) { border-right: none; }
 .cell:hover { background: rgba(99,122,53,0.06); }
@@ -410,4 +412,34 @@
   font-weight: 700;
   color: #22c55e;
   margin-bottom: 4px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .wrap { padding: 12px 8px 20px; gap: 10px; }
+
+  .monthNav { gap: 14px; }
+  .monthLabel { font-size: 15px; min-width: 100px; letter-spacing: 0.2px; }
+  .navBtn { font-size: 20px; padding: 2px 6px; }
+
+  .dayHeader { font-size: 9.5px; }
+
+  .cell { min-height: 56px; padding: 3px 3px 4px; }
+
+  .dateNum { font-size: 9px; margin-bottom: 2px; }
+  .dateNumToday { width: 16px; height: 16px; font-size: 8px; margin-top: 0; }
+
+  .eventsWrap { gap: 1.5px; }
+  .chip {
+    font-size: 7.5px;
+    padding: 1.5px 3px;
+    line-height: 1.25;
+    border-radius: 2.5px;
+  }
+  .chipMore { font-size: 7px; padding: 0 2px; }
+
+  .legend { gap: 8px; padding: 0 2px; }
+  .legendItem { font-size: 9.5px; gap: 3px; }
+  .legendDot { width: 8px; height: 8px; }
+  .legendIcon { font-size: 9.5px; }
 }
