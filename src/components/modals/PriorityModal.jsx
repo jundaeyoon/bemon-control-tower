@@ -27,6 +27,17 @@ export default function PriorityModal({ member, mc, items, onSave, onClose }) {
 
   const handleDragEnd = () => setDragIndex(null);
 
+  const moveItem = (index, dir) => {
+    const target = index + dir;
+    if (target < 0 || target >= order.length) return;
+    setOrder(prev => {
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+    setDirty(true);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -45,7 +56,7 @@ export default function PriorityModal({ member, mc, items, onSave, onClose }) {
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        <div className={styles.hint}>드래그해서 순서를 바꿔보세요. 맨 위가 1순위예요.</div>
+        <div className={styles.hint}>화살표나 드래그로 순서를 바꿔보세요. 맨 위가 1순위예요.</div>
 
         <div className={styles.list}>
           {order.length === 0 ? (
@@ -67,6 +78,22 @@ export default function PriorityModal({ member, mc, items, onSave, onClose }) {
                   {item.projectName && (
                     <span className={styles.projectTag}>📂 {item.projectName}</span>
                   )}
+                </div>
+                <div className={styles.moveBtns}>
+                  <button
+                    type="button"
+                    className={styles.moveBtn}
+                    onClick={() => moveItem(i, -1)}
+                    disabled={i === 0}
+                    aria-label="위로 이동"
+                  >▲</button>
+                  <button
+                    type="button"
+                    className={styles.moveBtn}
+                    onClick={() => moveItem(i, 1)}
+                    disabled={i === order.length - 1}
+                    aria-label="아래로 이동"
+                  >▼</button>
                 </div>
               </div>
             ))
