@@ -29,6 +29,7 @@ const ACCENT_COLORS = {
   coral:   { fill: 'rgba(232,137,106,0.72)', fillHover: 'rgba(232,137,106,0.86)', stroke: '#E8896A' },
   hotpink: { fill: 'rgba(236,72,153,0.72)',  fillHover: 'rgba(236,72,153,0.86)',  stroke: '#EC4899' },
   red:     { fill: 'rgba(239,68,68,0.72)',   fillHover: 'rgba(239,68,68,0.88)',   stroke: '#EF4444' },
+  brown:   { fill: 'rgba(74,55,40,0.72)',    fillHover: 'rgba(74,55,40,0.86)',    stroke: '#4A3728' },
 };
 
 export default function BranchNode({ data }) {

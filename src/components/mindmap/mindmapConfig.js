@@ -83,10 +83,10 @@ export const INITIAL_NODES = [
     hidden: true,
   },
   {
-    id: 'influencer',
+    id: 'footprints',
     type: 'branch',
     position: { x: 430, y: 260 },
-    data: { label: '바지에 미친 사람들! (컨텐츠)', emoji: '🌟', accent: 'red', parentId: 'hub', side: 'right', hasChildren: false },
+    data: { label: '베몽의 발자국들', emoji: '🐾', accent: 'brown', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
     hidden: true,
@@ -102,5 +102,5 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-completed',  source: 'hub', target: 'completed',  type: 'rough', data: { color: '#388E3C', seed: 6 } },
   { id: 'e-hub-thankyou',  source: 'hub', target: 'thankyou',  type: 'rough', data: { color: '#E8896A', seed: 7 } },
   { id: 'e-hub-ideabank',    source: 'hub', target: 'ideabank',    type: 'rough', data: { color: '#EC4899', seed: 9  } },
-  { id: 'e-hub-influencer', source: 'hub', target: 'influencer', type: 'rough', data: { color: '#EF4444', seed: 10 } },
+  { id: 'e-hub-footprints', source: 'hub', target: 'footprints', type: 'rough', data: { color: '#4A3728', seed: 10 } },
 ];

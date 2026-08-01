@@ -27,7 +27,7 @@ import HubCheckinPopup        from '../modals/HubCheckinPopup';
 import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
 import IdeaBankPanel      from '../panels/IdeaBankPanel';
-import InfluencerPanel    from '../panels/InfluencerPanel';
+import FootprintPanel     from '../panels/FootprintPanel';
 import MachoMan           from '../MachoMan';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
@@ -37,7 +37,7 @@ import { useVisionHouse }        from '../../hooks/useVisionHouse';
 import { useSchedule }          from '../../hooks/useSchedule';
 import { useThankYou }          from '../../hooks/useThankYou';
 import { useIdeaBank }          from '../../hooks/useIdeaBank';
-import { useInfluencer }        from '../../hooks/useInfluencer';
+import { useFootprints }        from '../../hooks/useFootprints';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -96,7 +96,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [feedbackVersion, setFeedbackVersion] = useState(0);
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [activeIdeaBank,   setActiveIdeaBank]   = useState(false);
-  const [activeInfluencer, setActiveInfluencer] = useState(false);
+  const [activeFootprints, setActiveFootprints] = useState(false);
   const [showCheckin,      setShowCheckin]      = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, updateTaskPriority, addTaskImage, removeTaskImage } = useProjects();
@@ -107,7 +107,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const schedHook  = useSchedule();
   const thankHook      = useThankYou();
   const ideaBankHook   = useIdeaBank();
-  const influencerHook = useInfluencer();
+  const footprintsHook = useFootprints();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -150,7 +150,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'schedule')   return setActiveSchedule(true);
       if (node.id === 'thankyou')   return setActiveThankyou(true);
       if (node.id === 'ideabank')    return setActiveIdeaBank(true);
-      if (node.id === 'influencer')  return setActiveInfluencer(true);
+      if (node.id === 'footprints')  return setActiveFootprints(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') {
@@ -264,7 +264,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     let dynGoalsY      = null;
     let dynCompletedY  = null;
     let dynThankYouY    = null;
-    let dynInfluencerY  = null;
+    let dynFootprintsY  = null;
 
     const compassExpanded = expandedSet.has('compass');
 
@@ -292,10 +292,10 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     }
     if (hubExpanded) {
       const effectiveCompassY = dynCompassY ?? -80;
-      dynInfluencerY = compassExpanded
+      dynFootprintsY = compassExpanded
         ? effectiveCompassY + BRANCH_H + COMPASS_SUBTREE + 80
         : effectiveCompassY + BRANCH_H + 150;
-      dynThankYouY = dynInfluencerY + BRANCH_H + 100;
+      dynThankYouY = dynFootprintsY + BRANCH_H + 100;
     }
 
     // Hub + 4 branch nodes
@@ -309,7 +309,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'compass'    && dynCompassY    !== null) overridePos = { ...n.position, y: dynCompassY };
       if (n.id === 'goals'      && dynGoalsY      !== null) overridePos = { ...n.position, y: dynGoalsY };
       if (n.id === 'completed'  && dynCompletedY  !== null) overridePos = { x: PROJ_BRANCH_X, y: dynCompletedY };
-      if (n.id === 'influencer' && dynInfluencerY  !== null) overridePos = { ...n.position, y: dynInfluencerY };
+      if (n.id === 'footprints' && dynFootprintsY  !== null) overridePos = { ...n.position, y: dynFootprintsY };
       if (n.id === 'thankyou'   && dynThankYouY   !== null) overridePos = { ...n.position, y: dynThankYouY };
       if (n.id === 'ideabank'   && projectsExpanded)        overridePos = { ...n.position, x: n.position.x - 150 };
       result.push({
@@ -682,10 +682,10 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           />
         )}
 
-        {activeInfluencer && (
-          <InfluencerPanel
-            influencerHook={influencerHook}
-            onClose={() => setActiveInfluencer(false)}
+        {activeFootprints && (
+          <FootprintPanel
+            footprintsHook={footprintsHook}
+            onClose={() => setActiveFootprints(false)}
           />
         )}
 
