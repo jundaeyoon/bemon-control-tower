@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import { MEMBERS, getMemberColor } from '../constants/memberColors';
@@ -15,7 +15,7 @@ function getThisMonthQuest(goals) {
   return (goals ?? []).find(g => g.year_month === ym)?.quest?.trim() || '없음';
 }
 
-export default function MachoMan({ projects, goals }) {
+const MachoMan = forwardRef(function MachoMan({ projects, goals }, ref) {
   const [open,     setOpen]     = useState(false);
   const [user,     setUser]     = useState(() => localStorage.getItem('machoman_user') ?? null);
   const [messages, setMessages] = useState([INITIAL_MSG]);
@@ -38,6 +38,12 @@ export default function MachoMan({ projects, goals }) {
 
   /* ── toggle / close ─────────────────────────────── */
   const toggleOpen = () => setOpen(v => !v);
+
+  // 외부(모바일 헤더 버튼 등)에서 채팅창을 열 수 있도록 하는 imperative API.
+  // ref를 넘기지 않는 기존 호출부(desktop)는 영향 없음.
+  useImperativeHandle(ref, () => ({
+    open: () => setOpen(true),
+  }));
 
   const handleCloseBtn = () => {
     if (hasConvo) {
@@ -299,4 +305,6 @@ export default function MachoMan({ projects, goals }) {
     </>,
     document.body
   );
-}
+});
+
+export default MachoMan;

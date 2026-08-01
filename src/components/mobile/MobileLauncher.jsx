@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import RoughCard from '../rough/RoughCard';
 import { ACCENT_COLORS } from '../../constants/branchColors';
 import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 
+import MachoMan             from '../MachoMan';
 import TaskDetailPanel      from '../panels/TaskDetailPanel';
 import CompletedPanel       from '../panels/CompletedPanel';
 import QuestSlidePanel      from '../panels/QuestSlidePanel';
@@ -78,17 +79,26 @@ export default function MobileLauncher() {
 
   const openTask = (taskId, projectId) => setActiveTask({ taskId, projectId });
 
+  const machoManRef = useRef(null);
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>BEMON CONTROL TOWER</span>
-          <button
-            className={styles.checkinBtn}
-            onClick={() => setShowCheckin(true)}
-            title="체크인"
-            aria-label="체크인"
-          >👋</button>
+          <div className={styles.headerActions}>
+            <button
+              className={styles.machoBtn}
+              onClick={() => machoManRef.current?.open()}
+              aria-label="마초맨"
+            >🤖 마초맨</button>
+            <button
+              className={styles.whoBtn}
+              onClick={() => setShowCheckin(true)}
+              title="체크인"
+              aria-label="체크인"
+            >WHO?</button>
+          </div>
         </div>
 
         <div className={styles.avatarRow}>
@@ -218,6 +228,8 @@ export default function MobileLauncher() {
           onUpdateTaskPriority={updateTaskPriority}
         />
       )}
+
+      <MachoMan ref={machoManRef} projects={projects} goals={goalsHook.goals} />
     </div>
   );
 }
