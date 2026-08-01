@@ -45,6 +45,17 @@ function currentYearMonth() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// branchColors.js의 fill 값은 캔버스 마인드맵 노드용 반투명(rgba, alpha 0.72)이라
+// 흰 배경 카드 위에서는 흐릿하게 보인다. 모바일 카드는 stroke(불투명 hex)를
+// 배경으로 쓰고, 테두리는 이를 살짝 어둡게 만든 색으로 구분한다.
+function darken(hex, factor = 0.78) {
+  const h = hex.replace('#', '');
+  const r = Math.round(parseInt(h.slice(0, 2), 16) * factor);
+  const g = Math.round(parseInt(h.slice(2, 4), 16) * factor);
+  const b = Math.round(parseInt(h.slice(4, 6), 16) * factor);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 export default function MobileLauncher() {
   const [activePanel,    setActivePanel]    = useState(null); // one of CARDS[].id
   // 진입 시 자동으로 체크인 팝업을 한 번 띄운다 (데스크탑 허브 클릭 시와 동일한 HubCheckinPopup 재사용)
@@ -100,15 +111,16 @@ export default function MobileLauncher() {
       <div className={styles.grid}>
         {CARDS.map(card => {
           const ac = ACCENT_COLORS[card.accent];
+          const borderColor = darken(ac.stroke);
           return (
             <RoughCard
               key={card.id}
               className={styles.card}
               padding="0"
-              fill={ac.fill}
-              stroke={ac.stroke}
-              hoverFill={ac.fillHover}
-              hoverStroke={ac.stroke}
+              fill={ac.stroke}
+              stroke={borderColor}
+              hoverFill={ac.stroke}
+              hoverStroke={borderColor}
               strokeWidth={1.7}
               roughness={1.4}
               hoverable
