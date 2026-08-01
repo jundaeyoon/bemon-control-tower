@@ -5,10 +5,8 @@ import RoughButton  from '../rough/RoughButton';
 import RoughInput   from '../rough/RoughInput';
 import TodoDetailModal from './TodoDetailModal';
 import IdeaDetailModal from './IdeaDetailModal';
-import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './BrainstormSlidePanel.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 const TABS = [
   { id: 'todos',     label: '할일',   emoji: '📋' },

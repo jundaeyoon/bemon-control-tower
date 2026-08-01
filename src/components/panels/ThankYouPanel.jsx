@@ -1,17 +1,11 @@
 import { useState } from 'react';
 import SlidePanel from './SlidePanel';
 import AddThankYouModal from '../modals/AddThankYouModal';
+import { getMemberColor } from '../../constants/memberColors';
 import styles from './ThankYouPanel.module.css';
 
-const POSTIT_COLORS = {
-  'JUN':    '#FDDDD3',
-  'SURI':   '#D8E6C0',
-  'SUNNY!': '#FDE9A0',
-  'LENA':   '#C8E8F8',
-};
-
 function getPostitColor(to_member) {
-  return POSTIT_COLORS[to_member] ?? '#FEFEFE';
+  return getMemberColor(to_member).bg;
 }
 
 function getRotation(id) {

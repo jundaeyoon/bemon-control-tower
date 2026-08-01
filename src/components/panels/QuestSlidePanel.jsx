@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import SlidePanel from './SlidePanel';
 import RoughCard from '../rough/RoughCard';
-import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './QuestSlidePanel.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 const TABS = [
   { id: 'quest',    label: '퀘스트',      emoji: '🎯' },

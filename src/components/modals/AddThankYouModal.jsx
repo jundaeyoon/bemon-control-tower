@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import RoughButton from '../rough/RoughButton';
+import { MEMBERS as TEAM_MEMBERS } from '../../constants/memberColors';
 import baseStyles from './AddProjectModal.module.css';
 import styles from './AddThankYouModal.module.css';
 
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA', '팀 전체'];
+const MEMBERS = [...TEAM_MEMBERS, '팀 전체'];
 
 export default function AddThankYouModal({ onAdd, onClose }) {
   const [to,   setTo]   = useState(null);

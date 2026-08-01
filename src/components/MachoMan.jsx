@@ -1,16 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
+import { MEMBERS, getMemberColor } from '../constants/memberColors';
 import styles from './MachoMan.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
-const MEMBER_COLORS = {
-  'JUN':    '#E8896A',
-  'SURI':   '#6B7C45',
-  'SUNNY!': '#F59E0B',
-  'WENDY':  '#9333EA',
-  'LENA':   '#0284C7',
-};
 
 const INITIAL_MSG = {
   role: 'assistant',
@@ -161,7 +153,7 @@ export default function MachoMan({ projects, goals }) {
                 <>
                   <span
                     className={styles.userChip}
-                    style={{ background: MEMBER_COLORS[user] ?? '#888' }}
+                    style={{ background: getMemberColor(user).border }}
                   >
                     {user}
                   </span>
@@ -185,7 +177,7 @@ export default function MachoMan({ projects, goals }) {
                   <button
                     key={m}
                     className={styles.memberBtn}
-                    style={{ background: MEMBER_COLORS[m] }}
+                    style={{ background: getMemberColor(m).border }}
                     onClick={() => handleSelectUser(m)}
                   >
                     {m}

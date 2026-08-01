@@ -4,10 +4,8 @@ import RoughCard      from '../rough/RoughCard';
 import RoughButton    from '../rough/RoughButton';
 import RoughInput     from '../rough/RoughInput';
 import IdeaDetailModal from './IdeaDetailModal';
-import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import styles from './IdeaBankPanel.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 const CARD_COLORS       = { fill: '#FFFFFF', stroke: '#D8D2C4' };
 const CARD_HOVER_COLORS = { hoverFill: '#FFF5FB', hoverStroke: '#EC4899' };

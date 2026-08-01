@@ -4,6 +4,7 @@ export const MEMBER_COLORS = {
   'SUNNY!': { bg: '#FFF8E1', text: '#F59E0B', border: '#F59E0B' },
   WENDY:    { bg: '#F3E8FF', text: '#9333EA', border: '#9333EA' },
   LENA:     { bg: '#E0F2FE', text: '#0284C7', border: '#0284C7' },
+  JINI:     { bg: '#CCFBF1', text: '#0D9488', border: '#0D9488' },
 };
 
 // Derived from MEMBER_COLORS so the roster can never drift out of sync with the color map.
@@ -19,4 +20,13 @@ const MEMBER_INITIALS = {
 
 export function getMemberInitial(name) {
   return MEMBER_INITIALS[name] ?? name?.[0] ?? '';
+}
+
+const MEMBER_ROLES = {
+  JUN:  '대표',
+  JINI: '인스타그램 관리',
+};
+
+export function getMemberRole(name) {
+  return MEMBER_ROLES[name] ?? null;
 }

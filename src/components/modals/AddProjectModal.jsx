@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import RoughInput  from '../rough/RoughInput';
 import RoughButton from '../rough/RoughButton';
-import { getMemberColor } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor } from '../../constants/memberColors';
 import styles from './AddProjectModal.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 export default function AddProjectModal({ onAdd, onClose }) {
   const [name, setName] = useState('');

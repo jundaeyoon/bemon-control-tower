@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePersonalTasks } from '../../hooks/usePersonalTasks';
-import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import PersonalTaskSlide from '../panels/PersonalTaskSlide';
 import styles from './HubCheckinPopup.module.css';
-
-const MEMBERS = ['JUN', 'SURI', 'SUNNY!', 'WENDY', 'LENA'];
 
 function deadlineDiff(deadline) {
   const today = new Date(); today.setHours(0, 0, 0, 0);

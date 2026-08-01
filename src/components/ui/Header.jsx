@@ -1,15 +1,7 @@
-import { getMemberColor, getMemberInitial } from '../../constants/memberColors';
+import { MEMBERS, getMemberColor, getMemberInitial, getMemberRole } from '../../constants/memberColors';
 import { useMemberXP, getLevelInfo } from '../../hooks/useMemberXP';
 import LevelUpToast from './LevelUpToast';
 import styles from './Header.module.css';
-
-const TEAM = [
-  { name: 'JUN',    role: '대표' },
-  { name: 'SURI',   role: null   },
-  { name: 'SUNNY!', role: null   },
-  { name: 'WENDY',  role: null   },
-  { name: 'LENA',   role: null   },
-];
 
 export default function Header({ selectedMember, onSelectMember }) {
   const { xpMap, levelUpEvent, clearLevelUp } = useMemberXP();
@@ -24,17 +16,18 @@ export default function Header({ selectedMember, onSelectMember }) {
         </div>
 
         <div className={styles.team}>
-          {TEAM.map(m => {
-            const mc = getMemberColor(m.name);
-            const isSelected = selectedMember === m.name;
-            const xp = xpMap[m.name] ?? 0;
+          {MEMBERS.map(name => {
+            const mc = getMemberColor(name);
+            const role = getMemberRole(name);
+            const isSelected = selectedMember === name;
+            const xp = xpMap[name] ?? 0;
             const info = getLevelInfo(xp);
 
             return (
               <div
-                key={m.name}
+                key={name}
                 className={`${styles.member} ${styles.memberBtn}`}
-                onClick={() => onSelectMember(m.name)}
+                onClick={() => onSelectMember(name)}
               >
                 {/* 툴팁 */}
                 <div className={styles.tooltip}>
@@ -60,13 +53,13 @@ export default function Header({ selectedMember, onSelectMember }) {
                     transform:   isSelected ? 'scale(1.12)' : 'scale(1)',
                   }}
                 >
-                  {getMemberInitial(m.name)}
+                  {getMemberInitial(name)}
                 </div>
 
                 <div className={styles.info}>
                   <div className={styles.nameRow}>
-                    <span className={styles.name}>{m.name}</span>
-                    {m.role && <span className={styles.role}>{m.role}</span>}
+                    <span className={styles.name}>{name}</span>
+                    {role && <span className={styles.role}>{role}</span>}
                   </div>
                   <div className={styles.levelRow}>
                     <span className={styles.levelBadge} style={{ color: mc.border }}>
