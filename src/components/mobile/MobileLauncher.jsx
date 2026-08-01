@@ -85,13 +85,11 @@ export default function MobileLauncher() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.titleRow}>
-          <span className={styles.title}>BEMON CONTROL TOWER</span>
+          <span className={styles.title}>
+            <span className={styles.titleBemon}>BEMON</span>{' '}
+            <span className={styles.titleControlTower}>CONTROL TOWER</span>
+          </span>
           <div className={styles.headerActions}>
-            <button
-              className={styles.machoBtn}
-              onClick={() => machoManRef.current?.open()}
-              aria-label="마초맨"
-            >🤖 마초맨</button>
             <button
               className={styles.whoBtn}
               onClick={() => setShowCheckin(true)}
