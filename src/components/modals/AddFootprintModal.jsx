@@ -5,11 +5,13 @@ import RoughButton from '../rough/RoughButton';
 import { CATEGORIES, getCategoryColor } from '../../constants/footprintCategories';
 import baseStyles from './AddProjectModal.module.css';
 
-export default function AddFootprintModal({ onAdd, onClose }) {
+export default function AddFootprintModal({ onAdd, onClose, currentUser }) {
   const [title,       setTitle]       = useState('');
   const [date,        setDate]        = useState(new Date().toISOString().slice(0, 10));
   const [category,    setCategory]    = useState(null);
-  const [description, setDescription] = useState('');
+  const [achievement, setAchievement] = useState('');
+  const [timing,      setTiming]      = useState('');
+  const [item,        setItem]        = useState('');
   const [saving,      setSaving]      = useState(false);
   const inputRef = useRef(null);
 
@@ -18,12 +20,21 @@ export default function AddFootprintModal({ onAdd, onClose }) {
     el?.focus();
   }, []);
 
-  const canSubmit = title.trim() && date && category && !saving;
+  const hasFeedbackInput = achievement.trim() || timing.trim() || item.trim();
+  const needsAuthor = hasFeedbackInput && !currentUser;
+  const canSubmit = title.trim() && date && category && !needsAuthor && !saving;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
-    await onAdd({ title: title.trim(), date, category, description: description.trim() || null });
+    await onAdd({
+      title: title.trim(),
+      date,
+      category,
+      achievement: achievement.trim(),
+      timing: timing.trim(),
+      item: item.trim(),
+    });
     setSaving(false);
     onClose();
   };
@@ -77,16 +88,32 @@ export default function AddFootprintModal({ onAdd, onClose }) {
           </div>
         </div>
 
-        <div className={baseStyles.field}>
-          <span className={baseStyles.label}>설명 (선택)</span>
-          <textarea
-            className={baseStyles.descTextarea}
-            value={description}
-            placeholder="간단한 설명을 남겨보세요..."
-            onChange={e => setDescription(e.target.value)}
-            rows={3}
-          />
-        </div>
+        <RoughInput
+          label="성과 (선택)"
+          placeholder="예: 매출 목표 초과 달성"
+          value={achievement}
+          onChange={e => setAchievement(e.target.value)}
+        />
+
+        <RoughInput
+          label="시기 (선택)"
+          placeholder="예: 너무 늦었다, 3월 중순이 적기"
+          value={timing}
+          onChange={e => setTiming(e.target.value)}
+        />
+
+        <RoughInput
+          label="아이템 (선택)"
+          placeholder="예: 가격이 너무 비쌌다는 반응"
+          value={item}
+          onChange={e => setItem(e.target.value)}
+        />
+
+        {needsAuthor && (
+          <p className={baseStyles.label} style={{ color: 'var(--color-warning)' }}>
+            성과/시기/아이템을 입력하려면 먼저 상단에서 피드백 작성자 이름을 선택해주세요.
+          </p>
+        )}
 
         <div className={baseStyles.actions}>
           <RoughButton variant="ghost" onClick={onClose}>취소</RoughButton>

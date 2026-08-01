@@ -353,6 +353,19 @@
   word-break: break-word;
 }
 
+.feedbackCategoryTag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  padding: 1px 7px;
+  border-radius: 100px;
+  border: 1.3px solid;
+  white-space: nowrap;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 .feedbackMeta {
   font-size: 10.5px;
   color: var(--color-text-muted);
@@ -382,6 +395,33 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.feedbackCategoryPicker {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.feedbackCategoryPickBtn {
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1.3px solid rgba(26,26,26,0.16);
+  background: transparent;
+  color: var(--color-text-sub);
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+}
+
+.feedbackCategoryPickBtn:hover {
+  opacity: 0.85;
+}
+
+.feedbackCategoryPickBtnActive {
+  font-weight: 700;
 }
 
 .feedbackInput {

@@ -3,6 +3,7 @@ import SlidePanel from './SlidePanel';
 import AddFootprintModal from '../modals/AddFootprintModal';
 import { MEMBERS, getMemberColor, getMemberInitial } from '../../constants/memberColors';
 import { CATEGORIES, getCategoryColor } from '../../constants/footprintCategories';
+import { FEEDBACK_CATEGORIES, getFeedbackCategoryColor } from '../../constants/feedbackCategories';
 import styles from './FootprintPanel.module.css';
 
 const FILTER_ALL = '전체';
@@ -127,7 +128,7 @@ export default function FootprintPanel({ footprintsHook, onClose }) {
                     currentUser={currentUser}
                     collapsed={collapsedIds.has(fp.id)}
                     onToggleCollapse={() => toggleCollapse(fp.id)}
-                    onAddFeedback={(content) => addFeedback(fp.id, { content, author: currentUser })}
+                    onAddFeedback={(content, category) => addFeedback(fp.id, { content, author: currentUser, category })}
                   />
                 ))}
               </div>
@@ -138,7 +139,8 @@ export default function FootprintPanel({ footprintsHook, onClose }) {
 
       {showAddModal && (
         <AddFootprintModal
-          onAdd={addFootprint}
+          onAdd={(fields) => addFootprint({ ...fields, author: currentUser })}
+          currentUser={currentUser}
           onClose={() => setShowAddModal(false)}
         />
       )}
@@ -147,9 +149,10 @@ export default function FootprintPanel({ footprintsHook, onClose }) {
 }
 
 function FootprintCard({ footprint, currentUser, collapsed, onToggleCollapse, onAddFeedback }) {
-  const [draft,     setDraft]     = useState('');
-  const [adding,    setAdding]    = useState(false);
-  const [showInput, setShowInput] = useState(false);
+  const [draft,            setDraft]            = useState('');
+  const [draftCategory,    setDraftCategory]    = useState('일반');
+  const [adding,           setAdding]           = useState(false);
+  const [showInput,        setShowInput]        = useState(false);
   const cc = getCategoryColor(footprint.category);
   const feedbacks = footprint.footprint_feedbacks ?? [];
 
@@ -157,9 +160,10 @@ function FootprintCard({ footprint, currentUser, collapsed, onToggleCollapse, on
     const trimmed = draft.trim();
     if (!trimmed || !currentUser) return;
     setAdding(true);
-    await onAddFeedback(trimmed);
+    await onAddFeedback(trimmed, draftCategory);
     setAdding(false);
     setDraft('');
+    setDraftCategory('일반');
     setShowInput(false);
   };
 
@@ -191,6 +195,8 @@ function FootprintCard({ footprint, currentUser, collapsed, onToggleCollapse, on
               <div className={styles.feedbackList}>
                 {feedbacks.map(fb => {
                   const mc = getMemberColor(fb.author);
+                  const fbCat = fb.category ?? '일반';
+                  const fcc = getFeedbackCategoryColor(fbCat);
                   return (
                     <div key={fb.id} className={styles.feedbackItem}>
                       <span
@@ -201,7 +207,15 @@ function FootprintCard({ footprint, currentUser, collapsed, onToggleCollapse, on
                         {getMemberInitial(fb.author)}
                       </span>
                       <div className={styles.feedbackTextCol}>
-                        <span className={styles.feedbackContent}>{fb.content}</span>
+                        <span className={styles.feedbackContent}>
+                          <span
+                            className={styles.feedbackCategoryTag}
+                            style={{ background: fcc.bg, color: fcc.text, borderColor: fcc.border }}
+                          >
+                            {fbCat}
+                          </span>
+                          {fb.content}
+                        </span>
                         <span className={styles.feedbackMeta}>{fb.author} · {fmtDate(fb.created_at?.slice(0, 10) ?? footprint.date)}</span>
                       </div>
                     </div>
@@ -212,6 +226,23 @@ function FootprintCard({ footprint, currentUser, collapsed, onToggleCollapse, on
 
             {showInput ? (
               <div className={styles.feedbackAddRow}>
+                <div className={styles.feedbackCategoryPicker}>
+                  {FEEDBACK_CATEGORIES.map(cat => {
+                    const active = draftCategory === cat;
+                    const fcc = getFeedbackCategoryColor(cat);
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        className={`${styles.feedbackCategoryPickBtn} ${active ? styles.feedbackCategoryPickBtnActive : ''}`}
+                        style={active ? { borderColor: fcc.border, color: fcc.text, background: fcc.bg } : {}}
+                        onClick={() => setDraftCategory(cat)}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
                 <textarea
                   className={styles.feedbackInput}
                   placeholder={currentUser ? '피드백을 남겨보세요...' : '먼저 상단에서 이름을 선택해주세요'}
