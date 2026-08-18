@@ -94,7 +94,7 @@ export const INITIAL_NODES = [
   {
     id: 'wiki',
     type: 'branch',
-    position: { x: 260, y: 650 }, // 지그재그: 땡큐 베리 머치(390)보다 더 왼쪽으로
+    position: { x: 190, y: 650 }, // 지그재그: 땡큐 베리 머치(390)보다 더 왼쪽으로
     data: { label: '모르면 여기!', emoji: '🔖', accent: 'navy', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
