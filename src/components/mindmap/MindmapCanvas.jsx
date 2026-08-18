@@ -300,9 +300,15 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       const effectiveCompassY = dynCompassY ?? -80;
       dynFootprintsY = compassExpanded
         ? effectiveCompassY + BRANCH_H + COMPASS_SUBTREE + 80
-        : effectiveCompassY + BRANCH_H + 150;
-      dynThankYouY = dynFootprintsY + BRANCH_H + 100;
-      dynWikiY     = dynThankYouY + BRANCH_H + 100;
+        : effectiveCompassY + BRANCH_H + 110;
+      dynThankYouY = dynFootprintsY + BRANCH_H + 80;
+      // 모르면 여기! — "이달의 퀘스트(OKR)"와 "땡큐 베리 머치"의 중간 높이 근처에 배치.
+      // goals는 왼쪽 컬럼(다른 X)이라 겹칠 일이 없으므로 자유롭게 평균을 목표로 삼되,
+      // 같은 오른쪽 컬럼인 땡큐 베리 머치와는 겹치지 않도록 최소 간격만 보장한다.
+      dynWikiY = Math.max(
+        (dynGoalsY + dynThankYouY) / 2,
+        dynThankYouY + BRANCH_H + 40,
+      );
     }
 
     // Hub + 4 branch nodes
