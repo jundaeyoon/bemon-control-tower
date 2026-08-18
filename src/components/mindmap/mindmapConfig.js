@@ -40,7 +40,7 @@ export const INITIAL_NODES = [
   {
     id: 'compass',
     type: 'branch',
-    position: { x: 430, y: -80 },
+    position: { x: 475, y: -80 }, // 지그재그: 기준선(430)보다 오른쪽으로
     data: { label: 'BEMON 나침반', emoji: '🧭', accent: 'violet', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
@@ -67,7 +67,7 @@ export const INITIAL_NODES = [
   {
     id: 'thankyou',
     type: 'branch',
-    position: { x: 430, y: 450 },
+    position: { x: 390, y: 450 }, // 지그재그: 기준선(430)보다 왼쪽으로
     data: { label: '땡큐 베리 머치', emoji: '🙏', accent: 'coral', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
@@ -94,7 +94,7 @@ export const INITIAL_NODES = [
   {
     id: 'wiki',
     type: 'branch',
-    position: { x: 430, y: 650 },
+    position: { x: 365, y: 650 }, // 지그재그: 땡큐 베리 머치(390)보다 더 왼쪽으로
     data: { label: '모르면 여기!', emoji: '🔖', accent: 'navy', parentId: 'hub', side: 'right', hasChildren: false },
     width:  NODE_WIDTH.branch,
     height: NODE_HEIGHT.branch,
