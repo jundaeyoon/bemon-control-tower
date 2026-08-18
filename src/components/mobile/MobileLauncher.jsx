@@ -12,6 +12,7 @@ import CalendarPanel        from '../panels/CalendarPanel';
 import ThankYouPanel        from '../panels/ThankYouPanel';
 import IdeaBankPanel        from '../panels/IdeaBankPanel';
 import FootprintPanel       from '../panels/FootprintPanel';
+import WikiPanel            from '../panels/WikiPanel';
 import FeedbackModal        from '../modals/FeedbackModal';
 import HubCheckinPopup      from '../modals/HubCheckinPopup';
 import MemberTasksModal     from '../modals/MemberTasksModal';
@@ -26,6 +27,7 @@ import { useSchedule }    from '../../hooks/useSchedule';
 import { useThankYou }    from '../../hooks/useThankYou';
 import { useIdeaBank }    from '../../hooks/useIdeaBank';
 import { useFootprints }  from '../../hooks/useFootprints';
+import { useWikiDocs }    from '../../hooks/useWikiDocs';
 
 import styles from './MobileLauncher.module.css';
 
@@ -38,6 +40,7 @@ const CARDS = [
   { id: 'schedule',   label: '베몽 달력',            accent: 'sky'     },
   { id: 'compass',    label: 'BEMON 나침반',         accent: 'violet'  },
   { id: 'footprints', label: '베몽의 발자국들',      accent: 'brown'   },
+  { id: 'wiki',       label: '모르면 여기!',         accent: 'navy'    },
   { id: 'thankyou',   label: '땡큐 베리 머치',       accent: 'coral'   },
 ];
 
@@ -74,6 +77,7 @@ export default function MobileLauncher() {
   const thankHook     = useThankYou();
   const ideaBankHook  = useIdeaBank();
   const footprintsHook = useFootprints();
+  const wikiHook        = useWikiDocs();
 
   const { projects, updateTask, updateTaskMemo, toggleTask, deleteTask, addTaskImage, removeTaskImage, updateTaskPriority } = projectsHook;
 
@@ -180,6 +184,10 @@ export default function MobileLauncher() {
 
       {activePanel === 'footprints' && (
         <FootprintPanel footprintsHook={footprintsHook} onClose={() => setActivePanel(null)} />
+      )}
+
+      {activePanel === 'wiki' && (
+        <WikiPanel wikiHook={wikiHook} onClose={() => setActivePanel(null)} />
       )}
 
       {activePanel === 'thankyou' && (

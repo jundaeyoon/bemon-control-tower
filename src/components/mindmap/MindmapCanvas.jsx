@@ -28,6 +28,7 @@ import CompletedPanel     from '../panels/CompletedPanel';
 import ThankYouPanel      from '../panels/ThankYouPanel';
 import IdeaBankPanel      from '../panels/IdeaBankPanel';
 import FootprintPanel     from '../panels/FootprintPanel';
+import WikiPanel          from '../panels/WikiPanel';
 import MachoMan           from '../MachoMan';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
@@ -38,6 +39,7 @@ import { useSchedule }          from '../../hooks/useSchedule';
 import { useThankYou }          from '../../hooks/useThankYou';
 import { useIdeaBank }          from '../../hooks/useIdeaBank';
 import { useFootprints }        from '../../hooks/useFootprints';
+import { useWikiDocs }          from '../../hooks/useWikiDocs';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -97,6 +99,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeThankyou,  setActiveThankyou]  = useState(false);
   const [activeIdeaBank,   setActiveIdeaBank]   = useState(false);
   const [activeFootprints, setActiveFootprints] = useState(false);
+  const [activeWiki,       setActiveWiki]       = useState(false);
   const [showCheckin,      setShowCheckin]      = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, updateTaskPriority, addTaskImage, removeTaskImage } = useProjects();
@@ -108,6 +111,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const thankHook      = useThankYou();
   const ideaBankHook   = useIdeaBank();
   const footprintsHook = useFootprints();
+  const wikiHook        = useWikiDocs();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -151,6 +155,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'thankyou')   return setActiveThankyou(true);
       if (node.id === 'ideabank')    return setActiveIdeaBank(true);
       if (node.id === 'footprints')  return setActiveFootprints(true);
+      if (node.id === 'wiki')        return setActiveWiki(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') {
@@ -265,6 +270,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
     let dynCompletedY  = null;
     let dynThankYouY    = null;
     let dynFootprintsY  = null;
+    let dynWikiY        = null;
 
     const compassExpanded = expandedSet.has('compass');
 
@@ -296,6 +302,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
         ? effectiveCompassY + BRANCH_H + COMPASS_SUBTREE + 80
         : effectiveCompassY + BRANCH_H + 150;
       dynThankYouY = dynFootprintsY + BRANCH_H + 100;
+      dynWikiY     = dynThankYouY + BRANCH_H + 100;
     }
 
     // Hub + 4 branch nodes
@@ -311,6 +318,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (n.id === 'completed'  && dynCompletedY  !== null) overridePos = { x: PROJ_BRANCH_X, y: dynCompletedY };
       if (n.id === 'footprints' && dynFootprintsY  !== null) overridePos = { ...n.position, y: dynFootprintsY };
       if (n.id === 'thankyou'   && dynThankYouY   !== null) overridePos = { ...n.position, y: dynThankYouY };
+      if (n.id === 'wiki'       && dynWikiY       !== null) overridePos = { ...n.position, y: dynWikiY };
       if (n.id === 'ideabank'   && projectsExpanded)        overridePos = { ...n.position, x: n.position.x - 150 };
       result.push({
         ...n,
@@ -686,6 +694,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <FootprintPanel
             footprintsHook={footprintsHook}
             onClose={() => setActiveFootprints(false)}
+          />
+        )}
+
+        {activeWiki && (
+          <WikiPanel
+            wikiHook={wikiHook}
+            onClose={() => setActiveWiki(false)}
           />
         )}
 

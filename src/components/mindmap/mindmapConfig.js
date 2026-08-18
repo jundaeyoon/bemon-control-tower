@@ -91,6 +91,15 @@ export const INITIAL_NODES = [
     height: NODE_HEIGHT.branch,
     hidden: true,
   },
+  {
+    id: 'wiki',
+    type: 'branch',
+    position: { x: 430, y: 650 },
+    data: { label: '모르면 여기!', emoji: '🔖', accent: 'navy', parentId: 'hub', side: 'right', hasChildren: false },
+    width:  NODE_WIDTH.branch,
+    height: NODE_HEIGHT.branch,
+    hidden: true,
+  },
 ];
 
 export const INITIAL_EDGES = [
@@ -103,4 +112,5 @@ export const INITIAL_EDGES = [
   { id: 'e-hub-thankyou',  source: 'hub', target: 'thankyou',  type: 'rough', data: { color: '#E8896A', seed: 7 } },
   { id: 'e-hub-ideabank',    source: 'hub', target: 'ideabank',    type: 'rough', data: { color: '#EC4899', seed: 9  } },
   { id: 'e-hub-footprints', source: 'hub', target: 'footprints', type: 'rough', data: { color: '#4A3728', seed: 10 } },
+  { id: 'e-hub-wiki',       source: 'hub', target: 'wiki',       type: 'rough', data: { color: '#334E68', seed: 11 } },
 ];
