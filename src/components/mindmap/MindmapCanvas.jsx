@@ -29,6 +29,7 @@ import ThankYouPanel      from '../panels/ThankYouPanel';
 import IdeaBankPanel      from '../panels/IdeaBankPanel';
 import FootprintPanel     from '../panels/FootprintPanel';
 import WikiPanel          from '../panels/WikiPanel';
+import DinnerPanel        from '../panels/DinnerPanel';
 import MachoMan           from '../MachoMan';
 import { MindmapActionsContext } from '../../contexts/MindmapActionsContext';
 import { useProjects }           from '../../hooks/useProjects';
@@ -40,6 +41,7 @@ import { useThankYou }          from '../../hooks/useThankYou';
 import { useIdeaBank }          from '../../hooks/useIdeaBank';
 import { useFootprints }        from '../../hooks/useFootprints';
 import { useWikiDocs }          from '../../hooks/useWikiDocs';
+import { useCompanyDinner }     from '../../hooks/useCompanyDinner';
 import styles from './MindmapCanvas.module.css';
 
 const NODE_TYPES = { hub: HubNode, branch: BranchNode, project: ProjectNode, task: TaskNode, session: SessionNode, quest: QuestNode, compass: CompassNode };
@@ -100,6 +102,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const [activeIdeaBank,   setActiveIdeaBank]   = useState(false);
   const [activeFootprints, setActiveFootprints] = useState(false);
   const [activeWiki,       setActiveWiki]       = useState(false);
+  const [activeDinner,     setActiveDinner]     = useState(false);
   const [showCheckin,      setShowCheckin]      = useState(false);
 
   const { projects, addProject, updateProject, archiveProject, addTask, updateTask, updateTaskMemo, toggleTask, deleteProject, deleteTask, updateTaskPriority, addTaskImage, removeTaskImage } = useProjects();
@@ -112,6 +115,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
   const ideaBankHook   = useIdeaBank();
   const footprintsHook = useFootprints();
   const wikiHook        = useWikiDocs();
+  const dinnerHook      = useCompanyDinner();
 
   // fitView key: changes whenever the project/brainstorm/goals layout shape changes
   const fitKey = useMemo(() => {
@@ -156,6 +160,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
       if (node.id === 'ideabank')    return setActiveIdeaBank(true);
       if (node.id === 'footprints')  return setActiveFootprints(true);
       if (node.id === 'wiki')        return setActiveWiki(true);
+      if (node.id === 'dinner')      return setActiveDinner(true);
       return setActivePanel(node.id);
     }
     if (node.type === 'project') {
@@ -707,6 +712,13 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           <WikiPanel
             wikiHook={wikiHook}
             onClose={() => setActiveWiki(false)}
+          />
+        )}
+
+        {activeDinner && (
+          <DinnerPanel
+            dinnerHook={dinnerHook}
+            onClose={() => setActiveDinner(false)}
           />
         )}
 

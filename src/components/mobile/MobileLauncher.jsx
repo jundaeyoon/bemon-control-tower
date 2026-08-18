@@ -13,6 +13,7 @@ import ThankYouPanel        from '../panels/ThankYouPanel';
 import IdeaBankPanel        from '../panels/IdeaBankPanel';
 import FootprintPanel       from '../panels/FootprintPanel';
 import WikiPanel            from '../panels/WikiPanel';
+import DinnerPanel          from '../panels/DinnerPanel';
 import FeedbackModal        from '../modals/FeedbackModal';
 import HubCheckinPopup      from '../modals/HubCheckinPopup';
 import MemberTasksModal     from '../modals/MemberTasksModal';
@@ -28,12 +29,14 @@ import { useThankYou }    from '../../hooks/useThankYou';
 import { useIdeaBank }    from '../../hooks/useIdeaBank';
 import { useFootprints }  from '../../hooks/useFootprints';
 import { useWikiDocs }    from '../../hooks/useWikiDocs';
+import { useCompanyDinner } from '../../hooks/useCompanyDinner';
 
 import styles from './MobileLauncher.module.css';
 
 const CARDS = [
   { id: 'projects',   label: '프로젝트',            accent: 'salmon'  },
   { id: 'completed',  label: '프로젝트 완수!',       accent: 'emerald' },
+  { id: 'dinner',     label: '공포의 회식',          accent: 'black'   },
   { id: 'brainstorm', label: '브레인스토밍',         accent: 'green'   },
   { id: 'goals',      label: '이달의 퀘스트! (OKR)', accent: 'mustard' },
   { id: 'ideabank',   label: '이건 대박!',           accent: 'hotpink' },
@@ -78,6 +81,7 @@ export default function MobileLauncher() {
   const ideaBankHook  = useIdeaBank();
   const footprintsHook = useFootprints();
   const wikiHook        = useWikiDocs();
+  const dinnerHook      = useCompanyDinner();
 
   const { projects, updateTask, updateTaskMemo, toggleTask, deleteTask, addTaskImage, removeTaskImage, updateTaskPriority } = projectsHook;
 
@@ -188,6 +192,10 @@ export default function MobileLauncher() {
 
       {activePanel === 'wiki' && (
         <WikiPanel wikiHook={wikiHook} onClose={() => setActivePanel(null)} />
+      )}
+
+      {activePanel === 'dinner' && (
+        <DinnerPanel dinnerHook={dinnerHook} onClose={() => setActivePanel(null)} />
       )}
 
       {activePanel === 'thankyou' && (

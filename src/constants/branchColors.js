@@ -12,4 +12,8 @@ export const ACCENT_COLORS = {
   red:     { fill: 'rgba(239,68,68,0.72)',   fillHover: 'rgba(239,68,68,0.88)',   stroke: '#EF4444' },
   brown:   { fill: 'rgba(74,55,40,0.72)',    fillHover: 'rgba(74,55,40,0.86)',    stroke: '#4A3728' },
   navy:    { fill: 'rgba(51,78,104,0.72)',   fillHover: 'rgba(51,78,104,0.86)',   stroke: '#334E68' },
+  // 모바일 카드는 stroke(불투명 hex)를 배경으로 그대로 쓰기 때문에(MobileLauncher 참고),
+  // 여기 stroke도 순한 갈색이 아니라 거의 검정에 가까운 다크브라운으로 잡아야
+  // 캔버스 테두리와 모바일 카드 배경 둘 다 "검정 계열"로 보인다.
+  black:   { fill: 'rgba(26,26,26,0.82)',    fillHover: 'rgba(26,26,26,0.94)',    stroke: '#2A1F18' },
 };

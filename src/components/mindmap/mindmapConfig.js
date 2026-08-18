@@ -100,6 +100,18 @@ export const INITIAL_NODES = [
     height: NODE_HEIGHT.branch,
     hidden: true,
   },
+  {
+    // 독립 노드 — 허브(BEMON)와 연결선이 없고, data.parentId가 없어서
+    // MindmapCanvas의 hidden 계산(`n.data.parentId ? !hubExpanded : false`)에 의해
+    // 허브를 펼치고 접는 것과 무관하게 항상 보인다.
+    id: 'dinner',
+    type: 'branch',
+    position: { x: -400, y: -450 }, // '프로젝트 완수!' 바로 위
+    data: { label: '공포의 회식', emoji: '😱', accent: 'black', side: 'left', hasChildren: false },
+    width:  NODE_WIDTH.branch,
+    height: NODE_HEIGHT.branch,
+    hidden: false,
+  },
 ];
 
 export const INITIAL_EDGES = [
