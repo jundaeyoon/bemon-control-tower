@@ -63,7 +63,7 @@ function darken(hex, factor = 0.78) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export default function MobileLauncher() {
+export default function MobileLauncher({ onForcePc }) {
   const [activePanel,    setActivePanel]    = useState(null); // one of CARDS[].id
   // 진입 시 자동으로 체크인 팝업을 한 번 띄운다 (데스크탑 허브 클릭 시와 동일한 HubCheckinPopup 재사용)
   const [showCheckin,    setShowCheckin]    = useState(true);
@@ -98,6 +98,14 @@ export default function MobileLauncher() {
             <span className={styles.titleControlTower}>CONTROL TOWER</span>
           </span>
           <div className={styles.headerActions}>
+            {onForcePc && (
+              <button
+                className={styles.pcBtn}
+                onClick={onForcePc}
+                title="PC 버전 마인드맵 보기"
+                aria-label="PC 버전 보기"
+              >PC</button>
+            )}
             <button
               className={styles.whoBtn}
               onClick={() => setShowCheckin(true)}

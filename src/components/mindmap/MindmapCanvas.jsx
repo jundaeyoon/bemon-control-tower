@@ -74,16 +74,22 @@ const COMPASS_LEVEL_GAP = 30;   // vertical gap between tree levels
 const COMPASS_SUBTREE = COMPASS_LEVEL_TOP + COMPASS_H * 3 + COMPASS_LEVEL_GAP * 2;
 
 // Triggers fitView only when hub/branch level changes (not project/task expansion)
-function FitViewController({ fitKey }) {
+// disabled: true일 때는 자동 fitView를 걸지 않는다 (모바일에서 강제로 PC 마인드맵을 띄울 때,
+// initialZoom으로 잡은 축소된 시작 뷰를 fitView가 즉시 덮어써버리지 않도록).
+function FitViewController({ fitKey, disabled }) {
   const { fitView } = useReactFlow();
   useEffect(() => {
+    if (disabled) return;
     const t = setTimeout(() => fitView({ padding: 0.40, maxZoom: 0.75, duration: 500 }), 300);
     return () => clearTimeout(t);
-  }, [fitKey, fitView]);
+  }, [fitKey, fitView, disabled]);
   return null;
 }
 
-export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMember }) {
+// initialZoom: 지정하면 fitView 대신 이 zoom으로 고정된 초기 뷰포트에서 시작한다
+// (모바일 폭에서 PC 마인드맵을 강제로 띄울 때 전체가 웬만큼 들어오도록 축소된 값을 넘겨줌).
+// 지정하지 않으면 기존 desktop 동작(fitView 자동 맞춤) 그대로.
+export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMember, initialZoom }) {
   const [expandedSet,    setExpandedSet]    = useState(new Set());
   const [activePanel,    setActivePanel]    = useState(null);
   const [activeTask,     setActiveTask]     = useState(null);
@@ -564,8 +570,9 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           onNodeClick={handleNodeClick}
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
-          fitView
+          fitView={!initialZoom}
           fitViewOptions={{ padding: 0.40, maxZoom: 1.0 }}
+          defaultViewport={initialZoom ? { x: 160, y: 220, zoom: initialZoom } : undefined}
           minZoom={0.2}
           maxZoom={2.5}
           zoomOnScroll
@@ -578,7 +585,7 @@ export default function MindmapCanvas({ selectedMember = null, onCloseSelectedMe
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
         >
-          <FitViewController fitKey={fitKey} />
+          <FitViewController fitKey={fitKey} disabled={!!initialZoom} />
           <Background
             variant={BackgroundVariant.Dots}
             gap={28}
