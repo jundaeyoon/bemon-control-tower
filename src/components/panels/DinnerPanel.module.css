@@ -4,6 +4,145 @@
   gap: 16px;
 }
 
+/* ── 목록 화면 ─────────────────────────── */
+.bigAddBtn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #DC2626;
+  background: #1A1A1A;
+  color: #F87171;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.bigAddBtn:hover { background: #241414; }
+.bigAddBtn:active { transform: scale(0.99); }
+
+.emptyList {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--color-text-sub);
+  font-size: 13px;
+  font-family: var(--font-family);
+  line-height: 1.7;
+}
+
+.dinnerList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dinnerCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: #1A1A1A;
+  border: 1.5px solid #2A1F18;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.dinnerCard:hover { border-color: #DC2626; }
+.dinnerCard:active { transform: scale(0.995); }
+
+.dinnerCardMain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dinnerCardDate {
+  font-size: 11px;
+  font-weight: 700;
+  color: #F87171;
+  font-family: var(--font-family);
+}
+
+.dinnerCardTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #F5F0E8;
+  font-family: var(--font-family);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dinnerCardBadge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  color: #C9BBA8;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  white-space: nowrap;
+}
+
+/* ── 상세 화면 ─────────────────────────── */
+.backBtn {
+  align-self: flex-start;
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  color: var(--color-text-sub);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  cursor: pointer;
+}
+
+.backBtn:hover { color: var(--color-text-main); }
+
+.titleInput {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px dashed transparent;
+  background: transparent;
+  color: var(--color-text-main);
+  font-size: 19px;
+  font-weight: 800;
+  font-family: var(--font-family);
+  padding: 2px 0 6px;
+  box-sizing: border-box;
+  transition: border-color 0.12s;
+}
+
+.titleInput:hover,
+.titleInput:focus {
+  outline: none;
+  border-bottom-color: var(--color-border-strong);
+}
+
+.summaryBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(220,38,38,0.06);
+  border: 1.4px solid rgba(220,38,38,0.22);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+}
+
+.ddayTag {
+  margin-left: auto;
+  color: #C05A30;
+}
+
 /* ── 공용: 다크 카드 섹션 ─────────────── */
 .section {
   display: flex;
@@ -25,7 +164,7 @@
   gap: 6px;
 }
 
-/* ── 날짜/장소 ─────────────────────────── */
+/* ── 날짜 ──────────────────────────────── */
 .infoRow {
   display: flex;
   gap: 8px;
@@ -44,10 +183,6 @@
   font-family: var(--font-family);
   padding: 0 10px;
   transition: border-color 0.12s;
-}
-
-.infoInput::placeholder {
-  color: #8A7B6E;
 }
 
 .infoInput:focus {
@@ -78,6 +213,169 @@
   color: #F87171;
   font-family: var(--font-family);
 }
+
+/* ── 투표자 선택 (장소·메뉴 공용) ──────── */
+.voterBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.voterLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-sub);
+  font-family: var(--font-family);
+}
+
+.voterBtn {
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid #5C4738;
+  background: #1A1A1A;
+  font-size: 11.5px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  color: #F5F0E8;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.voterBtn:hover { border-color: #DC2626; }
+
+.voterPicker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 60px;
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: #2A2320;
+  border: 1.5px solid #5C4738;
+  box-shadow: var(--shadow-md);
+  max-width: 260px;
+}
+
+.voterPickBtn {
+  height: 26px;
+  padding: 0 9px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid #5C4738;
+  background: #1A1A1A;
+  font-size: 11px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  color: #F5F0E8;
+  cursor: pointer;
+}
+.voterPickBtn:hover { border-color: #DC2626; color: #F87171; }
+
+/* ── 투표 목록 (장소·메뉴 공용) ────────── */
+.voteAddRow {
+  display: flex;
+  gap: 8px;
+}
+
+.voteInput {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1.4px solid #5C4738;
+  background: #2A2320;
+  color: #F5F0E8;
+  font-size: 12.5px;
+  font-family: var(--font-family);
+  padding: 0 10px;
+}
+.voteInput::placeholder { color: #8A7B6E; }
+.voteInput:focus { outline: none; border-color: #DC2626; }
+
+.voteAddBtn {
+  flex-shrink: 0;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #DC2626;
+  background: rgba(220,38,38,0.16);
+  color: #F87171;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  cursor: pointer;
+}
+.voteAddBtn:hover:not(:disabled) { background: rgba(220,38,38,0.28); }
+.voteAddBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.voteList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.voteEmpty {
+  font-size: 12px;
+  color: #8A7B6E;
+  font-family: var(--font-family);
+  text-align: center;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.voteRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+}
+
+.voteRank {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #8A7B6E;
+  font-family: var(--font-family);
+  width: 16px;
+}
+
+.voteName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: #F5F0E8;
+  font-family: var(--font-family);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voteBtn {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1.4px solid #5C4738;
+  background: transparent;
+  color: #B8A99A;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+}
+
+.voteBtn:hover:not(:disabled) { border-color: #DC2626; }
+
+.voteBtnActive {
+  border-color: #DC2626;
+  background: rgba(220,38,38,0.2);
+  color: #F87171;
+}
+
+.voteBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── 참석자 ────────────────────────────── */
 .attendeeSummary {
@@ -167,163 +465,65 @@
   font-weight: 800;
 }
 
-/* ── 메뉴 투표 ─────────────────────────── */
-.voterBar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-}
-
-.voterLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: #C9BBA8;
-  font-family: var(--font-family);
-}
-
-.voterBtn {
-  height: 26px;
-  border-radius: var(--radius-md);
-  border: 1.4px solid #5C4738;
-  background: #2A2320;
-  font-size: 11.5px;
-  font-family: var(--font-family);
-  font-weight: 700;
-  color: #F5F0E8;
-  padding: 0 10px;
-  cursor: pointer;
-}
-
-.voterBtn:hover { border-color: #DC2626; }
-
-.voterPicker {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 60px;
-  z-index: 20;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding: 8px;
-  border-radius: var(--radius-md);
-  background: #2A2320;
-  border: 1.5px solid #5C4738;
-  box-shadow: var(--shadow-md);
-  max-width: 260px;
-}
-
-.voterPickBtn {
-  height: 26px;
-  padding: 0 9px;
-  border-radius: var(--radius-md);
-  border: 1.4px solid #5C4738;
-  background: #1A1A1A;
-  font-size: 11px;
-  font-family: var(--font-family);
-  font-weight: 700;
-  color: #F5F0E8;
-  cursor: pointer;
-}
-.voterPickBtn:hover { border-color: #DC2626; color: #F87171; }
-
-.menuAddRow {
-  display: flex;
-  gap: 8px;
-}
-
-.menuInput {
-  flex: 1;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1.4px solid #5C4738;
-  background: #2A2320;
-  color: #F5F0E8;
-  font-size: 12.5px;
-  font-family: var(--font-family);
-  padding: 0 10px;
-}
-.menuInput::placeholder { color: #8A7B6E; }
-.menuInput:focus { outline: none; border-color: #DC2626; }
-
-.menuAddBtn {
-  flex-shrink: 0;
-  padding: 0 14px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid #DC2626;
-  background: rgba(220,38,38,0.16);
-  color: #F87171;
-  font-size: 12.5px;
-  font-weight: 700;
-  font-family: var(--font-family);
-  cursor: pointer;
-}
-.menuAddBtn:hover:not(:disabled) { background: rgba(220,38,38,0.28); }
-.menuAddBtn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.menuList {
+/* ── 재미 요소: 오늘의 공포 지수 ───────── */
+.fearSection {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.menuEmpty {
-  font-size: 12px;
-  color: #8A7B6E;
-  font-family: var(--font-family);
+  gap: 10px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #1A1A1A 0%, #2A0F0F 100%);
+  border: 1.5px solid #DC2626;
   text-align: center;
-  padding: 10px 0;
 }
 
-.menuRow {
+.fearTitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #F87171;
+  font-family: var(--font-family);
+}
+
+.fearRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.03);
 }
 
-.menuRank {
+.fearEmoji {
   flex-shrink: 0;
-  font-size: 11px;
-  color: #8A7B6E;
-  font-family: var(--font-family);
-  width: 16px;
+  font-size: 26px;
 }
 
-.menuName {
+.fearBarTrack {
   flex: 1;
+  height: 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+.fearBarFill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #FACC15, #DC2626);
+  transition: width 0.4s ease;
+}
+
+.fearPercent {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #F5F0E8;
+  font-family: var(--font-family);
+  min-width: 40px;
+  text-align: right;
+}
+
+.fearText {
   font-size: 13px;
   font-weight: 700;
   color: #F5F0E8;
   font-family: var(--font-family);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-
-.voteBtn {
-  flex-shrink: 0;
-  padding: 4px 12px;
-  border-radius: 100px;
-  border: 1.4px solid #5C4738;
-  background: transparent;
-  color: #B8A99A;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: var(--font-family);
-  cursor: pointer;
-  transition: background 0.13s, border-color 0.13s, color 0.13s;
-}
-
-.voteBtn:hover:not(:disabled) { border-color: #DC2626; }
-
-.voteBtnActive {
-  border-color: #DC2626;
-  background: rgba(220,38,38,0.2);
-  color: #F87171;
-}
-
-.voteBtn:disabled { opacity: 0.5; cursor: not-allowed; }
